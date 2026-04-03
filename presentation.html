@@ -668,9 +668,10 @@
         return row[0] + ": " + row[1];
       }).join("\n");
       var fixesText = item.notes.join("\n");
-      var rawText = item.raw || fixesText;
+      var hasRaw = !!item.raw && item.raw.trim() && item.raw.trim() !== fixesText.trim();
+      var rawText = hasRaw ? item.raw : "";
 
-      var commandSource = requirementsText + "\n" + rawText;
+      var commandSource = requirementsText + "\n" + fixesText + (hasRaw ? ("\n" + rawText) : "");
       var commands = unique((commandSource.match(/\*[a-z0-9_]+/gi) || []));
       var commandButtons = commands.length
         ? commands.map(function (cmd) {
@@ -685,16 +686,23 @@
         }).join("") + "</ul>";
       }
 
+      var rawButton = hasRaw
+        ? "<button type=\"button\" class=\"copy-btn\" id=\"copyRaw\">Copy Raw Slide Text</button>"
+        : "";
+      var rawSection = hasRaw
+        ? "<h4>Original Slide Text</h4><pre class=\"raw-block\">" + rawText.replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</pre>"
+        : "";
+
       cardEl.innerHTML = "<h3>" + item.name + "</h3>"
         + "<div class=\"copy-row\">"
         + "<button type=\"button\" class=\"copy-btn\" id=\"copyReq\">Copy Requirements</button>"
         + "<button type=\"button\" class=\"copy-btn\" id=\"copyFix\">Copy Fixes</button>"
         + "<button type=\"button\" class=\"copy-btn\" id=\"copyCmd\">Copy Commands</button>"
-        + "<button type=\"button\" class=\"copy-btn\" id=\"copyRaw\">Copy Raw Slide Text</button>"
+        + rawButton
         + "</div>"
         + "<div class=\"spec-table\">" + specRows + "</div>"
         + "<h4>Important Fixes / Notes</h4><ul>" + noteRows + "</ul>"
-        + "<h4>Original Slide Text</h4><pre class=\"raw-block\">" + rawText.replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</pre>"
+        + rawSection
         + "<h4>Commands</h4><div class=\"cmd-row\">" + commandButtons + "</div>"
         + linkRows;
 
@@ -712,9 +720,11 @@
       copyCmdBtn.addEventListener("click", function () {
         copyText(commands.join("\n"), "Commands");
       });
-      copyRawBtn.addEventListener("click", function () {
-        copyText(rawText, "Raw slide text");
-      });
+      if (copyRawBtn) {
+        copyRawBtn.addEventListener("click", function () {
+          copyText(rawText, "Raw slide text");
+        });
+      }
 
       Array.prototype.slice.call(cardEl.querySelectorAll(".cmd-chip")).forEach(function (btn) {
         btn.addEventListener("click", function () {
