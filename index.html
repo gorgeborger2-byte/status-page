@@ -25,11 +25,8 @@
 
   <main class="container">
     <section class="panel" aria-live="polite">
-      <div class="panel-head">
-        <h2>Live Queue</h2>
-        <button id="refreshBtn" type="button">Refresh</button>
-      </div>
-      <p id="statusLine" class="status-line">Loading status feed...</p>
+      <h2>Live Queue</h2>
+      <p id="statusLine" class="status-line"></p>
       <div id="cards" class="cards"></div>
     </section>
   </main>
@@ -45,12 +42,53 @@ const sourceTimeEl = document.getElementById("sourceTime");
 const fetchedTimeEl = document.getElementById("fetchedTime");
 const refreshBtn = document.getElementById("refreshBtn");
 
-function formatDateTime(value) {
-  if (!value) return "--";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleString();
-}
+const defaultData = {
+  lastUpdated: "April 3, 2026 - 9:59 PM",
+  fetchedAt: "2026-04-03T20:00:08.083Z",
+  items: [
+    {brand: "AstroZoom", game: "Arena Breakout", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "AstroZoom", game: "Call of Duty", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "AstroZoom", game: "Delta Force", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "AstroZoom", game: "FragPunk", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "AstroZoom", game: "Rust", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "Forge", game: "Apex-Full", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "Forge", game: "Apex-Lite", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "Forge", game: "BF6", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "Forge", game: "EFT-Full", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "Forge", game: "EFT-Lite", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "Forge", game: "Fortnite", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "Forge", game: "Rust", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "Hero", game: "Apex Legends", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "Hero", game: "Delta Force", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "Hero", game: "EFT Full", status: "Updating", updated: "Apr 3, 2026 9:59 PM"},
+    {brand: "Hero", game: "Rainbow Six Siege: Full", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "Hero", game: "Rainbow Six Siege: Lite", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "Hero", game: "Rust", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "Kane", game: "Active Matter", status: "Updating", updated: "Feb 15, 2026 8:15 PM"},
+    {brand: "Kane", game: "Dark and Darker", status: "Updating", updated: "Mar 20, 2026 11:47 AM"},
+    {brand: "Kane", game: "Gray Zone Warfare", status: "Updating", updated: "Jan 20, 2026 8:12 PM"},
+    {brand: "Kane", game: "Spoofer", status: "Testing", updated: "Feb 12, 2026 9:52 AM"},
+    {brand: "Kane", game: "THE FINALS", status: "Updating", updated: "Mar 27, 2026 8:16 AM"},
+    {brand: "Kane", game: "WarThunder", status: "Updating", updated: "Apr 1, 2026 1:30 PM"},
+    {brand: "Liquid", game: "Apex", status: "Testing", updated: "Apr 3, 2026 7:06 PM"},
+    {brand: "Liquid", game: "Arena Breakout", status: "Updating", updated: "Dec 24, 2025 3:00 AM"},
+    {brand: "Liquid", game: "Delta Force", status: "Updating", updated: "Feb 12, 2026 11:55 AM"},
+    {brand: "Liquid", game: "EFT", status: "Updating", updated: "Apr 3, 2026 6:30 PM"},
+    {brand: "Liquid", game: "EFT Chams", status: "Updating", updated: "Apr 3, 2026 6:30 PM"},
+    {brand: "Liquid", game: "Hunt: Showdown", status: "Updating", updated: "Mar 18, 2026 2:04 PM"},
+    {brand: "Liquid", game: "Marvel Rivals", status: "Updating", updated: "Dec 24, 2025 3:00 AM"},
+    {brand: "Pulse", game: "ARC Raiders", status: "Updating", updated: "Apr 3, 2026 9:58 PM"},
+    {brand: "Pulse", game: "CS2", status: "Updating", updated: "Apr 3, 2026 9:58 PM"},
+    {brand: "Vex", game: "EAC Spoofer", status: "Updating", updated: "Apr 3, 2026 9:59 PM"},
+    {brand: "Viper", game: "Arena Breakout Infinite", status: "Updating", updated: "Apr 3, 2026 9:58 PM"},
+    {brand: "Viper", game: "ARK Survival Ascended", status: "Updating", updated: "Apr 3, 2026 9:58 PM"},
+    {brand: "Viper", game: "Battlefield 6", status: "Updating", updated: "Apr 3, 2026 9:58 PM"},
+    {brand: "Viper", game: "Beasts of Bermuda", status: "Updating", updated: "Apr 3, 2026 9:58 PM"},
+    {brand: "Viper", game: "Dune Awakening", status: "Updating", updated: "Feb 3, 2026 10:58 PM"},
+    {brand: "Viper", game: "Escape From Tarkov", status: "Updating", updated: "Apr 3, 2026 9:58 PM"},
+    {brand: "Viper", game: "Marathon", status: "Updating", updated: "Apr 3, 2026 9:58 PM"}
+  ]
+};
 
 function renderItems(items) {
   if (!items.length) {
@@ -65,24 +103,26 @@ function renderItems(items) {
   statusLineEl.textContent = items.length + " products currently active (Updating/Testing).";
 }
 
-async function loadStatus() {
-  refreshBtn.disabled = true;
-  statusLineEl.textContent = "Refreshing...";
-  try {
-    const resp = await fetch('data/status.json');
-    const data = await resp.json();
+function formatDateTime(value) {
+  if (!value) return "--";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleString();
+}
+
+function loadStatus() {
+  fetch('data/status.json').then(r => r.json()).then(data => {
     renderItems(data.items || []);
     sourceTimeEl.textContent = 'Source last updated: ' + (data.lastUpdated || "--");
     fetchedTimeEl.textContent = 'Synced: ' + formatDateTime(data.fetchedAt);
-  } catch(e) {
-    statusLineEl.textContent = "Error loading feed.";
-  }
-  refreshBtn.disabled = false;
+  }).catch(() => {
+    renderItems(defaultData.items);
+    sourceTimeEl.textContent = 'Source last updated: ' + defaultData.lastUpdated;
+    fetchedTimeEl.textContent = 'Synced: ' + formatDateTime(defaultData.fetchedAt);
+  });
 }
 
-refreshBtn.onclick = loadStatus;
 loadStatus();
-setInterval(loadStatus, 30000);
   </script>
 </body>
 </html>
