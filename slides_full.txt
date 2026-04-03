@@ -1,0 +1,459 @@
+Support Guide Overview Windows Versions • Products • Setup Procedures • Error Fixes
+
+https://support.cosmotickets.com/^-^ All bot commands ^-^https://support.cosmotickets.com/status/password: support                           
+
+Overview of slides:
+Cosmo NaxoCosmo ProAtlasForge
+Astrozoom
+Supreme
+KaneLiquidProAimCobraAthenaKraken (Games)Kraken SpooferInfernoPulseHero ValorantHero Delta ForceHero FN,Rust,Apex,ABI,ARCVOLTVEXCrownOpalOpal except FiveMViperBreezeVortex
+Extra Fixes Kane:T.O.S. Refunds / Compensation / HWID Reset
+
+
+Cosmo (Naxo)
+TPM:                         (N/A)
+Secure Boot:             DISABLED
+Virtualization:            DISABLED
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    DISABLED
+Supported windows versions:Apex, EFT, Rust (ALL)
+DayZ (25h2 & 24h2 not supported)
+
+Other requirements:UEFI BiosVisuals installed (*visual)Core Isolation offFastboot disabled in BIOS & Windows
+Fixable errors:
+Hyper V error: Use the *cosmohyperv command.Fastboot/Hiberboot: (copy paste to customer down below)* *Open cmd as admin type:* 
+`reg add "HKLM\System\CurrentControlSet\Control\Session Manager\Power" /v "HiberbootEnabled" /t REG_DWORD /d "1" /f`
+* *Then type* `powercfg -h on`
+* Then go into Control Panel
+  * *Control Panel > Hardware and Sound > Change What Power Buttons Do* > **Turn Off Fast Start Up**
+Mapping driver failed:Add this file to: "C:\Windows\System32\drivers" then restart pc.https://mega.nz/file/TB1A0bbZ#oLP83kATOQzucyzfaHrtAE4-JD5-U3OblZ1VnzXVwDY
+Driver does not seem to be running contact support:Computer\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management and remove LargePageDriversAfter check c/windows/sys32/drivers and delete PMAD again.Can’t fix the issue? @Senior Support, they will inform Naxo if needed.Use the *naxoticket command, this will add Naxo to the ticket.
+
+Cosmo Pro
+TPM:                         (N/A)
+Secure Boot:             DISABLED
+Virtualization:            ENABLED
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    DISABLED
+Supported windows versions:Supports ALL windows except 25h2(Warthunder & Apex)
+Other requirements:UEFI BiosVisuals installed (*visual)Core Isolation offFastboot disabled in BIOS & Windows 
+Fixable errors:
+Hyper V error: Use the *cosmohyperv command.Warthunder stuck at 15%: Copy file path of warthunder and paste in loader.
+If the website opens but the error persists, try installing Python manually:
+Download python.zip from our website: http://warchill.xyz/python.zip,
+Go to the temp folder (C:\Users\USERNAME\AppData\Local\Temp) and create a python folder there,
+Unzip the python.zip archive into the temp/python folder,
+Run the loader from the admin again
+
+
+Atlas
+TPM:                         (N/A) (ENABLED for COD)
+Secure Boot:             DISABLED (except COD)
+Virtualization:            DISABLED
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    ENABLED (DEFAULT)
+Supported windows versions:Supports ALL windows versions.
+Other requirements:UEFI BiosVisuals installed (*visual)Core Isolation off
+Fixable errors:
+Meltdown protection/spectre protection:https://www.guru3d.com/download/download-inspectre/ download this, once downloaded disable meltdown protection and spectre protection in it. then go to go to C:/ find RSCFG folder and delete temp. restart pc and try againBlue screens: Disable build in spooferFailed to load driver: Open CMD as admin run sfc /scannow also check core isolation to be disabled. Fatal Error - Engine Error:Open rivatuner and set detection level as ‘none’PUBG Blackscreen:C:\x86)\Steam\steamapps\common\PUBG\TslGame\Content\Movies delete Movies folder. 
+
+Forge
+TPM:                         (N/A) 
+Secure Boot:             DISABLED 
+Virtualization:            DISABLED
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    DISABLED
+Supported windows versions:Supports ALL windows versions.
+Other requirements:UEFI BiosVisuals installed (*visual)Core Isolation off
+Fixable errors:
+BSOD: sfc /scannowDISM.exe /Online /Cleanup-image /Restorehealth
+Loader Closes at 100%:
+Sync PC timebedaisy.sys / easyanticheat.sys Error Fix:Run Loader before launching the game.I2 Error Fix:Check all anti-virus/anti-cheats again, also ensure core isolation is disabled. Visuals are installed and the loader must be run as admin. 
+
+
+
+Astrozoom
+TPM:                         (N/A)           (enabled for cod)
+Secure Boot:             DISABLED (enabled for cod)
+Virtualization:            DISABLED
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    DISABLED
+Supported windows versions:Windows 10 22h2 - Windows 11 23h2.Only COD supports 24h2 and 25h2.
+ 
+Other requirements:UEFI BiosVisuals installed (*visual)Core Isolation off
+Fixable errors:
+Loading mem_ctx:Ensure that all Anti-Cheats and Anti-Virus software are uninstalled, including programs like: FaceIT, Vanguard, Anti-Cheat Expert and Kaspersky, McAfee, Malwarebytes.Context Error: #13 / Error 0x2:Unsupported windows version.Ntherr / Nreq Error:Check if customer is not on a Virtual Machine/Desktop.Connection errors timeout reached/couldn’t resolve hostname:Use a VPN like Warp/Tunnelbear. R0: press f2 after 5 seconds when character in fortnite main menu loaded
+
+
+
+
+
+Supreme
+TPM:                         (N/A)
+Secure Boot:             DISABLED
+Virtualization:            (N/A)
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    ENABLED (Default)
+Supported windows versions:Supports ALL windows versions.
+Other requirements:UEFI BiosVisuals installed (*visual)Core Isolation off
+Fixable errors:
+Invalid Processed Data 0x0:Use a VPN to fix, it’s caused by ISP blocking the connection.Error #3B000000:Turn off Core Isolation and run this command in CMD as admin:bcdedit /set hypervisorlaunchtype offError Code 0x1/0x2:Uninstall any Anti-Cheat and restart your PC.
+
+Error Code 0x3/0x7: Spoofed before inject, restart PC then inject first.
+
+
+Kane
+TPM:                         (N/A)
+Secure Boot:             DISABLED
+Virtualization:            ENABLED
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    ENABLED (Default)
+Supported windows versions:Supports ALL windows version.
+Other requirements:UEFI BiosVisuals installed (*visual)Core Isolation offNvidia/AMD overlay.Steelseries for the following games: Rust, Apex, Dark and Darker, The Midnight Walkersand PUBG
+Fixable errors:
+“Please download and install the latest vc_redist libs.”:Use command: *kaneamdmenufixSVM/VMX Error:Disable windows pin. (*pin command) after follow *iobit command.https://www.youtube.com/watch?v=L-55o0UnHFUNo menu:Update all drivers for GPU, Windows and make all visuals are installed. Disable all other overlays.  Also don’t run steam or the game itself as admin!Failed to Map Memory Error:Check if user has more than 8GB of RAM. If they do, disable all startup apps in Task Manager.Extra fixes all the way in back in Extra Fixes Kane:
+
+
+Liquid
+TPM:                         (N/A)
+Secure Boot:             DISABLED
+Virtualization:            ENABLED
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    ENABLED (Default)
+Supported windows versions:Supports ALL windows version.
+Other requirements:UEFI BiosVisuals installed (*visual)Core Isolation offEFT CHAMS PRESS F1 IN MAIN MENU TO INJECT.ARC Raiders - Steam only
+Fixable errors:
+Steelseries:You need to use Steelseries.com/gg: GENERAL > General section, turn on Sonar, then go to the SONAR > Shortcuts tab, put the "F7" key on the Master - Volume Up, you need to press this bind before injection.
+SVM/VMX Error:Disable windows pin. (*pin command) after follow *iobit commandNo menu:Update all drivers for GPU, Windows and make all visuals are installed. Disable all other overlays.  Also don’t run steam or the game itself as admin!Failed to Map Memory Error:Check if user has more than 8GB of RAM. If they do, disable all startup apps in Task Manager.
+
+dxdiag
+
+ProAim
+TPM:                         (N/A)
+Secure Boot:             DISABLED
+Virtualization:            ENABLED
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    DISABLED
+Supported windows versions:Supports ALL windows versions.
+Other requirements:UEFI BiosVisuals installed (*visual)Core Isolation offFor AMD ensure NX Mode in bios is enabled (when getting hypervisor error after applying the fix).
+Fixable errors:
+No menu / BSOD:Send them new loader from: https://t.me/fecloadersIf still BSOD with latest loader, send them *delay command.Have them add this file to the loader, and run the file.────୨ৎ────────୨ৎ────────୨ৎ────────୨ৎ────────୨ৎ────────୨ৎ─── Still BSOD?           Go to C:\Windows\Minidump 	                                           Find the latest created file.                                            Copy the latest created file on the desktop. 	                                           Send us the file from the desktop.                                          And send **latest** file! Then please wait! ────୨ৎ────────୨ৎ────────୨ৎ────────୨ৎ────────୨ৎ────────୨ৎ───Hyper-V Not Launched Error:Open CMD as admin and enter the following commands in this order:
+sfc /scannow
+dism /online /cleanup-image /restorehealth
+bcdedit /set hypervisorlaunchtype autoWarthunder: must be run in DX12
+
+
+
+Cobra
+TPM:                         (N/A)
+Secure Boot:             DISABLED
+Virtualization:            DISABLED
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    DISABLED
+Supported windows versions:Supports ALL windows versions.
+Other requirements:UEFI BiosVisuals installed (*visual)Core Isolation off
+Fixable errors:
+Mapping driver failed:Disable all anti-cheats & anti-virus. Feel free to use *defendercontrol to make sure all is disabled.Loader connection issues:Use PROTON VPN.Crashing / BSOD:Make sure they selected the download with no-spoofer. EAC spoofer is not working. If they want to use the BE spoofer, have them disable TPM.Overlay:Disable all overlays! Discord, Steam, Medal, Nvidia / AMD etc. 
+
+Athena
+TPM:                         (N/A)
+Secure Boot:             DISABLED
+Virtualization:            DISABLED
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    DISABLED
+Supported windows versions:Supports ALL windows versions except:Marvel, PUBG, OW2 and Naraka 22h2 w10 only.
+Other requirements:UEFI BiosVisuals installed (*visual)Core Isolation off
+Fixable errors:
+ARC: is steam only, and DX12 must be used.Error code 2145/2146: Tell a Senior to contact developer, the uploaded file was corrupted during upload.Crashing loader:Paste this code into cmd as an administrator, then restart your computer. Change the “aaaaa14” part here as you wish, but all letters must be lowercase.
+aaaaa14
+wmic computersystem where name="%computername%" call rename name="aaaaa14"
+
+
+Kraken (Games)
+TPM:                         (N/A)
+Secure Boot:             (N/A)
+Virtualization:            (N/A)
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    DISABLED
+Supported windows versions:Supports ALL windows versions.DayZ 25h2 & 24h2 not supported.
+Other requirements:UEFI BiosVisuals installed (*visual)Core Isolation off
+Fixable errors:
+Nvidia overlay & Overwolf for AMD users.Roblox:Download the game from https://www.fishstrap.app where it prevents downloading any silent beta updates every few hours which breaks the product.
+
+Kraken Spoofer
+TPM:                         (N/A)
+Secure Boot:             (N/A)
+Virtualization:            ENABLED
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    DISABLED
+Supported windows versions:Supports ALL windows versions.
+Other requirements:UEFI BiosVisuals installed (*visual)Core Isolation off*defendercontrol
+Fixable errors:
+No Hardware Virtualization Capabilities Found.
+Hardware Virtualization is currently disabled. Please enable virtualization in your BIOS/UEFI (VTx/VTd Intel / SVM AMD).
+Hyper-V is enabled.
+This issue happens when Windows Hyper-V is running. Head to "Turn Windows Features On or Off" and disable it.
+Loader stuck at 11%
+In powershell as admin: Get-Volume | Where-Object DriveLetter | ForEach-Object { $drive = $_.DriveLetter; Write-Host "Running chkdsk on drive $drive..."; chkdsk "$drive`:" /F }Restart PC with all anticheats and antivirus disabled. 
+
+Inferno
+TPM:                         (N/A)
+Secure Boot:             (N/A)
+Virtualization:            (N/A)
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    DISABLED
+Supported windows versions:Supports ALL windows versions.
+Other requirements:UEFI BiosVisuals installed (*visual)Core Isolation off
+Fixable errors:
+Driver initialization Error 1:You need to download this file https://mega.nz/file/uURS0ZgL#gn9i_rBW__80V9uzexA_Cr2vPUPNGQK2aif4qtevXHs . Run the file and restart your PC, then try to run the cheat again. You also need to disable core isolation and Vulnerable Driver Blocking in Windows Defender; And if that didn't help, then click "Get Support" in the loader, select "Driver Error," and restart PCAny errors that you have fixed, dm Joker on discord for it to be added to the slides.
+
+Pulse
+TPM:                         (N/A)
+Secure Boot:             DISABLED
+Virtualization:            DISABLED
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    DISABLED
+Supported windows versions:Supports ALL windows versions.
+Other requirements:UEFI BiosVisuals installed (*visual)Core Isolation off
+Fixable errors:
+Injection failed (0x1394) (ARC Raiders)Close chrome and try with another browser, opera recommended
+If still not working try this: 1)https://download.overwolf.com/install/Download?utm_content=new-light&utm_source=web_app_store 2) Go to task manager> startup apps and disable EVERYTHING. Restart PC after.3) Make sure all game launchers are completely closed>EA/STEAM/BNET.4) Open overwolf and disable all its overlays. Once done, minimize it to icon tray. 5) Open loader as admin and inject the cheat, wait for success message (HANDLE SUCCESSFULLY SENT) 6) Once done, open steam and launch game
+Loader not opening:Don’t have the checker / support tool open with the loader.
+
+Hero Valorant
+TPM:                         ENABLED
+Secure Boot:             ENABLED
+Virtualization:            ENABLED
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    DEFAULT
+Supported windows versions:Supports ALL windows versions.
+Other requirements:UEFI Bios*visual*defendercontrol*coreisovalMedal.TV overlayGPU Drivers up to dateHYPER V ON(IN WINDOWS FEATURES)
+Fixable errors:
+No menu:Install Medal.TV and make sure record with medal is on.Please make sure that Valorant Launcher is not open during inject.Still no menu?Download this: https://gofile.io/d/sOW8lX and have them run it as admin. It will create a file named bundle.enc, have them send it in the ticket and @ Seniors to forward to the developer.
+Secure Boot policy fix:
+Go to BIOS -> Secure Boot -> Key Management -> Forbidden Signatures(dbx) -> Delete, then press No and delete signatures that you have there (it should be 2-5 signatures) Make sure secure boot mode: Custom
+Don't press DELETE ALL SIGNATURES or DELETE ALL
+You should delete 1 by 1.
+
+
+Hero OW2
+TPM:                         N/A
+Secure Boot:             N/A
+Virtualization:            N/A
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    DISABLED
+Supported windows versions:Supports ALL windows versions.
+Other requirements:UEFI Bios*visual*defendercontrolCore Isolation disabledReputation based protection tooExploit too.GPU Drivers up to date.Run loader as admin.DISABLE ALL OVERLAYSPut DX11 in overwatch 2.
+Fixable errors:
+Latest loader: https://mega.nz/folder/VUdnFYCC#Y3MUZeXJl_vkQt5hjvgvXwFix to External Overlay error: 1. Disable Discord overlay (Settings → Game Activity → Overlay toggle)
+2. Close OBS / switch from Game Capture to Window Capture
+3. Disable GeForce Experience overlay (Alt+Z → Settings → In-Game Overlay → Off)
+4. Disable Xbox Game Bar (Windows Settings → Gaming → Xbox Game Bar → Off)
+Graphic game crash: Sent the following 2 screenshots:Graphics: https://imgur.com/a/Jf9L64COverlay crash:  https://imgur.com/a/ixjO37iAimbot or ESP not working: Select the default preset in the menu for aimbot & for esp: Reload the cheat within the menu. 
+
+Hero Delta Force
+TPM:                         (N/A)
+Secure Boot:             ENABLED
+Virtualization:            ENABLED
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    DISABLED
+Supported windows versions:Supports ALL windows versions.
+Other requirements:UEFI BiosVisuals installed (*visual)Core Isolation off*defendercontrolSteam only
+DX12 only
+Fixable errors:
+Before injecting ensure that:In Delta Force the display is set to WF/Borderless.Super resolution/upscaling OFFLoader crashes after key verification:Install the latest Microsoft Visual C++ Redistributable packages (both x86 and x64):
+→ https://aka.ms/vs/17/release/vc_redist.x64.exe
+→ https://aka.ms/vs/17/release/vc_redist.x86.exeRandom Crashes / Freezes:Put lowest graphics, set a stable FPS cap, Disable Super Resolution / DLSS / FSR.No menu:Download this: https://gofile.io/d/sOW8lX and have them run it as admin. It will create a file named bundle.enc, have them send it in the ticket and @ Seniors to forward to the developer.
+
+Hero FN,Rust,Apex,ABI,ARC
+TPM:                         (N/A)
+Secure Boot:             (N/A)
+Virtualization:            (N/A)
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    DEFAULT
+Supported windows versions:Supports ALL windows versions.
+Other requirements:UEFI BiosVisuals installed (*visual)Core Isolation offALL NEED MEDAL.TVHyper V enabled for: ARC Raiders, Valorant, Fortnite and Apex
+Fixable errors:
+BSOD for Apex: https://go.microsoft.com/fwlink/?linkid=2335869Ensure file path is: C:\Program Files (x86)\Windows Kits\10\Also make sure to always generate new build.Still no menu or errors?Download this: https://gofile.io/d/sOW8lX and have them run it as admin. It will create a file named bundle.enc, have them send it in the ticket and @ Seniors to forward to the developer.Arena Breakout ENC:ONTo many reports, change account. It will go away after 12-24hours.
+Rust & FN requirement:https://go.microsoft.com/fwlink/?linkid=2335869
+
+VOLT
+TPM:                         DISABLED
+Secure Boot:             DISABLED
+Virtualization:            ENABLED
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    DISABLED
+Supported windows versions:Supports ALL windows versions.
+Other requirements:UEFI BiosVisuals installed (*visual)Core Isolation off*pin removed for TPMHVIX & HVAX in system32(usually only removed if user used Kane before). 
+Fixable errors:
+Framework error:https://builds.dotnet.microsoft.com/dotnet/Runtime/7.0.5/dotnet-runtime-7.0.5-win-x64.exehttps://builds.dotnet.microsoft.com/dotnet/Runtime/7.0.5/dotnet-runtime-7.0.5-win-x86.exeNo ESP DayZ & EFT: DayZ: settings > video > Disable: “POSTPROCESS ANTIALIASING” & “HARDWARE ANTIALIASING”EFT: Settings > game > find the option “Autoclean RAM” disable it. Keybinds for Rust Lite: F5 for ESP, F6 for no recoil and F9 for remove walls.Legacy BIOS/ Boot part not GPT: https://youtu.be/a54sqzcDrUU?si=Lj2PE-bUK2bLBMEg
+Errors that require reinstall windows:Error 1,3,4,5,6,7 (all related to boot partitions)
+HVIX/HVAX not found:Run sfc /scannow in CMD as admin.
+
+VEX
+TPM:                         (N/A)
+Secure Boot:             DISABLED
+Virtualization:            DISABLED
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    DISABLED
+Supported windows versions:Windows 10 22H2 > Windows 11 23H2.
+Other requirements:UEFI BiosVisuals installed (*visual)Core Isolation off*defendercontrol
+Fixable errors:
+VEX Warthunder: Must be run in DX11. Add -D3D11 to launch parameters.Connection issue?https://pcheck.ru/files/networkmanager.zip⏺ Run it.
+⏺ Select the "Find the Best IP" option.
+⏺ Wait for the check to complete.
+⏺ Click "Apply".
+
+Crown
+TPM:                         DISABLED (except COD)
+Secure Boot:             DISABLED (except COD)
+Virtualization:            (N/A)
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    DISABLED
+Supported windows versions:Supports ALL windows versions.
+Other requirements:UEFI BiosVisuals installed (*visual)Core Isolation off*defendercontrol
+Fixable errors:
+Marvels: Run a notepad as admin before injecting cheat.Marvels 25h2 unstable.
+
+Opal
+TPM:                         (N/A)
+Secure Boot:             (N/A)
+Virtualization:            (N/A)
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    DISABLED
+Supported windows versions:Supports ALL windows versions.
+Other requirements:UEFI BiosVisuals installed (*visual)Core Isolation off*defendercontrolSteam overlay enabledFiveM version release
+Fixable errors:
+Injections issues:
+Error 1-4: Download/Timeout Error | Fix : Use a VPN
+Error 2 : Integrity Error | Fix : Reinstall FiveM
+Error 3 : Injection Error | Anti-cheats / Anti-virus blocking the injection.
+Cheat issues:
+Display Settings can’t  be Fullscreen Exclusive, it will cause crashes.
+Steam needs to be open with steam overlay enabled.
+How to inject
+Open FiveM with steam running on background (just need to be open) > open the loader and log in using the key > inject the cheat and done! Users can inject inside of a server too (Open game > Join server > Inject)
+
+Opal except FiveM
+TPM:                         (N/A)
+Secure Boot:             (N/A)
+Virtualization:            (N/A)
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    DISABLED
+Supported windows versions:Supports ALL windows versions.
+Other requirements:UEFI BiosVisuals installed (*visual)Core Isolation off*defendercontrol
+Fixable errors:
+Fatal error! Connection error:
+Open date and time settings, sync pc time.
+BSOD:Disable all anti-virus, you can use this:https://antivirus-removal-tool.com/
+If issue persists, uninstall any mouse/keyboard software. (Razer, Armory Crate)
+2 Beeps when pressing F2 and game crashes:
+Remove all modifications, including Reshade / Redux.Reinstall the game if the issue persists with Revo-Uninstaller. Status 502 [Internal server error]:Server is down, change the server with by doing this:Create shortcut on desktop of the loader, open properties > on the line of target: add at the end: –diagnostic Reopen the shortcut loader, select a different server and try again.
+
+Viper
+TPM:                         (N/A)
+Secure Boot:             (N/A)
+Virtualization:            (N/A)
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    Use Default
+Supported windows versions:Supports ALL windows versions.
+Other requirements:ALL ANTI-VIRUS OFFWindows Defender-Smartscreen-Core isolation-(Use *defendercontrol)Disable all overlays! (Discord,Nvidia,Overwolf,Reshade,RivaTuner)Must run steam as admin! Don’t use any launch parameters! (Right click the game > properties to check).Disable Frame Generation and Nvidia Reflex in games that support it. (Check game settings).
+Also don’t use any Nvidia filters.Product is STEAM ONLY. Except ARC RaidersClose background apps or disable in startup.Visuals installed (*visual)Windows up to date.GPU driver up to date.
+
+Fixable errors:
+Failed to stream please check connection.Use a VPN.Extra step The Isle Evrima:Delete %localappdata%\TheIsle\Saved FolderExtra step Arc Raiders:Delete %localappdata%\PioneerGame\Saved FolderTroubleshoot tool: https://cdn.discordapp.com/attachments/1459056826317537397/1460873272760602848/Troubleshoot.exe?ex=69730bc1&is=6971ba41&hm=aca0f0f4914edeef0648c3757789ef3a7bcb3af38c032e0a785ebda91364d1f2&Failed to Stream:Set DNS to Cloudflare.
+
+Breeze
+TPM:                         (N/A)
+Secure Boot:             (N/A)
+Virtualization:            (N/A)
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    DISABLED
+Supported windows versions:Supports ALL windows versions.
+Other requirements:Reputation based protection,Core Isolation and Exploit off.(Use *defendercontrol)ARK: STEAM/EPIC ONLYVisuals installed (*visual)GPU drivers up to date.
+
+Fixable errors:
+Overlay for ARK: Legacy overlay discord (Enable overlay off)Overlay for R6: Nvidia or AMD (Metrics Overlay)
+Loader not opening:Sync PC Time & Use Warp VPN.(Also check installed programs for anti-virus) W11 fix for spoofer:https://gofile.io/d/qVXmXCAll windows 11 users must run this to avoid BSOD’s. Just tell them to extract the file, run as admin and click yes to all.Restart PC and then obviously clean if needed cleaning, and spoof.For spoofer:ALSO DELETE LAST 2 WINDOWS SECURITY UPDATES!(Windows Update > Update History > Uninstall Updates)Look for Security updates and uninstall. 
+
+Vortex
+TPM:                         (N/A) ON for games that require it
+Secure Boot:             DISABLED
+Virtualization:            ENABLED
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    DISABLED
+Supported windows versions:Supports ALL windows versions.
+Other requirements:*visual for all visualsHyper-V enabled in win featuresBios UEFI & Disks GPTAll antivirus uninstalled(VGK, FaceIT, McAfee etc)Core isolation disabled
+
+Fixable errors:
+InitWindows Error!:Press F2 for injector only after you see discord overlay banner.ALSO DON’T BE IN A DISCORD CALL WHEN USING DISCORD OVERLAY!(Have legacy overlay disabled)LoadHyperVisor Error!: Hypervisor not loaded properly, follow this video: https://youtu.be/XYVeHy5u4j4Error! Craft UEFI: Try making a partition (GPT) in disk management and boot from there, if not working reinstall windows.Blackscreen Initialization:Disable TPM and re-check all setup for HyperVisor use. (YT Link)Bad Image Libs: Solution: Files from the folder with the loader libcrypto-1_1-x64.dll and libssl-1_1-x64.dll replace them in C:\Windows\System32 and C:\Windows\INF
+
+Vortex
+TPM:                         (N/A) ON for games that require it
+Secure Boot:             DISABLED
+Virtualization:            ENABLED
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    DISABLED
+Supported windows versions:Supports ALL windows versions.
+Other requirements:*visual for all visualsHyper-V enabled in win featuresBios UEFI & Disks GPTAll antivirus uninstalled(VGK, FaceIT, McAfee etc)Core isolation disabled
+
+Fixable errors:
+Secure boot bypass Valorant fix:https://gofile.io/d/JPNqIp1) WBCL.dat - drop in C:\Windows\System32 2) Run Start.exe as Admin 3) Run Secure Boot Fix.batUnsupported 16-Bit Application:Screenshot of disabled Windows Defender (Real-time Protection), third-party anti-virus systems should also be REMOVED from the PC.
+Disable the firewall completely
+Delete Bypassing YouTube/Discord may interfere with the launch of the loader
+Use VPN for launching
+
+
+Extra Fixes Kane:
+no available servers were found: use vpn
+crd failed at 199 with code 887a0001: try disabling integrated gpu, if that doesn't work or doesn't have any other gpu than integrated gpu then refund
+required resource not found: start cheat after spoofer
+failed to prepare environment(1): restart pc and try again
+error 0x298: contact dev
+failed to inject the cheat(12): try pressing ok and entering the game and see if it works
+
+Extra rare fixes
+Occlusion culling off in Experimental settings for COSMO RUST.
+
+T.O.S. Refunds / Compensation / HWID Reset
+
+
+ Refunds:When refunding please ask for key, order number, key length, and what game.
+Eligible refund reasons:Insta banned without being able to use the product. (Check if user wasn’t banned before or double injected)
+If user falls under these conditions then we can refund, if user doesn't fit then kindly explain why and what they did wrong and mention how to remove ban with spoofer and new account.Corrupted PC: When a user uses something and it wipes their pc, then we usually refund. Some developers have fixes though. (So no refund)Updating:If a product has been updating for a while, and people as for a refund please say to wait. If a insane amount of users make tickets about it and product been taking a long time without update, we might refund in some cases.
+Downgrading: We can refund some products if user does not wanna downgrade, but we rather have user downgrade.
+You can convince them to backup important files with something like onedrive or a USB. If user continues to want refund please @ a senior support - You can always ask a senior if you can refund. 
+Compensations:
+
+- We can comp users keys for most reasons, like:
+- losing time from troubleshooting, when a product was updating or not working.
+- We WON'T comp keys if they have been comped more than once already, we won’t comp little time like 1-2 hours.
+- Some devs take time to comp keys so please make sure you dont "Ghost" the user and reply to them that we are still waiting for developers.HWID Resets? Ask Senior Support or some support with reset access.

@@ -41,6 +41,15 @@
       <p class="status-line" id="positionLine"></p>
 
       <article class="guide-card single-guide-card" id="guideCard"></article>
+
+      <section class="full-slides">
+        <div class="full-slides-head">
+          <h4>Full Slide Text (1:1)</h4>
+          <button id="copySlidesTextBtn" type="button">Copy Full Slide Text</button>
+        </div>
+        <p class="status-line" id="fullTextSearchState"></p>
+        <pre id="fullSlidesText" class="raw-block full-text-block">Loading slide text...</pre>
+      </section>
     </section>
   </main>
 
@@ -613,8 +622,13 @@
     var prevBtn = document.getElementById("prevBtn");
     var nextBtn = document.getElementById("nextBtn");
     var copyAllDataBtn = document.getElementById("copyAllDataBtn");
+    var copySlidesTextBtn = document.getElementById("copySlidesTextBtn");
     var lineEl = document.getElementById("positionLine");
     var cardEl = document.getElementById("guideCard");
+    var fullSlidesTextEl = document.getElementById("fullSlidesText");
+    var fullTextSearchStateEl = document.getElementById("fullTextSearchState");
+    var fullSlidesText = "";
+    var fullSlidesTextNormalized = "";
 
     function copyText(text, label) {
       if (!text) return;
@@ -699,6 +713,46 @@
         }
       });
       return lower + " " + extra.join(" ");
+    }
+
+    function normalizeText(text) {
+      return text.toLowerCase().replace(/[^a-z0-9]+/g, " ");
+    }
+
+    function updateFullTextSearch(q, normalizedQuery) {
+      if (!fullSlidesText) {
+        fullTextSearchStateEl.textContent = "Slide text not loaded yet.";
+        return;
+      }
+      if (!q) {
+        fullTextSearchStateEl.textContent = "Showing full slide export text.";
+        return;
+      }
+
+      var plainIndex = fullSlidesText.toLowerCase().indexOf(q);
+      var normalizedIndex = normalizedQuery ? fullSlidesTextNormalized.indexOf(normalizedQuery) : -1;
+      var found = plainIndex !== -1 || normalizedIndex !== -1;
+      fullTextSearchStateEl.textContent = found ? "Search also found in full slide text." : "No full-text match for this search.";
+    }
+
+    function loadFullSlidesText() {
+      fetch("slides_full.txt?t=" + Date.now(), { cache: "no-store" })
+        .then(function (res) {
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          return res.text();
+        })
+        .then(function (txt) {
+          fullSlidesText = txt.replace(/\u000b/g, "\n").replace(/\r\n/g, "\n");
+          fullSlidesTextNormalized = normalizeText(withAliases(fullSlidesText));
+          fullSlidesTextEl.textContent = fullSlidesText;
+          fullTextSearchStateEl.textContent = "Showing full slide export text.";
+        })
+        .catch(function () {
+          fullSlidesText = "Could not load full slide text file.";
+          fullSlidesTextNormalized = normalizeText(fullSlidesText);
+          fullSlidesTextEl.textContent = fullSlidesText;
+          fullTextSearchStateEl.textContent = "Failed to load full slide text.";
+        });
     }
 
     function renderSelect() {
@@ -812,12 +866,13 @@
       filtered = products.filter(function (p) {
         var linkText = (p.links || []).map(function (l) { return l.join(" "); }).join(" ");
         var text = withAliases(p.name + " " + p.notes.join(" ") + " " + p.specs.map(function (s) { return s.join(" "); }).join(" ") + " " + linkText);
-        var normalizedText = text.replace(/[^a-z0-9]+/g, " ");
+        var normalizedText = normalizeText(text);
         return !q || text.indexOf(q) !== -1 || (normalizedQuery && normalizedText.indexOf(normalizedQuery) !== -1);
       });
       current = 0;
       renderSelect();
       renderCard();
+      updateFullTextSearch(q, normalizedQuery);
     }
 
     searchEl.addEventListener("input", applySearch);
@@ -842,8 +897,13 @@
       copyText(buildAllDataText(), "All data");
     });
 
+    copySlidesTextBtn.addEventListener("click", function () {
+      copyText(fullSlidesText || "", "Full slide text");
+    });
+
     renderSelect();
     renderCard();
+    loadFullSlidesText();
   })();
   </script>
 </body>

@@ -516,6 +516,41 @@ body.compact-page .footer {
   overflow: auto;
 }
 
+.full-slides {
+  margin-top: 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(10, 22, 42, 0.72);
+  padding: 0.7rem;
+}
+
+.full-slides-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.full-slides-head h4 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.full-slides-head button {
+  border: 1px solid var(--border);
+  background: #183257;
+  color: #e8f0ff;
+  border-radius: 8px;
+  padding: 0.3rem 0.55rem;
+  cursor: pointer;
+}
+
+.full-text-block {
+  margin-top: 0.45rem;
+  max-height: 260px;
+  overflow: auto;
+}
+
 .guide-card {
   border: 1px solid var(--border);
   border-radius: 12px;
