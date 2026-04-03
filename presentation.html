@@ -46,6 +46,66 @@
   (function () {
     var products = [
       {
+        name: "Global Links + Commands",
+        specs: [
+          ["Support Site", "support.cosmotickets.com"],
+          ["Status Site", "support.cosmotickets.com/status"],
+          ["Status Password", "support"],
+          ["Visual Package", "Use *visual command"],
+          ["Defender Utility", "Use *defendercontrol command"],
+          ["Core Isolation", "Keep disabled unless product requires otherwise"]
+        ],
+        notes: [
+          "This card is a quick launch card for links/commands used across all products.",
+          "For product-specific requirements, switch to that product card."
+        ],
+        links: [
+          ["Support Home", "https://support.cosmotickets.com/"],
+          ["Status Dashboard", "https://support.cosmotickets.com/status/"],
+          ["Source Slides", "https://docs.google.com/presentation/d/1xdaRaAgXz_y2i9zU1DKSWTr7QxGoVlIF_zEK7KBgjpo/edit"]
+        ]
+      },
+      {
+        name: "Cosmo Naxo",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "DISABLED"],
+          ["Virtualization", "DISABLED"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "Hyper-V errors: use *cosmohyperv.",
+          "Fastboot/Hiberboot: use registry + powercfg sequence from docs.",
+          "Mapping driver failed: place PMAD driver file in system32 drivers.",
+          "Driver not running: check LargePageDrivers and remove PMAD remnants.",
+          "Escalation command: *naxoticket."
+        ],
+        links: [
+          ["PMAD file", "https://mega.nz/file/TB1A0bbZ#oLP83kATOQzucyzfaHrtAE4-JD5-U3OblZ1VnzXVwDY"]
+        ]
+      },
+      {
+        name: "Cosmo Pro",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "DISABLED"],
+          ["Virtualization", "ENABLED"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "Supports all Windows except 25H2 for most products.",
+          "Warthunder stuck at 15 percent: validate path and run python bundle flow.",
+          "If website opens but loader error persists, install python manually into temp path."
+        ],
+        links: [
+          ["Python bundle", "http://warchill.xyz/python.zip"]
+        ]
+      },
+      {
         name: "AstroZoom",
         specs: [
           ["TPM", "(N/A) - ENABLED for COD"],
@@ -56,9 +116,11 @@
           ["Exploit Protection", "DISABLED"]
         ],
         notes: [
-          "Windows 10 22H2 to Windows 11 23H2 (COD supports newer builds).",
-          "Connection timeout/hostname issues: use VPN.",
-          "Error #13 / 0x2: unsupported Windows version."
+          "Windows 10 22H2 to 11 23H2; COD supports 24H2/25H2.",
+          "Loading mem_ctx: remove anti-cheats and antivirus fully.",
+          "Error #13 / 0x2: unsupported Windows version.",
+          "Timeout/hostname: use VPN (Warp/Tunnelbear).",
+          "Fortnite R0 flow: press F2 after character loads."
         ]
       },
       {
@@ -72,9 +134,13 @@
           ["Exploit Protection", "ENABLED (Default)"]
         ],
         notes: [
-          "Use Inspectre to disable Meltdown/Spectre when needed.",
-          "Failed driver load: run sfc /scannow.",
-          "Disable overlays for engine/fatal crashes."
+          "Meltdown/Spectre issues: disable with Inspectre.",
+          "Blue screen: disable built-in spoofer.",
+          "Failed load driver: run sfc /scannow and check core isolation.",
+          "PUBG blackscreen: remove PUBG movies folder."
+        ],
+        links: [
+          ["Inspectre", "https://www.guru3d.com/download/download-inspectre/"]
         ]
       },
       {
@@ -89,7 +155,26 @@
         ],
         notes: [
           "BSOD flow: sfc /scannow then DISM /Online /Cleanup-image /Restorehealth.",
-          "Loader closes at 100%: sync PC time and run as admin."
+          "Loader closes at 100 percent: sync PC time.",
+          "bedaisy/easyanticheat errors: run loader before game.",
+          "I2 errors: verify anti-cheat/AV removal + run loader as admin."
+        ]
+      },
+      {
+        name: "Supreme",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "DISABLED"],
+          ["Virtualization", "(N/A)"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "ENABLED (Default)"]
+        ],
+        notes: [
+          "0x0 invalid processed data: use VPN.",
+          "3B000000: run bcdedit /set hypervisorlaunchtype off.",
+          "0x1/0x2: uninstall anti-cheat and restart.",
+          "0x3/0x7: reboot and inject before spoofing."
         ]
       },
       {
@@ -103,9 +188,14 @@
           ["Exploit Protection", "ENABLED (Default)"]
         ],
         notes: [
-          "Use *kaneamdmenufix for vc_redist/libs errors.",
-          "No available servers: use VPN.",
-          "Error 0x298: contact dev."
+          "vc_redist libs error: *kaneamdmenufix.",
+          "SVM/VMX: disable Windows pin then run *iobit flow.",
+          "No menu: update drivers and disable overlays.",
+          "Failed map memory: check RAM and disable startup apps.",
+          "Extra fixes include no server VPN and error 0x298 escalate."
+        ],
+        links: [
+          ["Kane video", "https://www.youtube.com/watch?v=L-55o0UnHFU"]
         ]
       },
       {
@@ -119,8 +209,118 @@
           ["Exploit Protection", "ENABLED (Default)"]
         ],
         notes: [
-          "EFT Chams: press F1 in main menu to inject.",
-          "Use Steelseries GG sonar shortcut flow where required."
+          "EFT Chams: press F1 in main menu.",
+          "ARC Raiders: Steam only.",
+          "Steelseries GG sonar shortcut requirement applies to specific products.",
+          "No menu/SVM issues follow Kane-style troubleshooting stack."
+        ],
+        links: [
+          ["Steelseries GG", "https://steelseries.com/gg"]
+        ]
+      },
+      {
+        name: "ProAim",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "DISABLED"],
+          ["Virtualization", "ENABLED"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "No menu/BSOD: use latest loader; then apply delay command if needed.",
+          "If BSOD persists, collect latest C:\\Windows\\Minidump file.",
+          "Hyper-V not launched: run sfc, dism, and bcdedit hypervisor auto.",
+          "Warthunder requires DX12."
+        ],
+        links: [
+          ["Loader channel", "https://t.me/fecloaders"]
+        ]
+      },
+      {
+        name: "Cobra",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "DISABLED"],
+          ["Virtualization", "DISABLED"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "Mapping driver failed: disable anti-cheats and antivirus.",
+          "Loader connection issue: use Proton VPN.",
+          "Crash/BSOD: use no-spoofer build when required.",
+          "Disable all overlays (Discord/Steam/NVIDIA/AMD/Medal)."
+        ]
+      },
+      {
+        name: "Athena",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "DISABLED"],
+          ["Virtualization", "DISABLED"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "ARC is Steam only and requires DX12.",
+          "Error 2145/2146: escalate as corrupted upload case.",
+          "Crashing loader: use machine rename command workaround from docs."
+        ]
+      },
+      {
+        name: "Kraken (Games)",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "(N/A)"],
+          ["Virtualization", "(N/A)"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "Use NVIDIA overlay or Overwolf for AMD where required.",
+          "Roblox: use Fishstrap to avoid silent beta breakages."
+        ],
+        links: [
+          ["Fishstrap", "https://www.fishstrap.app/"]
+        ]
+      },
+      {
+        name: "Kraken Spoofer",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "(N/A)"],
+          ["Virtualization", "ENABLED"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "Enable BIOS virtualization (VT-x/VT-d or SVM).",
+          "Disable Windows Hyper-V feature if active.",
+          "Loader stuck at 11 percent: run chkdsk on all drives and reboot."
+        ]
+      },
+      {
+        name: "Inferno",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "(N/A)"],
+          ["Virtualization", "(N/A)"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "Driver init error 1: run provided file, reboot, disable core isolation and vulnerable driver blocking.",
+          "If unresolved use loader Get Support -> Driver Error then reboot."
+        ],
+        links: [
+          ["Inferno fix file", "https://mega.nz/file/uURS0ZgL#gn9i_rBW__80V9uzexA_Cr2vPUPNGQK2aif4qtevXHs"]
         ]
       },
       {
@@ -134,8 +334,57 @@
           ["Exploit Protection", "DISABLED"]
         ],
         notes: [
-          "ARC inject issue: disable startup apps and overlays.",
-          "Inject first, then open launcher/game flow."
+          "Injection failed 0x1394 (ARC): close Chrome or switch browser.",
+          "Use Overwolf install + startup cleanup + inject-before-launch flow.",
+          "Loader not opening: do not keep checker/support tool open with loader."
+        ],
+        links: [
+          ["Overwolf", "https://download.overwolf.com/install/Download?utm_content=new-light&utm_source=web_app_store"]
+        ]
+      },
+      {
+        name: "Hero (Valorant / OW2 / Delta / Multi)",
+        specs: [
+          ["TPM", "MIXED by product"],
+          ["Secure Boot", "MIXED by product"],
+          ["Virtualization", "MIXED by product"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DEFAULT or DISABLED by product"]
+        ],
+        notes: [
+          "Valorant build needs Medal + Hyper-V and stricter requirements.",
+          "OW2: disable overlays, use DX11, use provided loader bundle when needed.",
+          "Delta Force: Steam only, DX12 only, VC redist required.",
+          "FN/Rust/Apex/ABI/ARC: Hyper-V needed for selected titles and specific anti-ban flow."
+        ],
+        links: [
+          ["Medal", "http://medal.tv"],
+          ["VC Redist x64", "https://aka.ms/vs/17/release/vc_redist.x64.exe"],
+          ["VC Redist x86", "https://aka.ms/vs/17/release/vc_redist.x86.exe"],
+          ["Bundle tool", "https://gofile.io/d/sOW8lX"]
+        ]
+      },
+      {
+        name: "VOLT",
+        specs: [
+          ["TPM", "DISABLED"],
+          ["Secure Boot", "DISABLED"],
+          ["Virtualization", "ENABLED"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "Framework error: install .NET runtime packages from docs links.",
+          "No ESP tips: DayZ AA settings off; EFT disable AutoClean RAM.",
+          "Legacy BIOS/MBR errors may require GPT conversion or reinstall.",
+          "HVIX/HVAX missing: run sfc /scannow."
+        ],
+        links: [
+          ["Runtime x64", "https://builds.dotnet.microsoft.com/dotnet/Runtime/7.0.5/dotnet-runtime-7.0.5-win-x64.exe"],
+          ["Runtime x86", "https://builds.dotnet.microsoft.com/dotnet/Runtime/7.0.5/dotnet-runtime-7.0.5-win-x86.exe"],
+          ["GPT conversion video", "https://youtu.be/a54sqzcDrUU?si=Lj2PE-bUK2bLBMEg"]
         ]
       },
       {
@@ -149,8 +398,62 @@
           ["Exploit Protection", "DISABLED"]
         ],
         notes: [
-          "Warthunder: must run DX11.",
-          "Connection issues: run network manager IP optimizer."
+          "Warthunder requires DX11 launch parameter.",
+          "Connection issues: run network manager best-IP flow."
+        ],
+        links: [
+          ["Network manager", "https://pcheck.ru/files/networkmanager.zip"]
+        ]
+      },
+      {
+        name: "Crown",
+        specs: [
+          ["TPM", "DISABLED (except COD)"],
+          ["Secure Boot", "DISABLED (except COD)"],
+          ["Virtualization", "(N/A)"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "Marvels: run notepad as admin before injection.",
+          "Marvels 25H2 is unstable per docs."
+        ]
+      },
+      {
+        name: "Opal (FiveM)",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "(N/A)"],
+          ["Virtualization", "(N/A)"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "Steam must be open with overlay enabled.",
+          "Display cannot be fullscreen exclusive.",
+          "Error 1-4 timeout/download: use VPN.",
+          "Error 2 integrity: reinstall FiveM; Error 3 injection: anti-cheat/AV block."
+        ]
+      },
+      {
+        name: "Opal (except FiveM)",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "(N/A)"],
+          ["Virtualization", "(N/A)"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "Fatal connection error: sync PC date/time.",
+          "BSOD: remove antivirus software and mouse/keyboard overlays.",
+          "Status 502 internal server: use diagnostic mode and switch server."
+        ],
+        links: [
+          ["AV removal tool", "https://antivirus-removal-tool.com/"]
         ]
       },
       {
@@ -161,18 +464,43 @@
           ["Virtualization", "(N/A)"],
           ["Windows Defender", "DISABLED"],
           ["Windows Firewall", "DISABLED"],
-          ["Exploit Protection", "ENABLED (Default)"]
+          ["Exploit Protection", "DEFAULT"]
         ],
         notes: [
-          "Disable all overlays and antivirus.",
-          "Failed stream: VPN + Cloudflare DNS.",
-          "Steam only (except ARC Raiders)."
+          "Disable all overlays and startup apps.",
+          "Steam as admin; no launch parameters; disable frame generation/reflex.",
+          "Failed stream: VPN and Cloudflare DNS.",
+          "The Isle/ARC extra fix: delete local saved folders.",
+          "Troubleshoot tool available in docs."
+        ],
+        links: [
+          ["Troubleshoot tool", "https://cdn.discordapp.com/attachments/1459056826317537397/1460873272760602848/Troubleshoot.exe"]
         ]
       },
       {
-        name: "Volt",
+        name: "Breeze",
         specs: [
-          ["TPM", "DISABLED"],
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "(N/A)"],
+          ["Virtualization", "(N/A)"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "Reputation-based protection, core isolation, and exploit must be off.",
+          "ARK overlay requirements differ by game.",
+          "Loader not opening: sync PC time and use Warp VPN.",
+          "Windows 11 spoofer fix and uninstall last two security updates if required."
+        ],
+        links: [
+          ["Win11 spoofer fix", "https://gofile.io/d/qVXmXC"]
+        ]
+      },
+      {
+        name: "Vortex",
+        specs: [
+          ["TPM", "(N/A) ON for required games"],
           ["Secure Boot", "DISABLED"],
           ["Virtualization", "ENABLED"],
           ["Windows Defender", "DISABLED"],
@@ -180,19 +508,30 @@
           ["Exploit Protection", "DISABLED"]
         ],
         notes: [
-          "Framework errors: install required .NET runtime packages.",
-          "HVIX/HVAX not found: run sfc /scannow."
+          "Requires Hyper-V enabled, UEFI, GPT disks, and AV removal.",
+          "InitWindows: press F2 only after Discord overlay banner appears.",
+          "LoadHyperVisor: follow hypervisor setup video.",
+          "Bad image libs: replace DLLs in system paths per docs.",
+          "Secure boot bypass valorant fix available in docs package."
+        ],
+        links: [
+          ["Hypervisor setup video", "https://youtu.be/XYVeHy5u4j4"],
+          ["Secure boot bypass pack", "https://gofile.io/d/JPNqIp"]
         ]
       },
       {
         name: "Refund / Compensation / HWID",
         specs: [
-          ["Refund info", "Need key + order + key length + game"],
-          ["Compensation", "For major downtime/troubleshooting"],
-          ["HWID reset", "Escalate to senior support"]
+          ["Refund eligibility", "Insta ban before use or severe unresolved product faults"],
+          ["Refund inputs", "Key + order number + key length + game"],
+          ["Compensation", "For meaningful lost time, not repeated abuse"],
+          ["Updating products", "Ask user to wait; escalate mass-impact cases"],
+          ["Downgrade", "Preferred before refund where possible"],
+          ["HWID Reset", "Escalate to senior/reset access staff"]
         ],
         notes: [
-          "Use senior review when case is unclear."
+          "This card mirrors the final policy slides for support handling.",
+          "When unsure, escalate to senior support before final action."
         ]
       }
     ];
@@ -229,7 +568,14 @@
         return "<li>" + n + "</li>";
       }).join("");
 
-      cardEl.innerHTML = "<h3>" + item.name + "</h3><div class=\"spec-table\">" + specRows + "</div><ul>" + noteRows + "</ul>";
+      var linkRows = "";
+      if (item.links && item.links.length) {
+        linkRows = "<h4>Links</h4><ul>" + item.links.map(function (link) {
+          return "<li><a class=\"footer-link\" href=\"" + link[1] + "\" target=\"_blank\" rel=\"noreferrer\">" + link[0] + "</a></li>";
+        }).join("") + "</ul>";
+      }
+
+      cardEl.innerHTML = "<h3>" + item.name + "</h3><div class=\"spec-table\">" + specRows + "</div><h4>Important Fixes / Notes</h4><ul>" + noteRows + "</ul>" + linkRows;
       lineEl.textContent = (current + 1) + " / " + filtered.length;
       selectEl.value = String(current);
     }
@@ -237,7 +583,8 @@
     function applySearch() {
       var q = searchEl.value.toLowerCase().trim();
       filtered = products.filter(function (p) {
-        var text = (p.name + " " + p.notes.join(" ") + " " + p.specs.map(function (s) { return s.join(" "); }).join(" ")).toLowerCase();
+        var linkText = (p.links || []).map(function (l) { return l.join(" "); }).join(" ");
+        var text = (p.name + " " + p.notes.join(" ") + " " + p.specs.map(function (s) { return s.join(" "); }).join(" ") + " " + linkText).toLowerCase();
         return !q || text.indexOf(q) !== -1;
       });
       current = 0;

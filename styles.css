@@ -346,6 +346,13 @@ body.compact-page .footer {
   font-family: "Chakra Petch", sans-serif;
 }
 
+.guide-card h4 {
+  margin: 0.7rem 0 0.35rem;
+  font-size: 0.92rem;
+  color: #b9cff0;
+  letter-spacing: 0.02em;
+}
+
 .guide-card ul {
   margin: 0.7rem 0 0;
   color: #c7d7f1;
