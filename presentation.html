@@ -600,8 +600,9 @@
         return row[0] + ": " + row[1];
       }).join("\n");
       var fixesText = item.notes.join("\n");
+      var rawText = item.raw || fixesText;
 
-      var commandSource = requirementsText + "\n" + fixesText;
+      var commandSource = requirementsText + "\n" + rawText;
       var commands = unique((commandSource.match(/\*[a-z0-9_]+/gi) || []));
       var commandButtons = commands.length
         ? commands.map(function (cmd) {
@@ -621,15 +622,18 @@
         + "<button type=\"button\" class=\"copy-btn\" id=\"copyReq\">Copy Requirements</button>"
         + "<button type=\"button\" class=\"copy-btn\" id=\"copyFix\">Copy Fixes</button>"
         + "<button type=\"button\" class=\"copy-btn\" id=\"copyCmd\">Copy Commands</button>"
+        + "<button type=\"button\" class=\"copy-btn\" id=\"copyRaw\">Copy Raw Slide Text</button>"
         + "</div>"
         + "<div class=\"spec-table\">" + specRows + "</div>"
         + "<h4>Important Fixes / Notes</h4><ul>" + noteRows + "</ul>"
+        + "<h4>Original Slide Text</h4><pre class=\"raw-block\">" + rawText.replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</pre>"
         + "<h4>Commands</h4><div class=\"cmd-row\">" + commandButtons + "</div>"
         + linkRows;
 
       var copyReqBtn = document.getElementById("copyReq");
       var copyFixBtn = document.getElementById("copyFix");
       var copyCmdBtn = document.getElementById("copyCmd");
+      var copyRawBtn = document.getElementById("copyRaw");
 
       copyReqBtn.addEventListener("click", function () {
         copyText(requirementsText, "Requirements");
@@ -639,6 +643,9 @@
       });
       copyCmdBtn.addEventListener("click", function () {
         copyText(commands.join("\n"), "Commands");
+      });
+      copyRawBtn.addEventListener("click", function () {
+        copyText(rawText, "Raw slide text");
       });
 
       Array.prototype.slice.call(cardEl.querySelectorAll(".cmd-chip")).forEach(function (btn) {
