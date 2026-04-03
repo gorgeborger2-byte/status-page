@@ -44,8 +44,14 @@
 
       <details class="guide-item" open>
         <summary>AstroZoom</summary>
+        <pre class="spec-block">TPM:                         (N/A) - ENABLED for COD
+Secure Boot:             DISABLED - ENABLED for COD
+Virtualization:            DISABLED
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    DISABLED</pre>
         <ul>
-          <li>Defaults: Defender off, Firewall off, Core Isolation off, UEFI BIOS, visuals installed.</li>
+          <li>Requirements: Core Isolation off, UEFI BIOS, visuals installed.</li>
           <li>Windows support: 10 22H2 - 11 23H2 (COD supports newer builds).</li>
           <li>Common fixes: <code>mem_ctx</code> load issues -> remove anti-cheats/antivirus; <code>Error #13/0x2</code> -> unsupported Windows; timeout/hostname -> VPN.</li>
         </ul>
@@ -53,16 +59,28 @@
 
       <details class="guide-item">
         <summary>Atlas</summary>
+        <pre class="spec-block">TPM:                         (N/A) - ENABLED for COD
+Secure Boot:             DISABLED - ENABLED for COD
+Virtualization:            DISABLED
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    ENABLED (Default)</pre>
         <ul>
-          <li>Defaults: Virtualization disabled, Defender/Firewall disabled, Core Isolation off.</li>
+          <li>Requirements: Core Isolation off, UEFI BIOS, visuals installed.</li>
           <li>Common fixes: disable Meltdown/Spectre with Inspectre tool; run <code>sfc /scannow</code> for driver load errors; disable overlays for engine/fatal errors.</li>
         </ul>
       </details>
 
       <details class="guide-item">
         <summary>Forge</summary>
+        <pre class="spec-block">TPM:                         (N/A)
+Secure Boot:             DISABLED
+Virtualization:            DISABLED
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    DISABLED</pre>
         <ul>
-          <li>Defaults: Defender/Firewall/Exploit Protection disabled, Core Isolation off.</li>
+          <li>Requirements: Core Isolation off, UEFI BIOS, visuals installed.</li>
           <li>BSOD flow: run <code>sfc /scannow</code> and <code>DISM.exe /Online /Cleanup-image /Restorehealth</code>.</li>
           <li>Loader closes at 100%: sync PC time and re-run as admin.</li>
         </ul>
@@ -70,6 +88,12 @@
 
       <details class="guide-item">
         <summary>Hero</summary>
+        <pre class="spec-block">TPM:                         MIXED (By Product)
+Secure Boot:             MIXED (By Product)
+Virtualization:            MIXED (By Product)
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    MIXED (Default / Disabled)</pre>
         <ul>
           <li>Variants include Valorant, OW2, Delta Force, FN/Rust/Apex/ABI/ARC.</li>
           <li>Frequent requirements: Medal overlay, Hyper-V for specific products, all overlays except required one off.</li>
@@ -79,8 +103,13 @@
 
       <details class="guide-item">
         <summary>Kane</summary>
+        <pre class="spec-block">TPM:                         (N/A)
+Secure Boot:             DISABLED
+Virtualization:            ENABLED
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    ENABLED (Default)</pre>
         <ul>
-          <li>Defaults: Virtualization enabled, Defender/Firewall disabled, Exploit Protection default.</li>
           <li>Key fixes: use <code>*kaneamdmenufix</code> for vc_redist/libs; pin/hypervisor fixes via support commands; disable startup apps for map memory errors.</li>
           <li>Extra slide fixes include: no servers -> VPN, error 0x298 -> contact dev.</li>
         </ul>
@@ -88,8 +117,14 @@
 
       <details class="guide-item">
         <summary>Liquid</summary>
+        <pre class="spec-block">TPM:                         (N/A)
+Secure Boot:             DISABLED
+Virtualization:            ENABLED
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    ENABLED (Default)</pre>
         <ul>
-          <li>Defaults: Virtualization enabled, Defender/Firewall disabled, Core Isolation off.</li>
+          <li>Requirements: Core Isolation off, UEFI BIOS, visuals installed.</li>
           <li>EFT Chams: press F1 in main menu to inject.</li>
           <li>Steelseries requirement for some products; no menu flow same as Kane style troubleshooting.</li>
         </ul>
@@ -97,14 +132,25 @@
 
       <details class="guide-item">
         <summary>Pulse</summary>
+        <pre class="spec-block">TPM:                         (N/A)
+Secure Boot:             DISABLED
+Virtualization:            DISABLED
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    DISABLED</pre>
         <ul>
-          <li>Defaults: Defender/Firewall/Exploit Protection disabled.</li>
           <li>ARC Raiders injection failures: close browser overlays, disable startup apps, disable Overwolf overlays, inject first then open launcher flow.</li>
         </ul>
       </details>
 
       <details class="guide-item">
         <summary>VEX</summary>
+        <pre class="spec-block">TPM:                         (N/A)
+Secure Boot:             DISABLED
+Virtualization:            DISABLED
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    DISABLED</pre>
         <ul>
           <li>Windows support target: 10 22H2 -> 11 23H2.</li>
           <li>Warthunder requires DX11.</li>
@@ -114,6 +160,12 @@
 
       <details class="guide-item">
         <summary>Viper</summary>
+        <pre class="spec-block">TPM:                         (N/A)
+Secure Boot:             (N/A)
+Virtualization:            (N/A)
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    ENABLED (Default)</pre>
         <ul>
           <li>Must remove/disable antivirus and overlays; product is Steam-only (except ARC Raiders).</li>
           <li>Failed stream: VPN + Cloudflare DNS.</li>
@@ -123,8 +175,13 @@
 
       <details class="guide-item">
         <summary>Volt</summary>
+        <pre class="spec-block">TPM:                         DISABLED
+Secure Boot:             DISABLED
+Virtualization:            ENABLED
+Windows Defender:  DISABLED
+Windows Firewall:    DISABLED
+Exploit Protection:    DISABLED</pre>
         <ul>
-          <li>Defaults: TPM + Secure Boot disabled, virtualization enabled.</li>
           <li>Framework errors: install required .NET runtime packages.</li>
           <li>HVIX/HVAX not found: run <code>sfc /scannow</code>; boot partition errors can require reinstall if not repairable.</li>
         </ul>
