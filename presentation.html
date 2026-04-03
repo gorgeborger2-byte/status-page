@@ -343,25 +343,88 @@
         ]
       },
       {
-        name: "Hero (Valorant / OW2 / Delta / Multi)",
+        name: "Hero Valorant",
         specs: [
-          ["TPM", "MIXED by product"],
-          ["Secure Boot", "MIXED by product"],
-          ["Virtualization", "MIXED by product"],
+          ["TPM", "ENABLED"],
+          ["Secure Boot", "ENABLED"],
+          ["Virtualization", "ENABLED"],
           ["Windows Defender", "DISABLED"],
           ["Windows Firewall", "DISABLED"],
-          ["Exploit Protection", "DEFAULT or DISABLED by product"]
+          ["Exploit Protection", "DEFAULT"]
         ],
         notes: [
-          "Valorant build needs Medal + Hyper-V and stricter requirements.",
-          "OW2: disable overlays, use DX11, use provided loader bundle when needed.",
-          "Delta Force: Steam only, DX12 only, VC redist required.",
-          "FN/Rust/Apex/ABI/ARC: Hyper-V needed for selected titles and specific anti-ban flow."
+          "Requirements include Medal overlay, GPU drivers up to date, and Hyper-V ON in Windows Features.",
+          "No menu fix: install Medal and keep record with Medal enabled.",
+          "If still no menu: run bundle tool as admin and send generated bundle.enc to senior support.",
+          "Secure Boot policy fix uses BIOS Key Management (delete dbx signatures one-by-one, not delete all)."
         ],
         links: [
           ["Medal", "http://medal.tv"],
+          ["Bundle tool", "https://gofile.io/d/sOW8lX"]
+        ]
+      },
+      {
+        name: "Hero OW2",
+        specs: [
+          ["TPM", "N/A"],
+          ["Secure Boot", "N/A"],
+          ["Virtualization", "N/A"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "Disable all overlays except required flow; run game in DX11.",
+          "Use latest OW2 loader package when needed.",
+          "External overlay crash fixes: disable Discord/OBS/NVIDIA/Xbox overlays.",
+          "Aimbot/ESP issues: reset to default preset, then reload cheat in menu."
+        ],
+        links: [
+          ["OW2 Loader Package", "https://mega.nz/folder/VUdnFYCC#Y3MUZeXJl_vkQt5hjvgvXw"],
+          ["Bundle tool", "https://gofile.io/d/sOW8lX"]
+        ]
+      },
+      {
+        name: "Hero Delta Force",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "ENABLED"],
+          ["Virtualization", "ENABLED"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "Steam only + DX12 only.",
+          "Before inject: set display to borderless/windowed and disable upscaling/super resolution.",
+          "Loader crash after key verification: install VC Redist x64 + x86.",
+          "No menu escalation: run bundle tool and send bundle.enc to senior support."
+        ],
+        links: [
           ["VC Redist x64", "https://aka.ms/vs/17/release/vc_redist.x64.exe"],
           ["VC Redist x86", "https://aka.ms/vs/17/release/vc_redist.x86.exe"],
+          ["Bundle tool", "https://gofile.io/d/sOW8lX"]
+        ]
+      },
+      {
+        name: "Hero FN/Rust/Apex/ABI/ARC",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "(N/A)"],
+          ["Virtualization", "(N/A)"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DEFAULT"]
+        ],
+        notes: [
+          "All need Medal; Hyper-V required for ARC Raiders, Valorant, Fortnite, and Apex.",
+          "Apex BSOD flow requires Windows SDK package and generating new build.",
+          "If no menu/errors persist: run bundle tool and escalate with bundle.enc.",
+          "Arena Breakout ENC ON: too many reports can require account change and wait window."
+        ],
+        links: [
+          ["Medal", "http://medal.tv"],
+          ["Windows SDK", "https://go.microsoft.com/fwlink/?linkid=2335869"],
           ["Bundle tool", "https://gofile.io/d/sOW8lX"]
         ]
       },
