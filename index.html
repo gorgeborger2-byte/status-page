@@ -138,7 +138,7 @@ function loadStatus() {
     fetchedTimeEl.textContent = 'Synced: ' + formatDateTime(defaultData.fetchedAt);
   };
   
-  fetch('data/status.json')
+  fetch('data/status.json?v=' + Date.now())
     .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
     .then(data => {
       if (data && data.items && data.items.length > 0) {
