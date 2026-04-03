@@ -93,67 +93,46 @@ const defaultData = {
     {brand: "Viper", game: "Marathon", status: "Updating", updated: "Apr 3, 2026 9:58 PM"}
   ]
 };
-const cardsEl = document.getElementById("cards");
-const statusLineEl = document.getElementById("statusLine");
-const sourceTimeEl = document.getElementById("sourceTime");
-const fetchedTimeEl = document.getElementById("fetchedTime");
-const searchInput = document.getElementById("searchInput");
-const countBadge = document.getElementById("countBadge");
-let allItems = [];
-let currentFilter = "all";
+var allItems = defaultData.items;
+var currentFilter = "all";
+var cardsEl = document.getElementById("cards");
+var statusLineEl = document.getElementById("statusLine");
+var sourceTimeEl = document.getElementById("sourceTime");
+var fetchedTimeEl = document.getElementById("fetchedTime");
+var searchInput = document.getElementById("searchInput");
+var countBadge = document.getElementById("countBadge");
 
 function renderItems(items) {
   if (!items.length) { cardsEl.innerHTML = ""; statusLineEl.textContent = "No products match your search."; countBadge.textContent = "(0)"; return; }
-  cardsEl.innerHTML = items.map(item => `<article class="card"><p class="brand">${item.brand}</p><h3 class="game">${item.game}</h3><span class="pill ${item.status.toLowerCase() === 'testing' ? 'pill-testing' : 'pill-updating'}">${item.status}</span><p class="updated">Updated: ${item.updated}</p></article>`).join("");
+  cardsEl.innerHTML = items.map(function(item) { return "<article class=\"card\"><p class=\"brand\">"+item.brand+"</p><h3 class=\"game\">"+item.game+"</h3><span class=\"pill "+(item.status.toLowerCase() === "testing" ? "pill-testing" : "pill-updating")+"\">"+item.status+"</span><p class=\"updated\">Updated: "+item.updated+"</p></article>"; }).join("");
   statusLineEl.textContent = "";
-  countBadge.textContent = `(${items.length})`;
+  countBadge.textContent = "("+items.length+")";
 }
 
 function filterItems() {
-  const query = searchInput.value.toLowerCase().trim();
-  let filtered = allItems;
-  if (currentFilter !== "all") filtered = filtered.filter(i => i.status === currentFilter);
-  if (query) filtered = filtered.filter(i => i.game.toLowerCase().includes(query) || i.brand.toLowerCase().includes(query));
+  var query = searchInput.value.toLowerCase().trim();
+  var filtered = allItems;
+  if (currentFilter !== "all") filtered = filtered.filter(function(i) { return i.status === currentFilter; });
+  if (query) filtered = filtered.filter(function(i) { return i.game.toLowerCase().includes(query) || i.brand.toLowerCase().includes(query); });
   renderItems(filtered);
 }
 
-document.querySelectorAll(".filter-btn").forEach(btn => {
+document.querySelectorAll(".filter-btn").forEach(function(btn) {
   btn.onclick = function() {
-    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".filter-btn").forEach(function(b) { b.classList.remove("active"); });
     this.classList.add("active");
-    currentFilter = this.dataset.filter;
+    currentFilter = this.getAttribute("data-filter");
     filterItems();
   };
 });
 
 searchInput.addEventListener("input", filterItems);
 
-function formatDateTime(value) { if (!value) return "--"; const d = new Date(value); return Number.isNaN(d.getTime()) ? value : d.toLocaleString(); }
+function formatDateTime(value) { if (!value) return "--"; var d = new Date(value); return isNaN(d.getTime()) ? value : d.toLocaleString(); }
 
-function loadStatus() {
-  const useFallback = () => {
-    allItems = defaultData.items;
-    filterItems();
-    sourceTimeEl.textContent = 'Source: ' + defaultData.lastUpdated;
-    fetchedTimeEl.textContent = 'Synced: ' + formatDateTime(defaultData.fetchedAt);
-  };
-  
-  fetch('data/status.json?v=' + Date.now())
-    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-    .then(data => {
-      if (data && data.items && data.items.length > 0) {
-        allItems = data.items;
-        filterItems();
-        sourceTimeEl.textContent = 'Source: ' + (data.lastUpdated || "--");
-        fetchedTimeEl.textContent = 'Synced: ' + formatDateTime(data.fetchedAt);
-      } else {
-        useFallback();
-      }
-    })
-    .catch(e => { console.error('Fetch error:', e); useFallback(); });
-}
-loadStatus();
-setInterval(loadStatus, 60000);
+sourceTimeEl.textContent = "Source: " + defaultData.lastUpdated;
+fetchedTimeEl.textContent = "Synced: " + formatDateTime(defaultData.fetchedAt);
+renderItems(allItems);
   </script>
 </body>
 </html>
