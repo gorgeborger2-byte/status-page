@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Chakra+Petch:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
-<body class="compact-page">
+<body>
   <div class="halo halo-a" aria-hidden="true"></div>
   <div class="halo halo-b" aria-hidden="true"></div>
 
@@ -20,21 +20,16 @@
       <a class="nav-link active" href="presentation.html">Support Guide</a>
     </nav>
     <h1>Cosmo Support Guide</h1>
-    <p class="subtitle">Compact mode - one product at a time (no long scrolling)</p>
+    <p class="subtitle">Open organized layout with all products visible</p>
   </header>
 
   <main class="container">
-    <section class="panel compact-panel">
-      <div class="compact-controls">
-        <input type="text" id="productSearch" placeholder="Search product..." autocomplete="off">
-        <select id="productSelect"></select>
-        <button id="prevBtn" type="button">Prev</button>
-        <button id="nextBtn" type="button">Next</button>
+    <section class="panel guide-open-panel">
+      <div class="search-box guide-search">
+        <input type="text" id="guideSearch" placeholder="Search product, fix, command, link..." autocomplete="off">
       </div>
-
       <p class="status-line" id="positionLine"></p>
-
-      <article class="guide-card single-guide-card" id="guideCard"></article>
+      <div class="guide-grid" id="guideCards"></div>
     </section>
   </main>
 
@@ -537,14 +532,9 @@
     ];
 
     var filtered = products.slice();
-    var current = 0;
-
-    var searchEl = document.getElementById("productSearch");
-    var selectEl = document.getElementById("productSelect");
-    var prevBtn = document.getElementById("prevBtn");
-    var nextBtn = document.getElementById("nextBtn");
+    var searchEl = document.getElementById("guideSearch");
     var lineEl = document.getElementById("positionLine");
-    var cardEl = document.getElementById("guideCard");
+    var cardsEl = document.getElementById("guideCards");
 
     function copyText(text, label) {
       if (!text) return;
@@ -574,122 +564,109 @@
       });
     }
 
-    function renderSelect() {
-      selectEl.innerHTML = filtered.map(function (p, i) {
-        return "<option value=\"" + i + "\">" + p.name + "</option>";
-      }).join("");
-      selectEl.value = String(current);
+    function escapeHtml(text) {
+      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
-    function renderCard() {
+    function getRequirements(item) {
+      return item.specs.map(function (row) { return row[0] + ": " + row[1]; }).join("\n");
+    }
+
+    function getFixes(item) {
+      return item.notes.join("\n");
+    }
+
+    function getRaw(item) {
+      return item.raw || getFixes(item);
+    }
+
+    function getCommands(item) {
+      var source = getRequirements(item) + "\n" + getRaw(item);
+      return unique(source.match(/\*[a-z0-9_]+/gi) || []);
+    }
+
+    function renderCards() {
       if (!filtered.length) {
-        cardEl.innerHTML = "<h3>No match</h3><p>Try another search keyword.</p>";
-        lineEl.textContent = "0 / 0";
+        cardsEl.innerHTML = "<article class=\"guide-card\"><h3>No match</h3><p>Try another search keyword.</p></article>";
+        lineEl.textContent = "0 products";
         return;
       }
 
-      var item = filtered[current];
-      var specRows = item.specs.map(function (row) {
-        return "<p><span>" + row[0] + "</span><strong>" + row[1] + "</strong></p>";
+      cardsEl.innerHTML = filtered.map(function (item, index) {
+        var specRows = item.specs.map(function (row) {
+          return "<p><span>" + row[0] + "</span><strong>" + row[1] + "</strong></p>";
+        }).join("");
+        var noteRows = item.notes.map(function (n) {
+          return "<li>" + n + "</li>";
+        }).join("");
+        var rawText = getRaw(item);
+        var commands = getCommands(item);
+        var commandButtons = commands.length
+          ? commands.map(function (cmd) {
+              return "<button type=\"button\" class=\"cmd-chip\" data-cmd=\"" + cmd + "\">" + cmd + "</button>";
+            }).join("")
+          : "<span class=\"cmd-empty\">No commands in this section</span>";
+
+        var linkRows = "";
+        if (item.links && item.links.length) {
+          linkRows = "<h4>Links</h4><ul>" + item.links.map(function (link) {
+            return "<li><a class=\"footer-link\" href=\"" + link[1] + "\" target=\"_blank\" rel=\"noreferrer\">" + link[0] + "</a></li>";
+          }).join("") + "</ul>";
+        }
+
+        return "<article class=\"guide-card\" data-index=\"" + index + "\">"
+          + "<h3>" + item.name + "</h3>"
+          + "<div class=\"copy-row\">"
+          + "<button type=\"button\" class=\"copy-btn\" data-action=\"req\">Copy Requirements</button>"
+          + "<button type=\"button\" class=\"copy-btn\" data-action=\"fix\">Copy Fixes</button>"
+          + "<button type=\"button\" class=\"copy-btn\" data-action=\"cmd\">Copy Commands</button>"
+          + "<button type=\"button\" class=\"copy-btn\" data-action=\"raw\">Copy Raw Slide Text</button>"
+          + "</div>"
+          + "<div class=\"spec-table\">" + specRows + "</div>"
+          + "<h4>Important Fixes / Notes</h4><ul>" + noteRows + "</ul>"
+          + "<h4>Original Slide Text</h4><pre class=\"raw-block\">" + escapeHtml(rawText) + "</pre>"
+          + "<h4>Commands</h4><div class=\"cmd-row\">" + commandButtons + "</div>"
+          + linkRows
+          + "</article>";
       }).join("");
-      var noteRows = item.notes.map(function (n) {
-        return "<li>" + n + "</li>";
-      }).join("");
 
-      var requirementsText = item.specs.map(function (row) {
-        return row[0] + ": " + row[1];
-      }).join("\n");
-      var fixesText = item.notes.join("\n");
-      var rawText = item.raw || fixesText;
-
-      var commandSource = requirementsText + "\n" + rawText;
-      var commands = unique((commandSource.match(/\*[a-z0-9_]+/gi) || []));
-      var commandButtons = commands.length
-        ? commands.map(function (cmd) {
-            return "<button type=\"button\" class=\"cmd-chip\" data-cmd=\"" + cmd + "\">" + cmd + "</button>";
-          }).join("")
-        : "<span class=\"cmd-empty\">No commands in this section</span>";
-
-      var linkRows = "";
-      if (item.links && item.links.length) {
-        linkRows = "<h4>Links</h4><ul>" + item.links.map(function (link) {
-          return "<li><a class=\"footer-link\" href=\"" + link[1] + "\" target=\"_blank\" rel=\"noreferrer\">" + link[0] + "</a></li>";
-        }).join("") + "</ul>";
-      }
-
-      cardEl.innerHTML = "<h3>" + item.name + "</h3>"
-        + "<div class=\"copy-row\">"
-        + "<button type=\"button\" class=\"copy-btn\" id=\"copyReq\">Copy Requirements</button>"
-        + "<button type=\"button\" class=\"copy-btn\" id=\"copyFix\">Copy Fixes</button>"
-        + "<button type=\"button\" class=\"copy-btn\" id=\"copyCmd\">Copy Commands</button>"
-        + "<button type=\"button\" class=\"copy-btn\" id=\"copyRaw\">Copy Raw Slide Text</button>"
-        + "</div>"
-        + "<div class=\"spec-table\">" + specRows + "</div>"
-        + "<h4>Important Fixes / Notes</h4><ul>" + noteRows + "</ul>"
-        + "<h4>Original Slide Text</h4><pre class=\"raw-block\">" + rawText.replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</pre>"
-        + "<h4>Commands</h4><div class=\"cmd-row\">" + commandButtons + "</div>"
-        + linkRows;
-
-      var copyReqBtn = document.getElementById("copyReq");
-      var copyFixBtn = document.getElementById("copyFix");
-      var copyCmdBtn = document.getElementById("copyCmd");
-      var copyRawBtn = document.getElementById("copyRaw");
-
-      copyReqBtn.addEventListener("click", function () {
-        copyText(requirementsText, "Requirements");
-      });
-      copyFixBtn.addEventListener("click", function () {
-        copyText(fixesText, "Fixes");
-      });
-      copyCmdBtn.addEventListener("click", function () {
-        copyText(commands.join("\n"), "Commands");
-      });
-      copyRawBtn.addEventListener("click", function () {
-        copyText(rawText, "Raw slide text");
-      });
-
-      Array.prototype.slice.call(cardEl.querySelectorAll(".cmd-chip")).forEach(function (btn) {
-        btn.addEventListener("click", function () {
-          copyText(btn.getAttribute("data-cmd"), "Command");
-        });
-      });
-
-      lineEl.textContent = (current + 1) + " / " + filtered.length;
-      selectEl.value = String(current);
+      lineEl.textContent = filtered.length + " products shown";
     }
 
     function applySearch() {
       var q = searchEl.value.toLowerCase().trim();
       filtered = products.filter(function (p) {
         var linkText = (p.links || []).map(function (l) { return l.join(" "); }).join(" ");
-        var text = (p.name + " " + p.notes.join(" ") + " " + p.specs.map(function (s) { return s.join(" "); }).join(" ") + " " + linkText).toLowerCase();
+        var text = (p.name + " " + p.notes.join(" ") + " " + p.specs.map(function (s) { return s.join(" "); }).join(" ") + " " + linkText + " " + (p.raw || "")).toLowerCase();
         return !q || text.indexOf(q) !== -1;
       });
-      current = 0;
-      renderSelect();
-      renderCard();
+      renderCards();
     }
 
     searchEl.addEventListener("input", applySearch);
-    selectEl.addEventListener("change", function () {
-      current = Number(selectEl.value) || 0;
-      renderCard();
+    cardsEl.addEventListener("click", function (event) {
+      var actionBtn = event.target.closest(".copy-btn");
+      if (actionBtn) {
+        var card = actionBtn.closest(".guide-card");
+        if (!card) return;
+        var idx = Number(card.getAttribute("data-index"));
+        var item = filtered[idx];
+        if (!item) return;
+        var action = actionBtn.getAttribute("data-action");
+        if (action === "req") copyText(getRequirements(item), "Requirements");
+        if (action === "fix") copyText(getFixes(item), "Fixes");
+        if (action === "cmd") copyText(getCommands(item).join("\n"), "Commands");
+        if (action === "raw") copyText(getRaw(item), "Raw slide text");
+        return;
+      }
+
+      var chip = event.target.closest(".cmd-chip");
+      if (chip) {
+        copyText(chip.getAttribute("data-cmd"), "Command");
+      }
     });
 
-    prevBtn.addEventListener("click", function () {
-      if (!filtered.length) return;
-      current = (current - 1 + filtered.length) % filtered.length;
-      renderCard();
-    });
-
-    nextBtn.addEventListener("click", function () {
-      if (!filtered.length) return;
-      current = (current + 1) % filtered.length;
-      renderCard();
-    });
-
-    renderSelect();
-    renderCard();
+    renderCards();
   })();
   </script>
 </body>
