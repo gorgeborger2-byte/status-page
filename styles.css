@@ -259,6 +259,37 @@ body {
   color: #b4d5ff;
 }
 
+.guide-search {
+  margin-bottom: 1rem;
+}
+
+.guide-panel {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.guide-item {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #101f38;
+  padding: 0.65rem 0.85rem;
+}
+
+.guide-item summary {
+  cursor: pointer;
+  font-family: "Chakra Petch", sans-serif;
+  font-size: 1.05rem;
+}
+
+.guide-item ul {
+  margin: 0.7rem 0 0;
+  color: #c7d7f1;
+}
+
+.guide-item li {
+  margin-bottom: 0.35rem;
+}
+
 .embed-panel {
   background: rgba(15, 34, 59, 0.82);
   border: 1px solid var(--border);

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cosmo Command Center</title>
-  <meta name="description" content="Embedded Command Center presentation view.">
+  <title>Cosmo Support Guide</title>
+  <meta name="description" content="Organized support guide extracted from the Cosmo support presentation.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Chakra+Petch:wght@600;700&display=swap" rel="stylesheet">
@@ -17,29 +17,150 @@
   <header class="container masthead">
     <nav class="top-nav" aria-label="Main">
       <a class="nav-link" href="index.html">Status</a>
-      <a class="nav-link active" href="presentation.html">Command Center</a>
+      <a class="nav-link active" href="presentation.html">Support Guide</a>
     </nav>
-    <h1>Cosmo Command Center</h1>
-    <p class="subtitle">Visual presentation view inside your website</p>
+    <h1>Cosmo Support Guide</h1>
+    <p class="subtitle">Content imported and organized from your Google Slides support deck</p>
+    <div class="meta">
+      <span>Search by brand or error</span>
+      <span>Quick command lookup</span>
+    </div>
   </header>
 
   <main class="container">
-    <section class="embed-panel">
-      <iframe
-        class="slides-frame"
-        src="https://docs.google.com/presentation/d/1xdaRaAgXz_y2i9zU1DKSWTr7QxGoVlIF_zEK7KBgjpo/embed?start=false&loop=false&delayms=3000"
-        allowfullscreen
-        loading="lazy"
-        title="Cosmo Command Center Slides">
-      </iframe>
+    <div class="search-box guide-search">
+      <input type="text" id="guideSearch" placeholder="Search brand, game, error, command..." autocomplete="off">
+    </div>
+
+    <section class="panel guide-panel" id="guideSections">
+      <details class="guide-item" open>
+        <summary>Overview + Links</summary>
+        <ul>
+          <li>Main support site: <a class="footer-link" href="https://support.cosmotickets.com/" target="_blank" rel="noreferrer">support.cosmotickets.com</a></li>
+          <li>Status page: <a class="footer-link" href="https://support.cosmotickets.com/status/" target="_blank" rel="noreferrer">support.cosmotickets.com/status</a></li>
+          <li>Slide source: <a class="footer-link" href="https://docs.google.com/presentation/d/1xdaRaAgXz_y2i9zU1DKSWTr7QxGoVlIF_zEK7KBgjpo/edit" target="_blank" rel="noreferrer">Google Slides</a></li>
+        </ul>
+      </details>
+
+      <details class="guide-item" open>
+        <summary>AstroZoom</summary>
+        <ul>
+          <li>Defaults: Defender off, Firewall off, Core Isolation off, UEFI BIOS, visuals installed.</li>
+          <li>Windows support: 10 22H2 - 11 23H2 (COD supports newer builds).</li>
+          <li>Common fixes: <code>mem_ctx</code> load issues -> remove anti-cheats/antivirus; <code>Error #13/0x2</code> -> unsupported Windows; timeout/hostname -> VPN.</li>
+        </ul>
+      </details>
+
+      <details class="guide-item">
+        <summary>Atlas</summary>
+        <ul>
+          <li>Defaults: Virtualization disabled, Defender/Firewall disabled, Core Isolation off.</li>
+          <li>Common fixes: disable Meltdown/Spectre with Inspectre tool; run <code>sfc /scannow</code> for driver load errors; disable overlays for engine/fatal errors.</li>
+        </ul>
+      </details>
+
+      <details class="guide-item">
+        <summary>Forge</summary>
+        <ul>
+          <li>Defaults: Defender/Firewall/Exploit Protection disabled, Core Isolation off.</li>
+          <li>BSOD flow: run <code>sfc /scannow</code> and <code>DISM.exe /Online /Cleanup-image /Restorehealth</code>.</li>
+          <li>Loader closes at 100%: sync PC time and re-run as admin.</li>
+        </ul>
+      </details>
+
+      <details class="guide-item">
+        <summary>Hero</summary>
+        <ul>
+          <li>Variants include Valorant, OW2, Delta Force, FN/Rust/Apex/ABI/ARC.</li>
+          <li>Frequent requirements: Medal overlay, Hyper-V for specific products, all overlays except required one off.</li>
+          <li>No menu / ENC / crashes: collect bundle file and escalate to senior support.</li>
+        </ul>
+      </details>
+
+      <details class="guide-item">
+        <summary>Kane</summary>
+        <ul>
+          <li>Defaults: Virtualization enabled, Defender/Firewall disabled, Exploit Protection default.</li>
+          <li>Key fixes: use <code>*kaneamdmenufix</code> for vc_redist/libs; pin/hypervisor fixes via support commands; disable startup apps for map memory errors.</li>
+          <li>Extra slide fixes include: no servers -> VPN, error 0x298 -> contact dev.</li>
+        </ul>
+      </details>
+
+      <details class="guide-item">
+        <summary>Liquid</summary>
+        <ul>
+          <li>Defaults: Virtualization enabled, Defender/Firewall disabled, Core Isolation off.</li>
+          <li>EFT Chams: press F1 in main menu to inject.</li>
+          <li>Steelseries requirement for some products; no menu flow same as Kane style troubleshooting.</li>
+        </ul>
+      </details>
+
+      <details class="guide-item">
+        <summary>Pulse</summary>
+        <ul>
+          <li>Defaults: Defender/Firewall/Exploit Protection disabled.</li>
+          <li>ARC Raiders injection failures: close browser overlays, disable startup apps, disable Overwolf overlays, inject first then open launcher flow.</li>
+        </ul>
+      </details>
+
+      <details class="guide-item">
+        <summary>VEX</summary>
+        <ul>
+          <li>Windows support target: 10 22H2 -> 11 23H2.</li>
+          <li>Warthunder requires DX11.</li>
+          <li>Connection issues: network manager IP optimization + VPN fallback.</li>
+        </ul>
+      </details>
+
+      <details class="guide-item">
+        <summary>Viper</summary>
+        <ul>
+          <li>Must remove/disable antivirus and overlays; product is Steam-only (except ARC Raiders).</li>
+          <li>Failed stream: VPN + Cloudflare DNS.</li>
+          <li>Game-specific saved-folder cleanup for The Isle/ARC when needed.</li>
+        </ul>
+      </details>
+
+      <details class="guide-item">
+        <summary>Volt</summary>
+        <ul>
+          <li>Defaults: TPM + Secure Boot disabled, virtualization enabled.</li>
+          <li>Framework errors: install required .NET runtime packages.</li>
+          <li>HVIX/HVAX not found: run <code>sfc /scannow</code>; boot partition errors can require reinstall if not repairable.</li>
+        </ul>
+      </details>
+
+      <details class="guide-item">
+        <summary>Refunds / Compensation / HWID</summary>
+        <ul>
+          <li>Refund review needs key, order number, key length, and game.</li>
+          <li>Compensation possible for significant downtime/troubleshooting (not repeated abuse).</li>
+          <li>HWID reset requests should be escalated to senior support/reset-access staff.</li>
+        </ul>
+      </details>
     </section>
   </main>
 
   <footer class="container footer">
-    <p>
-      If slides do not load in your browser,
-      <a class="footer-link" href="https://docs.google.com/presentation/d/1xdaRaAgXz_y2i9zU1DKSWTr7QxGoVlIF_zEK7KBgjpo/edit?pli=1&slide=id.g3cd2bdbeb85_2_0#slide=id.g3cd2bdbeb85_2_0" target="_blank" rel="noreferrer">open presentation directly</a>.
-    </p>
+    <p>This page is organized from your provided slide deck for faster lookup.</p>
   </footer>
+
+  <script>
+  (function () {
+    var search = document.getElementById("guideSearch");
+    var items = Array.prototype.slice.call(document.querySelectorAll(".guide-item"));
+
+    function applySearch() {
+      var q = search.value.toLowerCase().trim();
+      items.forEach(function (item) {
+        var text = item.textContent.toLowerCase();
+        var show = !q || text.indexOf(q) !== -1;
+        item.style.display = show ? "block" : "none";
+      });
+    }
+
+    search.addEventListener("input", applySearch);
+  })();
+  </script>
 </body>
 </html>
