@@ -34,6 +34,34 @@ body {
   padding: 2.8rem 0 1.5rem;
 }
 
+.top-nav {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.nav-link:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+.nav-link.active {
+  color: #081120;
+  background: var(--accent);
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
 .masthead h1 {
   margin: 0;
   font-size: clamp(2rem, 4vw, 3.1rem);
@@ -225,6 +253,26 @@ body {
   color: #90a7ce;
   padding: 1.5rem 0 2.1rem;
   font-size: 0.9rem;
+}
+
+.footer-link {
+  color: #b4d5ff;
+}
+
+.embed-panel {
+  background: rgba(15, 34, 59, 0.82);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1rem;
+  overflow: hidden;
+}
+
+.slides-frame {
+  width: 100%;
+  min-height: 70vh;
+  border: 0;
+  border-radius: 12px;
+  background: #0a1428;
 }
 
 .halo {
