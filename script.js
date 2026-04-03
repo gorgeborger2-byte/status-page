@@ -46,7 +46,7 @@ async function loadStatus() {
   statusLineEl.textContent = "Refreshing feed...";
 
   try {
-    const response = await fetch(`data/status.json?t=${Date.now()}`, { cache: "no-store" });
+    const response = await fetch('data/status.json');
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
     }
@@ -56,7 +56,8 @@ async function loadStatus() {
     sourceTimeEl.textContent = `Source last updated: ${data.lastUpdated || "--"}`;
     fetchedTimeEl.textContent = `Synced: ${formatDateTime(data.fetchedAt)}`;
   } catch (error) {
-    statusLineEl.textContent = "Could not load feed right now. Retrying automatically.";
+    console.error('Load error:', error);
+    statusLineEl.textContent = 'Could not load feed. Click refresh to try again.';
   } finally {
     refreshBtn.disabled = false;
   }
