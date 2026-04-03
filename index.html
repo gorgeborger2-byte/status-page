@@ -24,6 +24,8 @@
     <div class="meta">
       <span id="sourceTime">Source: --</span>
       <span id="fetchedTime">Synced: --</span>
+      <span id="dataAge">Data age: --</span>
+      <span id="refreshCountdown">Next refresh: --</span>
     </div>
   </header>
 
@@ -104,8 +106,12 @@ var cardsEl = document.getElementById("cards");
 var statusLineEl = document.getElementById("statusLine");
 var sourceTimeEl = document.getElementById("sourceTime");
 var fetchedTimeEl = document.getElementById("fetchedTime");
+var dataAgeEl = document.getElementById("dataAge");
+var refreshCountdownEl = document.getElementById("refreshCountdown");
 var searchInput = document.getElementById("searchInput");
 var countBadge = document.getElementById("countBadge");
+var nextRefreshAt = 0;
+var latestFetchedAt = null;
 
 function renderItems(items) {
   if (!items.length) { cardsEl.innerHTML = ""; statusLineEl.textContent = "No products match your search."; countBadge.textContent = "(0)"; return; }
@@ -135,14 +141,34 @@ searchInput.addEventListener("input", filterItems);
 
 function formatDateTime(value) { if (!value) return "--"; var d = new Date(value); return isNaN(d.getTime()) ? value : d.toLocaleString(); }
 
+function formatAge(date) {
+  if (!date) return "--";
+  var diffSec = Math.max(0, Math.floor((Date.now() - date.getTime()) / 1000));
+  if (diffSec < 60) return diffSec + "s";
+  var mins = Math.floor(diffSec / 60);
+  var secs = diffSec % 60;
+  return mins + "m " + secs + "s";
+}
+
+function tickTimers() {
+  if (nextRefreshAt > 0) {
+    var secLeft = Math.max(0, Math.ceil((nextRefreshAt - Date.now()) / 1000));
+    refreshCountdownEl.textContent = "Next refresh: " + secLeft + "s";
+  }
+  dataAgeEl.textContent = "Data age: " + formatAge(latestFetchedAt);
+}
+
 function applyLiveData(data) {
   allItems = (data && data.items && data.items.length) ? data.items : defaultData.items;
+  latestFetchedAt = new Date((data && data.fetchedAt) ? data.fetchedAt : defaultData.fetchedAt);
   filterItems();
   sourceTimeEl.textContent = "Source: " + ((data && data.lastUpdated) ? data.lastUpdated : defaultData.lastUpdated);
   fetchedTimeEl.textContent = "Synced: " + formatDateTime((data && data.fetchedAt) ? data.fetchedAt : defaultData.fetchedAt);
+  tickTimers();
 }
 
 function loadLiveStatus() {
+  nextRefreshAt = Date.now() + 30000;
   fetch("data/status.json?t=" + Date.now(), { cache: "no-store" })
     .then(function (res) {
       if (!res.ok) throw new Error("HTTP " + res.status);
@@ -158,6 +184,7 @@ function loadLiveStatus() {
 
 loadLiveStatus();
 setInterval(loadLiveStatus, 30000);
+setInterval(tickTimers, 1000);
   </script>
 </body>
 </html>
