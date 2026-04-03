@@ -485,7 +485,7 @@ body.compact-page .footer {
 
 .compact-controls {
   display: grid;
-  grid-template-columns: 1.2fr 1fr auto auto;
+  grid-template-columns: 1.2fr 1fr auto auto auto;
   gap: 0.55rem;
   margin-bottom: 0.5rem;
 }

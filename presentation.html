@@ -35,6 +35,7 @@
         <select id="productSelect"></select>
         <button id="prevBtn" type="button">Prev</button>
         <button id="nextBtn" type="button">Next</button>
+        <button id="copyAllDataBtn" type="button">Copy All Data</button>
       </div>
 
       <p class="status-line" id="positionLine"></p>
@@ -611,6 +612,7 @@
     var selectEl = document.getElementById("productSelect");
     var prevBtn = document.getElementById("prevBtn");
     var nextBtn = document.getElementById("nextBtn");
+    var copyAllDataBtn = document.getElementById("copyAllDataBtn");
     var lineEl = document.getElementById("positionLine");
     var cardEl = document.getElementById("guideCard");
 
@@ -640,6 +642,29 @@
         map[key] = true;
         return true;
       });
+    }
+
+    function buildAllDataText() {
+      return products.map(function (item) {
+        var requirementsText = item.specs.map(function (row) { return row[0] + ": " + row[1]; }).join("\n");
+        var fixesText = item.notes.join("\n");
+        var linksText = (item.links || []).map(function (link) { return link[0] + ": " + link[1]; }).join("\n");
+        var commands = unique((requirementsText + "\n" + fixesText).match(/\*[a-z0-9_]+/gi) || []).join("\n");
+        return [
+          "===== " + item.name + " =====",
+          "Requirements:",
+          requirementsText || "(none)",
+          "",
+          "Fixes:",
+          fixesText || "(none)",
+          "",
+          "Commands:",
+          commands || "(none)",
+          "",
+          "Links:",
+          linksText || "(none)"
+        ].join("\n");
+      }).join("\n\n");
     }
 
     var searchAliases = [
@@ -811,6 +836,10 @@
       if (!filtered.length) return;
       current = (current + 1) % filtered.length;
       renderCard();
+    });
+
+    copyAllDataBtn.addEventListener("click", function () {
+      copyText(buildAllDataText(), "All data");
     });
 
     renderSelect();
