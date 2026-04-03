@@ -1,35 +1,44 @@
-# Free Website with GitHub Pages
+# Cosmo Status Mirror
 
-This project is a free, static website template you can host on GitHub Pages.
+This site auto-syncs product statuses from:
 
-## Files
+- `https://support.cosmotickets.com/status/status.php`
 
-- `index.html` - page structure
-- `styles.css` - styling and responsive layout
-- `script.js` - section reveal animation and auto year
+It only displays products that are currently in:
 
-## Publish on GitHub (Free)
+- `Updating`
+- `Testing`
 
-1. Create a new repository on GitHub.
-2. Upload these files or push with git:
+## How auto-updates work
 
-```bash
-git init
-git add .
-git commit -m "Initial website"
-git branch -M main
-git remote add origin https://github.com/YOUR-USERNAME/YOUR-REPO.git
-git push -u origin main
-```
+- GitHub Actions runs every 5 minutes (24/7 schedule).
+- It logs in to the protected status page using your password secret.
+- It updates `data/status.json` in this repository.
+- The website reads that file and refreshes the UI automatically.
 
-3. In GitHub: **Settings -> Pages**.
-4. Under **Build and deployment**, set:
-   - **Source**: Deploy from a branch
-   - **Branch**: `main` / `(root)`
-5. Save and wait ~1 minute.
-6. Your site will be live at:
-   - `https://YOUR-USERNAME.github.io/YOUR-REPO/`
+## One-time setup in GitHub
 
-If you name the repository `YOUR-USERNAME.github.io`, your site URL will be:
+1. Open your repo: `https://github.com/gorgeborger2-byte/my-website`
+2. Go to **Settings -> Secrets and variables -> Actions**
+3. Click **New repository secret**
+4. Name: `STATUS_PASSWORD`
+5. Value: your status site password (for example: `support`)
+6. Save the secret
 
-- `https://YOUR-USERNAME.github.io/`
+## Turn on GitHub Pages
+
+1. Go to **Settings -> Pages**
+2. Source: **Deploy from a branch**
+3. Branch: `main` and folder `/(root)`
+4. Save
+
+## Run first sync manually
+
+1. Go to **Actions** tab in your repo
+2. Open workflow: **Update status feed**
+3. Click **Run workflow**
+4. After it finishes, refresh your website
+
+Your live URL is:
+
+- `https://gorgeborger2-byte.github.io/my-website/`

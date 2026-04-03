@@ -3,81 +3,39 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nova Craft Studio</title>
-  <meta name="description" content="A modern, free website starter ready for GitHub Pages.">
+  <title>Cosmo Product Status</title>
+  <meta name="description" content="Live product status board showing only Updating and Testing states.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Manrope:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Chakra+Petch:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="bg-orb orb-one" aria-hidden="true"></div>
-  <div class="bg-orb orb-two" aria-hidden="true"></div>
+  <div class="halo halo-a" aria-hidden="true"></div>
+  <div class="halo halo-b" aria-hidden="true"></div>
 
-  <header class="topbar container">
-    <a class="brand" href="#">Nova Craft</a>
-    <nav>
-      <a href="#services">Services</a>
-      <a href="#about">About</a>
-      <a href="#contact">Contact</a>
-    </nav>
+  <header class="container masthead">
+    <h1>Cosmo Product Status</h1>
+    <p class="subtitle">Only products currently in <strong>Updating</strong> or <strong>Testing</strong></p>
+    <div class="meta">
+      <span id="sourceTime">Source last updated: --</span>
+      <span id="fetchedTime">Synced: --</span>
+    </div>
   </header>
 
-  <main>
-    <section class="hero container reveal">
-      <p class="eyebrow">FREE WEBSITE STARTER</p>
-      <h1>Launch a polished site on GitHub Pages in minutes.</h1>
-      <p class="lead">
-        This template is lightweight, mobile-friendly, and costs nothing to host.
-        Customize the text and colors, push to GitHub, and go live.
-      </p>
-      <div class="cta-row">
-        <a class="btn btn-primary" href="#contact">Get Started</a>
-        <a class="btn btn-ghost" href="https://pages.github.com/" target="_blank" rel="noreferrer">GitHub Pages Docs</a>
+  <main class="container">
+    <section class="panel" aria-live="polite">
+      <div class="panel-head">
+        <h2>Live Queue</h2>
+        <button id="refreshBtn" type="button">Refresh</button>
       </div>
-    </section>
-
-    <section id="services" class="section container">
-      <h2 class="reveal">What you get</h2>
-      <div class="cards">
-        <article class="card reveal">
-          <h3>Fast setup</h3>
-          <p>Single-page structure with clean sections and smooth navigation.</p>
-        </article>
-        <article class="card reveal">
-          <h3>Modern style</h3>
-          <p>Custom typography, atmospheric gradients, and subtle motion effects.</p>
-        </article>
-        <article class="card reveal">
-          <h3>Zero hosting cost</h3>
-          <p>Deploy directly from your GitHub repository with GitHub Pages.</p>
-        </article>
-      </div>
-    </section>
-
-    <section id="about" class="section container split reveal">
-      <div>
-        <h2>Built for creators and small businesses</h2>
-        <p>
-          Replace this content with your brand story, portfolio highlights, or service details.
-          The layout keeps your message clear on desktop and mobile.
-        </p>
-      </div>
-      <div class="stat-box">
-        <p class="stat-value">100% Free</p>
-        <p class="stat-label">Hosting on GitHub Pages</p>
-      </div>
-    </section>
-
-    <section id="contact" class="section container reveal">
-      <h2>Contact</h2>
-      <p>Swap in your real email or social links:</p>
-      <a class="contact-link" href="mailto:hello@example.com">hello@example.com</a>
+      <p id="statusLine" class="status-line">Loading status feed...</p>
+      <div id="cards" class="cards"></div>
     </section>
   </main>
 
   <footer class="container footer">
-    <p>© <span id="year"></span> Nova Craft Studio. Built with HTML, CSS, and JavaScript.</p>
+    <p>Auto-updated with GitHub Actions every 10 minutes.</p>
   </footer>
 
   <script src="script.js"></script>
