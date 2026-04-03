@@ -301,9 +301,9 @@ body {
 
 .spec-table p {
   margin: 0;
-  display: grid;
-  grid-template-columns: 150px 1fr;
-  gap: 0.6rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
   padding: 0.5rem 0.7rem;
   border-top: 1px solid rgba(77, 115, 160, 0.3);
   font-size: 0.86rem;
@@ -316,6 +316,11 @@ body {
 .spec-table span {
   color: #9db7dc;
   font-family: "Consolas", "Courier New", monospace;
+  flex: 0 0 auto;
+}
+
+.spec-table span::after {
+  content: ":";
 }
 
 .spec-table strong {
