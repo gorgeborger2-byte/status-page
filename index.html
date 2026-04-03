@@ -36,12 +36,6 @@
   </footer>
 
   <script>
-const cardsEl = document.getElementById("cards");
-const statusLineEl = document.getElementById("statusLine");
-const sourceTimeEl = document.getElementById("sourceTime");
-const fetchedTimeEl = document.getElementById("fetchedTime");
-const refreshBtn = document.getElementById("refreshBtn");
-
 const defaultData = {
   lastUpdated: "April 3, 2026 - 9:59 PM",
   fetchedAt: "2026-04-03T20:00:08.083Z",
@@ -89,26 +83,18 @@ const defaultData = {
     {brand: "Viper", game: "Marathon", status: "Updating", updated: "Apr 3, 2026 9:58 PM"}
   ]
 };
+const cardsEl = document.getElementById("cards");
+const statusLineEl = document.getElementById("statusLine");
+const sourceTimeEl = document.getElementById("sourceTime");
+const fetchedTimeEl = document.getElementById("fetchedTime");
 
 function renderItems(items) {
-  if (!items.length) {
-    cardsEl.innerHTML = "";
-    statusLineEl.textContent = "No products currently in Updating or Testing.";
-    return;
-  }
-  cardsEl.innerHTML = items.map(item => {
-    const isTesting = item.status.toLowerCase() === "testing";
-    return `<article class="card"><p class="brand">${item.brand}</p><h3 class="game">${item.game}</h3><span class="pill ${isTesting ? "pill-testing" : "pill-updating"}">${item.status}</span><p class="updated">Updated: ${item.updated}</p></article>`;
-  }).join("");
+  if (!items.length) { cardsEl.innerHTML = ""; statusLineEl.textContent = "No products in Updating or Testing."; return; }
+  cardsEl.innerHTML = items.map(item => `<article class="card"><p class="brand">${item.brand}</p><h3 class="game">${item.game}</h3><span class="pill ${item.status.toLowerCase() === 'testing' ? 'pill-testing' : 'pill-updating'}">${item.status}</span><p class="updated">Updated: ${item.updated}</p></article>`).join("");
   statusLineEl.textContent = items.length + " products currently active (Updating/Testing).";
 }
 
-function formatDateTime(value) {
-  if (!value) return "--";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleString();
-}
+function formatDateTime(value) { if (!value) return "--"; const d = new Date(value); return Number.isNaN(d.getTime()) ? value : d.toLocaleString(); }
 
 function loadStatus() {
   fetch('data/status.json').then(r => r.json()).then(data => {
@@ -121,7 +107,6 @@ function loadStatus() {
     fetchedTimeEl.textContent = 'Synced: ' + formatDateTime(defaultData.fetchedAt);
   });
 }
-
 loadStatus();
   </script>
 </body>
