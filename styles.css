@@ -26,42 +26,63 @@ body {
   font-family: "Outfit", "Segoe UI", sans-serif;
   color: var(--text);
   position: relative;
-  isolation: isolate;
-  background:
-    radial-gradient(circle at 16% 18%, rgba(78, 131, 255, 0.36) 0%, rgba(78, 131, 255, 0) 40%),
-    radial-gradient(circle at 80% 16%, rgba(124, 91, 255, 0.26) 0%, rgba(124, 91, 255, 0) 38%),
-    radial-gradient(circle at 74% 82%, rgba(37, 196, 255, 0.22) 0%, rgba(37, 196, 255, 0) 36%),
-    linear-gradient(180deg, #050a16 0%, #040814 52%, #03060d 100%);
+  background: #040814;
 }
 
-body::before,
-body::after {
-  content: "";
+.space-bg {
   position: fixed;
-  inset: -30%;
-  z-index: -1;
+  inset: 0;
+  z-index: 0;
   pointer-events: none;
+  overflow: hidden;
 }
 
-body::before {
-  background-image:
-    radial-gradient(2px 2px at 10% 24%, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0) 70%),
-    radial-gradient(1.5px 1.5px at 24% 72%, rgba(193, 223, 255, 0.78) 0%, rgba(193, 223, 255, 0) 70%),
-    radial-gradient(2px 2px at 44% 38%, rgba(157, 226, 255, 0.8) 0%, rgba(157, 226, 255, 0) 70%),
-    radial-gradient(1px 1px at 65% 61%, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 70%),
-    radial-gradient(1.5px 1.5px at 82% 30%, rgba(184, 199, 255, 0.76) 0%, rgba(184, 199, 255, 0) 70%),
-    radial-gradient(1px 1px at 92% 80%, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0) 70%);
-  opacity: 0.95;
-  animation: starDrift 38s linear infinite, starPulse 4.5s ease-in-out infinite;
+.space-nebula,
+.space-stars {
+  position: absolute;
+  inset: -20%;
 }
 
-body::after {
+.space-nebula {
   background:
     radial-gradient(circle at 84% 10%, rgba(88, 221, 255, 0.22) 0%, rgba(88, 221, 255, 0) 48%),
     radial-gradient(circle at 12% 86%, rgba(130, 104, 255, 0.2) 0%, rgba(130, 104, 255, 0) 45%),
     radial-gradient(circle at 47% 56%, rgba(83, 139, 255, 0.14) 0%, rgba(83, 139, 255, 0) 52%),
     radial-gradient(circle at 63% 18%, rgba(191, 120, 255, 0.12) 0%, rgba(191, 120, 255, 0) 50%);
-  animation: nebulaShift 17s ease-in-out infinite alternate;
+  animation: nebulaShift 16s ease-in-out infinite alternate;
+  filter: blur(1px);
+}
+
+.space-stars {
+  background-repeat: repeat;
+  opacity: 0.9;
+}
+
+.space-stars-a {
+  background-image:
+    radial-gradient(2px 2px at 10% 24%, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0) 70%),
+    radial-gradient(1.5px 1.5px at 24% 72%, rgba(193, 223, 255, 0.78) 0%, rgba(193, 223, 255, 0) 70%),
+    radial-gradient(2px 2px at 44% 38%, rgba(157, 226, 255, 0.8) 0%, rgba(157, 226, 255, 0) 70%),
+    radial-gradient(1px 1px at 65% 61%, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 70%);
+  animation: starDrift 34s linear infinite, starPulse 4.2s ease-in-out infinite;
+}
+
+.space-stars-b {
+  background-image:
+    radial-gradient(1px 1px at 15% 15%, rgba(171, 226, 255, 0.56) 0%, rgba(171, 226, 255, 0) 70%),
+    radial-gradient(1px 1px at 35% 85%, rgba(255, 255, 255, 0.44) 0%, rgba(255, 255, 255, 0) 70%),
+    radial-gradient(1px 1px at 75% 45%, rgba(150, 198, 255, 0.52) 0%, rgba(150, 198, 255, 0) 70%),
+    radial-gradient(1px 1px at 92% 72%, rgba(255, 255, 255, 0.38) 0%, rgba(255, 255, 255, 0) 70%);
+  animation: starDriftReverse 46s linear infinite, starPulse 7s ease-in-out infinite;
+  opacity: 0.5;
+}
+
+header,
+main,
+footer,
+.halo {
+  position: relative;
+  z-index: 1;
 }
 
 .halo {
@@ -82,6 +103,11 @@ body::after {
 @keyframes nebulaShift {
   0% { transform: translate3d(0, 0, 0) scale(1); filter: saturate(1.02); }
   100% { transform: translate3d(2.5%, -1.7%, 0) scale(1.08); filter: saturate(1.15); }
+}
+
+@keyframes starDriftReverse {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  100% { transform: translate3d(4%, 2%, 0) scale(1.03); }
 }
 
 body.compact-page {
