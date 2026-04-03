@@ -16,23 +16,33 @@
 
   <header class="container masthead">
     <h1>Cosmo Product Status</h1>
-    <p class="subtitle">Only products currently in <strong>Updating</strong> or <strong>Testing</strong></p>
+    <p class="subtitle">Live tracking for <strong>Updating</strong> and <strong>Testing</strong> products</p>
     <div class="meta">
-      <span id="sourceTime">Source last updated: --</span>
+      <span id="sourceTime">Source: --</span>
       <span id="fetchedTime">Synced: --</span>
     </div>
   </header>
 
   <main class="container">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Search game or product..." autocomplete="off">
+    </div>
     <section class="panel" aria-live="polite">
-      <h2>Live Queue</h2>
+      <div class="panel-header">
+        <h2>All Products <span id="countBadge"></span></h2>
+        <div class="filter-row">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="Updating">Updating</button>
+          <button class="filter-btn" data-filter="Testing">Testing</button>
+        </div>
+      </div>
       <p id="statusLine" class="status-line"></p>
       <div id="cards" class="cards"></div>
     </section>
   </main>
 
   <footer class="container footer">
-    <p>Auto-updated with GitHub Actions every 10 minutes.</p>
+    <p>Auto-updates every 5 minutes via GitHub Actions</p>
   </footer>
 
   <script>
@@ -87,23 +97,49 @@ const cardsEl = document.getElementById("cards");
 const statusLineEl = document.getElementById("statusLine");
 const sourceTimeEl = document.getElementById("sourceTime");
 const fetchedTimeEl = document.getElementById("fetchedTime");
+const searchInput = document.getElementById("searchInput");
+const countBadge = document.getElementById("countBadge");
+let allItems = [];
+let currentFilter = "all";
 
 function renderItems(items) {
-  if (!items.length) { cardsEl.innerHTML = ""; statusLineEl.textContent = "No products in Updating or Testing."; return; }
+  if (!items.length) { cardsEl.innerHTML = ""; statusLineEl.textContent = "No products match your search."; countBadge.textContent = "(0)"; return; }
   cardsEl.innerHTML = items.map(item => `<article class="card"><p class="brand">${item.brand}</p><h3 class="game">${item.game}</h3><span class="pill ${item.status.toLowerCase() === 'testing' ? 'pill-testing' : 'pill-updating'}">${item.status}</span><p class="updated">Updated: ${item.updated}</p></article>`).join("");
-  statusLineEl.textContent = items.length + " products currently active (Updating/Testing).";
+  statusLineEl.textContent = "";
+  countBadge.textContent = `(${items.length})`;
 }
+
+function filterItems() {
+  const query = searchInput.value.toLowerCase().trim();
+  let filtered = allItems;
+  if (currentFilter !== "all") filtered = filtered.filter(i => i.status === currentFilter);
+  if (query) filtered = filtered.filter(i => i.game.toLowerCase().includes(query) || i.brand.toLowerCase().includes(query));
+  renderItems(filtered);
+}
+
+document.querySelectorAll(".filter-btn").forEach(btn => {
+  btn.onclick = function() {
+    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+    this.classList.add("active");
+    currentFilter = this.dataset.filter;
+    filterItems();
+  };
+});
+
+searchInput.addEventListener("input", filterItems);
 
 function formatDateTime(value) { if (!value) return "--"; const d = new Date(value); return Number.isNaN(d.getTime()) ? value : d.toLocaleString(); }
 
 function loadStatus() {
   fetch('data/status.json').then(r => r.json()).then(data => {
-    renderItems(data.items || []);
-    sourceTimeEl.textContent = 'Source last updated: ' + (data.lastUpdated || "--");
+    allItems = data.items || [];
+    filterItems();
+    sourceTimeEl.textContent = 'Source: ' + (data.lastUpdated || "--");
     fetchedTimeEl.textContent = 'Synced: ' + formatDateTime(data.fetchedAt);
   }).catch(() => {
-    renderItems(defaultData.items);
-    sourceTimeEl.textContent = 'Source last updated: ' + defaultData.lastUpdated;
+    allItems = defaultData.items;
+    filterItems();
+    sourceTimeEl.textContent = 'Source: ' + defaultData.lastUpdated;
     fetchedTimeEl.textContent = 'Synced: ' + formatDateTime(defaultData.fetchedAt);
   });
 }
