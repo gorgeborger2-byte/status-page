@@ -465,6 +465,28 @@ body.compact-page .footer {
   color: #b4d5ff;
 }
 
+.grizz-guard-msg {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%) translateY(12px);
+  background: rgba(170, 25, 45, 0.95);
+  color: #fff;
+  border: 1px solid rgba(255, 192, 203, 0.4);
+  border-radius: 999px;
+  padding: 0.42rem 0.9rem;
+  font-size: 0.82rem;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+}
+
+.grizz-guard-msg.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
 .guide-search {
   margin-bottom: 1rem;
 }
