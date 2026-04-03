@@ -546,6 +546,34 @@
     var lineEl = document.getElementById("positionLine");
     var cardEl = document.getElementById("guideCard");
 
+    function copyText(text, label) {
+      if (!text) return;
+      function done() {
+        lineEl.textContent = label + " copied";
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done);
+        return;
+      }
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      done();
+    }
+
+    function unique(arr) {
+      var map = {};
+      return arr.filter(function (v) {
+        var key = v.toLowerCase();
+        if (map[key]) return false;
+        map[key] = true;
+        return true;
+      });
+    }
+
     function renderSelect() {
       selectEl.innerHTML = filtered.map(function (p, i) {
         return "<option value=\"" + i + "\">" + p.name + "</option>";
@@ -568,6 +596,19 @@
         return "<li>" + n + "</li>";
       }).join("");
 
+      var requirementsText = item.specs.map(function (row) {
+        return row[0] + ": " + row[1];
+      }).join("\n");
+      var fixesText = item.notes.join("\n");
+
+      var commandSource = requirementsText + "\n" + fixesText;
+      var commands = unique((commandSource.match(/\*[a-z0-9_]+/gi) || []));
+      var commandButtons = commands.length
+        ? commands.map(function (cmd) {
+            return "<button type=\"button\" class=\"cmd-chip\" data-cmd=\"" + cmd + "\">" + cmd + "</button>";
+          }).join("")
+        : "<span class=\"cmd-empty\">No commands in this section</span>";
+
       var linkRows = "";
       if (item.links && item.links.length) {
         linkRows = "<h4>Links</h4><ul>" + item.links.map(function (link) {
@@ -575,7 +616,37 @@
         }).join("") + "</ul>";
       }
 
-      cardEl.innerHTML = "<h3>" + item.name + "</h3><div class=\"spec-table\">" + specRows + "</div><h4>Important Fixes / Notes</h4><ul>" + noteRows + "</ul>" + linkRows;
+      cardEl.innerHTML = "<h3>" + item.name + "</h3>"
+        + "<div class=\"copy-row\">"
+        + "<button type=\"button\" class=\"copy-btn\" id=\"copyReq\">Copy Requirements</button>"
+        + "<button type=\"button\" class=\"copy-btn\" id=\"copyFix\">Copy Fixes</button>"
+        + "<button type=\"button\" class=\"copy-btn\" id=\"copyCmd\">Copy Commands</button>"
+        + "</div>"
+        + "<div class=\"spec-table\">" + specRows + "</div>"
+        + "<h4>Important Fixes / Notes</h4><ul>" + noteRows + "</ul>"
+        + "<h4>Commands</h4><div class=\"cmd-row\">" + commandButtons + "</div>"
+        + linkRows;
+
+      var copyReqBtn = document.getElementById("copyReq");
+      var copyFixBtn = document.getElementById("copyFix");
+      var copyCmdBtn = document.getElementById("copyCmd");
+
+      copyReqBtn.addEventListener("click", function () {
+        copyText(requirementsText, "Requirements");
+      });
+      copyFixBtn.addEventListener("click", function () {
+        copyText(fixesText, "Fixes");
+      });
+      copyCmdBtn.addEventListener("click", function () {
+        copyText(commands.join("\n"), "Commands");
+      });
+
+      Array.prototype.slice.call(cardEl.querySelectorAll(".cmd-chip")).forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          copyText(btn.getAttribute("data-cmd"), "Command");
+        });
+      });
+
       lineEl.textContent = (current + 1) + " / " + filtered.length;
       selectEl.value = String(current);
     }

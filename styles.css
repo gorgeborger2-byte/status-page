@@ -353,6 +353,48 @@ body.compact-page .footer {
   letter-spacing: 0.02em;
 }
 
+.copy-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 0.6rem;
+}
+
+.copy-btn {
+  border: 1px solid var(--border);
+  background: #152d4d;
+  color: #e8f0ff;
+  padding: 0.35rem 0.6rem;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.copy-btn:hover {
+  border-color: var(--accent);
+}
+
+.cmd-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.cmd-chip {
+  border: 1px solid #2f5686;
+  background: #0f223f;
+  color: #bfe0ff;
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.76rem;
+  cursor: pointer;
+}
+
+.cmd-empty {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
 .guide-card ul {
   margin: 0.7rem 0 0;
   color: #c7d7f1;
