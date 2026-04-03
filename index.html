@@ -135,9 +135,29 @@ searchInput.addEventListener("input", filterItems);
 
 function formatDateTime(value) { if (!value) return "--"; var d = new Date(value); return isNaN(d.getTime()) ? value : d.toLocaleString(); }
 
-sourceTimeEl.textContent = "Source: " + defaultData.lastUpdated;
-fetchedTimeEl.textContent = "Synced: " + formatDateTime(defaultData.fetchedAt);
-renderItems(allItems);
+function applyLiveData(data) {
+  allItems = (data && data.items && data.items.length) ? data.items : defaultData.items;
+  filterItems();
+  sourceTimeEl.textContent = "Source: " + ((data && data.lastUpdated) ? data.lastUpdated : defaultData.lastUpdated);
+  fetchedTimeEl.textContent = "Synced: " + formatDateTime((data && data.fetchedAt) ? data.fetchedAt : defaultData.fetchedAt);
+}
+
+function loadLiveStatus() {
+  fetch("data/status.json?t=" + Date.now(), { cache: "no-store" })
+    .then(function (res) {
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return res.json();
+    })
+    .then(function (data) {
+      applyLiveData(data);
+    })
+    .catch(function () {
+      applyLiveData(defaultData);
+    });
+}
+
+loadLiveStatus();
+setInterval(loadLiveStatus, 30000);
   </script>
 </body>
 </html>
