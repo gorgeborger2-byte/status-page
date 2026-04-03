@@ -269,6 +269,40 @@ body {
   gap: 0.8rem;
 }
 
+.compact-panel {
+  padding: 0.9rem;
+}
+
+.compact-controls {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr auto auto;
+  gap: 0.55rem;
+  margin-bottom: 0.5rem;
+}
+
+.compact-controls input,
+.compact-controls select,
+.compact-controls button {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #0d1e36;
+  color: var(--text);
+  padding: 0.55rem 0.7rem;
+  font: inherit;
+}
+
+.compact-controls button {
+  cursor: pointer;
+}
+
+.compact-controls button:hover {
+  border-color: var(--accent);
+}
+
+.single-guide-card {
+  margin-top: 0.55rem;
+}
+
 .guide-card {
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -326,6 +360,12 @@ body {
 .spec-table strong {
   color: #e8f0ff;
   font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .compact-controls {
+    grid-template-columns: 1fr;
+  }
 }
 
 .embed-panel {

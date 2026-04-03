@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cosmo Support Guide</title>
-  <meta name="description" content="Clean, organized support guide page.">
+  <meta name="description" content="Compact support guide view.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Chakra+Petch:wght@600;700&display=swap" rel="stylesheet">
@@ -20,187 +20,251 @@
       <a class="nav-link active" href="presentation.html">Support Guide</a>
     </nav>
     <h1>Cosmo Support Guide</h1>
-    <p class="subtitle">Organized by product with clean docs-style system requirements</p>
+    <p class="subtitle">Compact mode - one product at a time (no long scrolling)</p>
   </header>
 
   <main class="container">
-    <div class="search-box guide-search">
-      <input type="text" id="guideSearch" placeholder="Search product, issue, or command..." autocomplete="off">
-    </div>
+    <section class="panel compact-panel">
+      <div class="compact-controls">
+        <input type="text" id="productSearch" placeholder="Search product..." autocomplete="off">
+        <select id="productSelect"></select>
+        <button id="prevBtn" type="button">Prev</button>
+        <button id="nextBtn" type="button">Next</button>
+      </div>
 
-    <section class="guide-grid" id="guideGrid">
-      <article class="guide-card">
-        <h3>AstroZoom</h3>
-        <div class="spec-table">
-          <p><span>TPM</span><strong>(N/A) - ENABLED for COD</strong></p>
-          <p><span>Secure Boot</span><strong>DISABLED - ENABLED for COD</strong></p>
-          <p><span>Virtualization</span><strong>DISABLED</strong></p>
-          <p><span>Windows Defender</span><strong>DISABLED</strong></p>
-          <p><span>Windows Firewall</span><strong>DISABLED</strong></p>
-          <p><span>Exploit Protection</span><strong>DISABLED</strong></p>
-        </div>
-        <ul>
-          <li>Windows: 10 22H2 to 11 23H2 (COD supports newer builds).</li>
-          <li>Fixes: remove anti-cheats/antivirus, use VPN for timeout/hostname.</li>
-        </ul>
-      </article>
+      <p class="status-line" id="positionLine"></p>
 
-      <article class="guide-card">
-        <h3>Atlas</h3>
-        <div class="spec-table">
-          <p><span>TPM</span><strong>(N/A) - ENABLED for COD</strong></p>
-          <p><span>Secure Boot</span><strong>DISABLED - ENABLED for COD</strong></p>
-          <p><span>Virtualization</span><strong>DISABLED</strong></p>
-          <p><span>Windows Defender</span><strong>DISABLED</strong></p>
-          <p><span>Windows Firewall</span><strong>DISABLED</strong></p>
-          <p><span>Exploit Protection</span><strong>ENABLED (Default)</strong></p>
-        </div>
-        <ul>
-          <li>Use Inspectre for Meltdown/Spectre.</li>
-          <li>For driver issues run <code>sfc /scannow</code>.</li>
-        </ul>
-      </article>
-
-      <article class="guide-card">
-        <h3>Forge</h3>
-        <div class="spec-table">
-          <p><span>TPM</span><strong>(N/A)</strong></p>
-          <p><span>Secure Boot</span><strong>DISABLED</strong></p>
-          <p><span>Virtualization</span><strong>DISABLED</strong></p>
-          <p><span>Windows Defender</span><strong>DISABLED</strong></p>
-          <p><span>Windows Firewall</span><strong>DISABLED</strong></p>
-          <p><span>Exploit Protection</span><strong>DISABLED</strong></p>
-        </div>
-        <ul>
-          <li>BSOD flow: <code>sfc /scannow</code> then <code>DISM /Online /Cleanup-image /Restorehealth</code>.</li>
-        </ul>
-      </article>
-
-      <article class="guide-card">
-        <h3>Kane</h3>
-        <div class="spec-table">
-          <p><span>TPM</span><strong>(N/A)</strong></p>
-          <p><span>Secure Boot</span><strong>DISABLED</strong></p>
-          <p><span>Virtualization</span><strong>ENABLED</strong></p>
-          <p><span>Windows Defender</span><strong>DISABLED</strong></p>
-          <p><span>Windows Firewall</span><strong>DISABLED</strong></p>
-          <p><span>Exploit Protection</span><strong>ENABLED (Default)</strong></p>
-        </div>
-        <ul>
-          <li>Use <code>*kaneamdmenufix</code> for vc_redist/libs error.</li>
-          <li>Common: disable startup apps for map-memory errors.</li>
-        </ul>
-      </article>
-
-      <article class="guide-card">
-        <h3>Liquid</h3>
-        <div class="spec-table">
-          <p><span>TPM</span><strong>(N/A)</strong></p>
-          <p><span>Secure Boot</span><strong>DISABLED</strong></p>
-          <p><span>Virtualization</span><strong>ENABLED</strong></p>
-          <p><span>Windows Defender</span><strong>DISABLED</strong></p>
-          <p><span>Windows Firewall</span><strong>DISABLED</strong></p>
-          <p><span>Exploit Protection</span><strong>ENABLED (Default)</strong></p>
-        </div>
-        <ul>
-          <li>EFT Chams: press F1 in main menu.</li>
-        </ul>
-      </article>
-
-      <article class="guide-card">
-        <h3>Pulse</h3>
-        <div class="spec-table">
-          <p><span>TPM</span><strong>(N/A)</strong></p>
-          <p><span>Secure Boot</span><strong>DISABLED</strong></p>
-          <p><span>Virtualization</span><strong>DISABLED</strong></p>
-          <p><span>Windows Defender</span><strong>DISABLED</strong></p>
-          <p><span>Windows Firewall</span><strong>DISABLED</strong></p>
-          <p><span>Exploit Protection</span><strong>DISABLED</strong></p>
-        </div>
-        <ul>
-          <li>ARC injection issues: disable overlays/startup apps, inject first.</li>
-        </ul>
-      </article>
-
-      <article class="guide-card">
-        <h3>VEX</h3>
-        <div class="spec-table">
-          <p><span>TPM</span><strong>(N/A)</strong></p>
-          <p><span>Secure Boot</span><strong>DISABLED</strong></p>
-          <p><span>Virtualization</span><strong>DISABLED</strong></p>
-          <p><span>Windows Defender</span><strong>DISABLED</strong></p>
-          <p><span>Windows Firewall</span><strong>DISABLED</strong></p>
-          <p><span>Exploit Protection</span><strong>DISABLED</strong></p>
-        </div>
-        <ul>
-          <li>Warthunder requires DX11.</li>
-        </ul>
-      </article>
-
-      <article class="guide-card">
-        <h3>Viper</h3>
-        <div class="spec-table">
-          <p><span>TPM</span><strong>(N/A)</strong></p>
-          <p><span>Secure Boot</span><strong>(N/A)</strong></p>
-          <p><span>Virtualization</span><strong>(N/A)</strong></p>
-          <p><span>Windows Defender</span><strong>DISABLED</strong></p>
-          <p><span>Windows Firewall</span><strong>DISABLED</strong></p>
-          <p><span>Exploit Protection</span><strong>ENABLED (Default)</strong></p>
-        </div>
-        <ul>
-          <li>Disable all overlays and antivirus.</li>
-          <li>Failed stream: use VPN + Cloudflare DNS.</li>
-        </ul>
-      </article>
-
-      <article class="guide-card">
-        <h3>Volt</h3>
-        <div class="spec-table">
-          <p><span>TPM</span><strong>DISABLED</strong></p>
-          <p><span>Secure Boot</span><strong>DISABLED</strong></p>
-          <p><span>Virtualization</span><strong>ENABLED</strong></p>
-          <p><span>Windows Defender</span><strong>DISABLED</strong></p>
-          <p><span>Windows Firewall</span><strong>DISABLED</strong></p>
-          <p><span>Exploit Protection</span><strong>DISABLED</strong></p>
-        </div>
-        <ul>
-          <li>Framework error: install required .NET runtime.</li>
-          <li>HVIX/HVAX not found: run <code>sfc /scannow</code>.</li>
-        </ul>
-      </article>
-
-      <article class="guide-card">
-        <h3>Refund / Compensation / HWID</h3>
-        <div class="spec-table">
-          <p><span>Refund info</span><strong>Key + order + game required</strong></p>
-          <p><span>Comp policy</span><strong>For major downtime/troubleshooting</strong></p>
-          <p><span>HWID reset</span><strong>Escalate to senior support</strong></p>
-        </div>
-        <ul>
-          <li>Use senior review when case is unclear.</li>
-        </ul>
-      </article>
+      <article class="guide-card single-guide-card" id="guideCard"></article>
     </section>
   </main>
 
   <footer class="container footer">
-    <p>Formatted cleanly from your docs style for easier reading.</p>
+    <p>Fast lookup format from your docs style.</p>
   </footer>
 
   <script>
   (function () {
-    var input = document.getElementById("guideSearch");
-    var cards = Array.prototype.slice.call(document.querySelectorAll(".guide-card"));
+    var products = [
+      {
+        name: "AstroZoom",
+        specs: [
+          ["TPM", "(N/A) - ENABLED for COD"],
+          ["Secure Boot", "DISABLED - ENABLED for COD"],
+          ["Virtualization", "DISABLED"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "Windows 10 22H2 to Windows 11 23H2 (COD supports newer builds).",
+          "Connection timeout/hostname issues: use VPN.",
+          "Error #13 / 0x2: unsupported Windows version."
+        ]
+      },
+      {
+        name: "Atlas",
+        specs: [
+          ["TPM", "(N/A) - ENABLED for COD"],
+          ["Secure Boot", "DISABLED - ENABLED for COD"],
+          ["Virtualization", "DISABLED"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "ENABLED (Default)"]
+        ],
+        notes: [
+          "Use Inspectre to disable Meltdown/Spectre when needed.",
+          "Failed driver load: run sfc /scannow.",
+          "Disable overlays for engine/fatal crashes."
+        ]
+      },
+      {
+        name: "Forge",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "DISABLED"],
+          ["Virtualization", "DISABLED"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "BSOD flow: sfc /scannow then DISM /Online /Cleanup-image /Restorehealth.",
+          "Loader closes at 100%: sync PC time and run as admin."
+        ]
+      },
+      {
+        name: "Kane",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "DISABLED"],
+          ["Virtualization", "ENABLED"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "ENABLED (Default)"]
+        ],
+        notes: [
+          "Use *kaneamdmenufix for vc_redist/libs errors.",
+          "No available servers: use VPN.",
+          "Error 0x298: contact dev."
+        ]
+      },
+      {
+        name: "Liquid",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "DISABLED"],
+          ["Virtualization", "ENABLED"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "ENABLED (Default)"]
+        ],
+        notes: [
+          "EFT Chams: press F1 in main menu to inject.",
+          "Use Steelseries GG sonar shortcut flow where required."
+        ]
+      },
+      {
+        name: "Pulse",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "DISABLED"],
+          ["Virtualization", "DISABLED"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "ARC inject issue: disable startup apps and overlays.",
+          "Inject first, then open launcher/game flow."
+        ]
+      },
+      {
+        name: "VEX",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "DISABLED"],
+          ["Virtualization", "DISABLED"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "Warthunder: must run DX11.",
+          "Connection issues: run network manager IP optimizer."
+        ]
+      },
+      {
+        name: "Viper",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "(N/A)"],
+          ["Virtualization", "(N/A)"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "ENABLED (Default)"]
+        ],
+        notes: [
+          "Disable all overlays and antivirus.",
+          "Failed stream: VPN + Cloudflare DNS.",
+          "Steam only (except ARC Raiders)."
+        ]
+      },
+      {
+        name: "Volt",
+        specs: [
+          ["TPM", "DISABLED"],
+          ["Secure Boot", "DISABLED"],
+          ["Virtualization", "ENABLED"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "Framework errors: install required .NET runtime packages.",
+          "HVIX/HVAX not found: run sfc /scannow."
+        ]
+      },
+      {
+        name: "Refund / Compensation / HWID",
+        specs: [
+          ["Refund info", "Need key + order + key length + game"],
+          ["Compensation", "For major downtime/troubleshooting"],
+          ["HWID reset", "Escalate to senior support"]
+        ],
+        notes: [
+          "Use senior review when case is unclear."
+        ]
+      }
+    ];
 
-    function filter() {
-      var q = input.value.toLowerCase().trim();
-      cards.forEach(function (card) {
-        var text = card.textContent.toLowerCase();
-        card.style.display = (!q || text.indexOf(q) !== -1) ? "block" : "none";
-      });
+    var filtered = products.slice();
+    var current = 0;
+
+    var searchEl = document.getElementById("productSearch");
+    var selectEl = document.getElementById("productSelect");
+    var prevBtn = document.getElementById("prevBtn");
+    var nextBtn = document.getElementById("nextBtn");
+    var lineEl = document.getElementById("positionLine");
+    var cardEl = document.getElementById("guideCard");
+
+    function renderSelect() {
+      selectEl.innerHTML = filtered.map(function (p, i) {
+        return "<option value=\"" + i + "\">" + p.name + "</option>";
+      }).join("");
+      selectEl.value = String(current);
     }
 
-    input.addEventListener("input", filter);
+    function renderCard() {
+      if (!filtered.length) {
+        cardEl.innerHTML = "<h3>No match</h3><p>Try another search keyword.</p>";
+        lineEl.textContent = "0 / 0";
+        return;
+      }
+
+      var item = filtered[current];
+      var specRows = item.specs.map(function (row) {
+        return "<p><span>" + row[0] + "</span><strong>" + row[1] + "</strong></p>";
+      }).join("");
+      var noteRows = item.notes.map(function (n) {
+        return "<li>" + n + "</li>";
+      }).join("");
+
+      cardEl.innerHTML = "<h3>" + item.name + "</h3><div class=\"spec-table\">" + specRows + "</div><ul>" + noteRows + "</ul>";
+      lineEl.textContent = (current + 1) + " / " + filtered.length;
+      selectEl.value = String(current);
+    }
+
+    function applySearch() {
+      var q = searchEl.value.toLowerCase().trim();
+      filtered = products.filter(function (p) {
+        var text = (p.name + " " + p.notes.join(" ") + " " + p.specs.map(function (s) { return s.join(" "); }).join(" ")).toLowerCase();
+        return !q || text.indexOf(q) !== -1;
+      });
+      current = 0;
+      renderSelect();
+      renderCard();
+    }
+
+    searchEl.addEventListener("input", applySearch);
+    selectEl.addEventListener("change", function () {
+      current = Number(selectEl.value) || 0;
+      renderCard();
+    });
+
+    prevBtn.addEventListener("click", function () {
+      if (!filtered.length) return;
+      current = (current - 1 + filtered.length) % filtered.length;
+      renderCard();
+    });
+
+    nextBtn.addEventListener("click", function () {
+      if (!filtered.length) return;
+      current = (current + 1) % filtered.length;
+      renderCard();
+    });
+
+    renderSelect();
+    renderCard();
   })();
   </script>
 </body>
