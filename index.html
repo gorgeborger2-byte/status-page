@@ -115,7 +115,13 @@ var latestFetchedAt = null;
 
 function renderItems(items) {
   if (!items.length) { cardsEl.innerHTML = ""; statusLineEl.textContent = "No products match your search."; countBadge.textContent = "(0)"; return; }
-  cardsEl.innerHTML = items.map(function(item) { return "<article class=\"card\"><p class=\"brand\">"+item.brand+"</p><h3 class=\"game\">"+item.game+"</h3><span class=\"pill "+(item.status.toLowerCase() === "testing" ? "pill-testing" : "pill-updating")+"\">"+item.status+"</span><p class=\"updated\">Updated: "+item.updated+"</p></article>"; }).join("");
+  cardsEl.innerHTML = items.map(function(item) {
+    var isTesting = item.status.toLowerCase() === "testing";
+    var pill = isTesting
+      ? "<span class=\"pill pill-testing\">Testing<span class=\"loading-dots\"><i></i><i></i><i></i></span></span>"
+      : "<span class=\"pill pill-updating\"><span class=\"status-ring\"></span>Updating</span>";
+    return "<article class=\"card\"><p class=\"brand\">"+item.brand+"</p><h3 class=\"game\">"+item.game+"</h3>"+pill+"<p class=\"updated\">Updated: "+item.updated+"</p></article>";
+  }).join("");
   statusLineEl.textContent = "";
   countBadge.textContent = "("+items.length+")";
 }
