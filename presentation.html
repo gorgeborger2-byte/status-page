@@ -660,10 +660,12 @@
 
     function applySearch() {
       var q = searchEl.value.toLowerCase().trim();
+      var normalizedQuery = q.replace(/[^a-z0-9]+/g, " ").trim();
       filtered = products.filter(function (p) {
         var linkText = (p.links || []).map(function (l) { return l.join(" "); }).join(" ");
         var text = (p.name + " " + p.notes.join(" ") + " " + p.specs.map(function (s) { return s.join(" "); }).join(" ") + " " + linkText).toLowerCase();
-        return !q || text.indexOf(q) !== -1;
+        var normalizedText = text.replace(/[^a-z0-9]+/g, " ");
+        return !q || text.indexOf(q) !== -1 || (normalizedQuery && normalizedText.indexOf(normalizedQuery) !== -1);
       });
       current = 0;
       renderSelect();
