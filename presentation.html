@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cosmo Support Guide</title>
-  <meta name="description" content="Organized support guide extracted from the Cosmo support presentation.">
+  <meta name="description" content="Clean, organized support guide page.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Chakra+Petch:wght@600;700&display=swap" rel="stylesheet">
@@ -20,203 +20,187 @@
       <a class="nav-link active" href="presentation.html">Support Guide</a>
     </nav>
     <h1>Cosmo Support Guide</h1>
-    <p class="subtitle">Content imported and organized from your Google Slides support deck</p>
-    <div class="meta">
-      <span>Search by brand or error</span>
-      <span>Quick command lookup</span>
-    </div>
+    <p class="subtitle">Organized by product with clean docs-style system requirements</p>
   </header>
 
   <main class="container">
     <div class="search-box guide-search">
-      <input type="text" id="guideSearch" placeholder="Search brand, game, error, command..." autocomplete="off">
+      <input type="text" id="guideSearch" placeholder="Search product, issue, or command..." autocomplete="off">
     </div>
 
-    <section class="panel guide-panel" id="guideSections">
-      <details class="guide-item" open>
-        <summary>Overview + Links</summary>
+    <section class="guide-grid" id="guideGrid">
+      <article class="guide-card">
+        <h3>AstroZoom</h3>
+        <div class="spec-table">
+          <p><span>TPM</span><strong>(N/A) - ENABLED for COD</strong></p>
+          <p><span>Secure Boot</span><strong>DISABLED - ENABLED for COD</strong></p>
+          <p><span>Virtualization</span><strong>DISABLED</strong></p>
+          <p><span>Windows Defender</span><strong>DISABLED</strong></p>
+          <p><span>Windows Firewall</span><strong>DISABLED</strong></p>
+          <p><span>Exploit Protection</span><strong>DISABLED</strong></p>
+        </div>
         <ul>
-          <li>Main support site: <a class="footer-link" href="https://support.cosmotickets.com/" target="_blank" rel="noreferrer">support.cosmotickets.com</a></li>
-          <li>Status page: <a class="footer-link" href="https://support.cosmotickets.com/status/" target="_blank" rel="noreferrer">support.cosmotickets.com/status</a></li>
-          <li>Slide source: <a class="footer-link" href="https://docs.google.com/presentation/d/1xdaRaAgXz_y2i9zU1DKSWTr7QxGoVlIF_zEK7KBgjpo/edit" target="_blank" rel="noreferrer">Google Slides</a></li>
+          <li>Windows: 10 22H2 to 11 23H2 (COD supports newer builds).</li>
+          <li>Fixes: remove anti-cheats/antivirus, use VPN for timeout/hostname.</li>
         </ul>
-      </details>
+      </article>
 
-      <details class="guide-item" open>
-        <summary>AstroZoom</summary>
-        <pre class="spec-block">TPM:                         (N/A) - ENABLED for COD
-Secure Boot:             DISABLED - ENABLED for COD
-Virtualization:            DISABLED
-Windows Defender:  DISABLED
-Windows Firewall:    DISABLED
-Exploit Protection:    DISABLED</pre>
+      <article class="guide-card">
+        <h3>Atlas</h3>
+        <div class="spec-table">
+          <p><span>TPM</span><strong>(N/A) - ENABLED for COD</strong></p>
+          <p><span>Secure Boot</span><strong>DISABLED - ENABLED for COD</strong></p>
+          <p><span>Virtualization</span><strong>DISABLED</strong></p>
+          <p><span>Windows Defender</span><strong>DISABLED</strong></p>
+          <p><span>Windows Firewall</span><strong>DISABLED</strong></p>
+          <p><span>Exploit Protection</span><strong>ENABLED (Default)</strong></p>
+        </div>
         <ul>
-          <li>Requirements: Core Isolation off, UEFI BIOS, visuals installed.</li>
-          <li>Windows support: 10 22H2 - 11 23H2 (COD supports newer builds).</li>
-          <li>Common fixes: <code>mem_ctx</code> load issues -> remove anti-cheats/antivirus; <code>Error #13/0x2</code> -> unsupported Windows; timeout/hostname -> VPN.</li>
+          <li>Use Inspectre for Meltdown/Spectre.</li>
+          <li>For driver issues run <code>sfc /scannow</code>.</li>
         </ul>
-      </details>
+      </article>
 
-      <details class="guide-item">
-        <summary>Atlas</summary>
-        <pre class="spec-block">TPM:                         (N/A) - ENABLED for COD
-Secure Boot:             DISABLED - ENABLED for COD
-Virtualization:            DISABLED
-Windows Defender:  DISABLED
-Windows Firewall:    DISABLED
-Exploit Protection:    ENABLED (Default)</pre>
+      <article class="guide-card">
+        <h3>Forge</h3>
+        <div class="spec-table">
+          <p><span>TPM</span><strong>(N/A)</strong></p>
+          <p><span>Secure Boot</span><strong>DISABLED</strong></p>
+          <p><span>Virtualization</span><strong>DISABLED</strong></p>
+          <p><span>Windows Defender</span><strong>DISABLED</strong></p>
+          <p><span>Windows Firewall</span><strong>DISABLED</strong></p>
+          <p><span>Exploit Protection</span><strong>DISABLED</strong></p>
+        </div>
         <ul>
-          <li>Requirements: Core Isolation off, UEFI BIOS, visuals installed.</li>
-          <li>Common fixes: disable Meltdown/Spectre with Inspectre tool; run <code>sfc /scannow</code> for driver load errors; disable overlays for engine/fatal errors.</li>
+          <li>BSOD flow: <code>sfc /scannow</code> then <code>DISM /Online /Cleanup-image /Restorehealth</code>.</li>
         </ul>
-      </details>
+      </article>
 
-      <details class="guide-item">
-        <summary>Forge</summary>
-        <pre class="spec-block">TPM:                         (N/A)
-Secure Boot:             DISABLED
-Virtualization:            DISABLED
-Windows Defender:  DISABLED
-Windows Firewall:    DISABLED
-Exploit Protection:    DISABLED</pre>
+      <article class="guide-card">
+        <h3>Kane</h3>
+        <div class="spec-table">
+          <p><span>TPM</span><strong>(N/A)</strong></p>
+          <p><span>Secure Boot</span><strong>DISABLED</strong></p>
+          <p><span>Virtualization</span><strong>ENABLED</strong></p>
+          <p><span>Windows Defender</span><strong>DISABLED</strong></p>
+          <p><span>Windows Firewall</span><strong>DISABLED</strong></p>
+          <p><span>Exploit Protection</span><strong>ENABLED (Default)</strong></p>
+        </div>
         <ul>
-          <li>Requirements: Core Isolation off, UEFI BIOS, visuals installed.</li>
-          <li>BSOD flow: run <code>sfc /scannow</code> and <code>DISM.exe /Online /Cleanup-image /Restorehealth</code>.</li>
-          <li>Loader closes at 100%: sync PC time and re-run as admin.</li>
+          <li>Use <code>*kaneamdmenufix</code> for vc_redist/libs error.</li>
+          <li>Common: disable startup apps for map-memory errors.</li>
         </ul>
-      </details>
+      </article>
 
-      <details class="guide-item">
-        <summary>Hero</summary>
-        <pre class="spec-block">TPM:                         MIXED (By Product)
-Secure Boot:             MIXED (By Product)
-Virtualization:            MIXED (By Product)
-Windows Defender:  DISABLED
-Windows Firewall:    DISABLED
-Exploit Protection:    MIXED (Default / Disabled)</pre>
+      <article class="guide-card">
+        <h3>Liquid</h3>
+        <div class="spec-table">
+          <p><span>TPM</span><strong>(N/A)</strong></p>
+          <p><span>Secure Boot</span><strong>DISABLED</strong></p>
+          <p><span>Virtualization</span><strong>ENABLED</strong></p>
+          <p><span>Windows Defender</span><strong>DISABLED</strong></p>
+          <p><span>Windows Firewall</span><strong>DISABLED</strong></p>
+          <p><span>Exploit Protection</span><strong>ENABLED (Default)</strong></p>
+        </div>
         <ul>
-          <li>Variants include Valorant, OW2, Delta Force, FN/Rust/Apex/ABI/ARC.</li>
-          <li>Frequent requirements: Medal overlay, Hyper-V for specific products, all overlays except required one off.</li>
-          <li>No menu / ENC / crashes: collect bundle file and escalate to senior support.</li>
+          <li>EFT Chams: press F1 in main menu.</li>
         </ul>
-      </details>
+      </article>
 
-      <details class="guide-item">
-        <summary>Kane</summary>
-        <pre class="spec-block">TPM:                         (N/A)
-Secure Boot:             DISABLED
-Virtualization:            ENABLED
-Windows Defender:  DISABLED
-Windows Firewall:    DISABLED
-Exploit Protection:    ENABLED (Default)</pre>
+      <article class="guide-card">
+        <h3>Pulse</h3>
+        <div class="spec-table">
+          <p><span>TPM</span><strong>(N/A)</strong></p>
+          <p><span>Secure Boot</span><strong>DISABLED</strong></p>
+          <p><span>Virtualization</span><strong>DISABLED</strong></p>
+          <p><span>Windows Defender</span><strong>DISABLED</strong></p>
+          <p><span>Windows Firewall</span><strong>DISABLED</strong></p>
+          <p><span>Exploit Protection</span><strong>DISABLED</strong></p>
+        </div>
         <ul>
-          <li>Key fixes: use <code>*kaneamdmenufix</code> for vc_redist/libs; pin/hypervisor fixes via support commands; disable startup apps for map memory errors.</li>
-          <li>Extra slide fixes include: no servers -> VPN, error 0x298 -> contact dev.</li>
+          <li>ARC injection issues: disable overlays/startup apps, inject first.</li>
         </ul>
-      </details>
+      </article>
 
-      <details class="guide-item">
-        <summary>Liquid</summary>
-        <pre class="spec-block">TPM:                         (N/A)
-Secure Boot:             DISABLED
-Virtualization:            ENABLED
-Windows Defender:  DISABLED
-Windows Firewall:    DISABLED
-Exploit Protection:    ENABLED (Default)</pre>
+      <article class="guide-card">
+        <h3>VEX</h3>
+        <div class="spec-table">
+          <p><span>TPM</span><strong>(N/A)</strong></p>
+          <p><span>Secure Boot</span><strong>DISABLED</strong></p>
+          <p><span>Virtualization</span><strong>DISABLED</strong></p>
+          <p><span>Windows Defender</span><strong>DISABLED</strong></p>
+          <p><span>Windows Firewall</span><strong>DISABLED</strong></p>
+          <p><span>Exploit Protection</span><strong>DISABLED</strong></p>
+        </div>
         <ul>
-          <li>Requirements: Core Isolation off, UEFI BIOS, visuals installed.</li>
-          <li>EFT Chams: press F1 in main menu to inject.</li>
-          <li>Steelseries requirement for some products; no menu flow same as Kane style troubleshooting.</li>
-        </ul>
-      </details>
-
-      <details class="guide-item">
-        <summary>Pulse</summary>
-        <pre class="spec-block">TPM:                         (N/A)
-Secure Boot:             DISABLED
-Virtualization:            DISABLED
-Windows Defender:  DISABLED
-Windows Firewall:    DISABLED
-Exploit Protection:    DISABLED</pre>
-        <ul>
-          <li>ARC Raiders injection failures: close browser overlays, disable startup apps, disable Overwolf overlays, inject first then open launcher flow.</li>
-        </ul>
-      </details>
-
-      <details class="guide-item">
-        <summary>VEX</summary>
-        <pre class="spec-block">TPM:                         (N/A)
-Secure Boot:             DISABLED
-Virtualization:            DISABLED
-Windows Defender:  DISABLED
-Windows Firewall:    DISABLED
-Exploit Protection:    DISABLED</pre>
-        <ul>
-          <li>Windows support target: 10 22H2 -> 11 23H2.</li>
           <li>Warthunder requires DX11.</li>
-          <li>Connection issues: network manager IP optimization + VPN fallback.</li>
         </ul>
-      </details>
+      </article>
 
-      <details class="guide-item">
-        <summary>Viper</summary>
-        <pre class="spec-block">TPM:                         (N/A)
-Secure Boot:             (N/A)
-Virtualization:            (N/A)
-Windows Defender:  DISABLED
-Windows Firewall:    DISABLED
-Exploit Protection:    ENABLED (Default)</pre>
+      <article class="guide-card">
+        <h3>Viper</h3>
+        <div class="spec-table">
+          <p><span>TPM</span><strong>(N/A)</strong></p>
+          <p><span>Secure Boot</span><strong>(N/A)</strong></p>
+          <p><span>Virtualization</span><strong>(N/A)</strong></p>
+          <p><span>Windows Defender</span><strong>DISABLED</strong></p>
+          <p><span>Windows Firewall</span><strong>DISABLED</strong></p>
+          <p><span>Exploit Protection</span><strong>ENABLED (Default)</strong></p>
+        </div>
         <ul>
-          <li>Must remove/disable antivirus and overlays; product is Steam-only (except ARC Raiders).</li>
-          <li>Failed stream: VPN + Cloudflare DNS.</li>
-          <li>Game-specific saved-folder cleanup for The Isle/ARC when needed.</li>
+          <li>Disable all overlays and antivirus.</li>
+          <li>Failed stream: use VPN + Cloudflare DNS.</li>
         </ul>
-      </details>
+      </article>
 
-      <details class="guide-item">
-        <summary>Volt</summary>
-        <pre class="spec-block">TPM:                         DISABLED
-Secure Boot:             DISABLED
-Virtualization:            ENABLED
-Windows Defender:  DISABLED
-Windows Firewall:    DISABLED
-Exploit Protection:    DISABLED</pre>
+      <article class="guide-card">
+        <h3>Volt</h3>
+        <div class="spec-table">
+          <p><span>TPM</span><strong>DISABLED</strong></p>
+          <p><span>Secure Boot</span><strong>DISABLED</strong></p>
+          <p><span>Virtualization</span><strong>ENABLED</strong></p>
+          <p><span>Windows Defender</span><strong>DISABLED</strong></p>
+          <p><span>Windows Firewall</span><strong>DISABLED</strong></p>
+          <p><span>Exploit Protection</span><strong>DISABLED</strong></p>
+        </div>
         <ul>
-          <li>Framework errors: install required .NET runtime packages.</li>
-          <li>HVIX/HVAX not found: run <code>sfc /scannow</code>; boot partition errors can require reinstall if not repairable.</li>
+          <li>Framework error: install required .NET runtime.</li>
+          <li>HVIX/HVAX not found: run <code>sfc /scannow</code>.</li>
         </ul>
-      </details>
+      </article>
 
-      <details class="guide-item">
-        <summary>Refunds / Compensation / HWID</summary>
+      <article class="guide-card">
+        <h3>Refund / Compensation / HWID</h3>
+        <div class="spec-table">
+          <p><span>Refund info</span><strong>Key + order + game required</strong></p>
+          <p><span>Comp policy</span><strong>For major downtime/troubleshooting</strong></p>
+          <p><span>HWID reset</span><strong>Escalate to senior support</strong></p>
+        </div>
         <ul>
-          <li>Refund review needs key, order number, key length, and game.</li>
-          <li>Compensation possible for significant downtime/troubleshooting (not repeated abuse).</li>
-          <li>HWID reset requests should be escalated to senior support/reset-access staff.</li>
+          <li>Use senior review when case is unclear.</li>
         </ul>
-      </details>
+      </article>
     </section>
   </main>
 
   <footer class="container footer">
-    <p>This page is organized from your provided slide deck for faster lookup.</p>
+    <p>Formatted cleanly from your docs style for easier reading.</p>
   </footer>
 
   <script>
   (function () {
-    var search = document.getElementById("guideSearch");
-    var items = Array.prototype.slice.call(document.querySelectorAll(".guide-item"));
+    var input = document.getElementById("guideSearch");
+    var cards = Array.prototype.slice.call(document.querySelectorAll(".guide-card"));
 
-    function applySearch() {
-      var q = search.value.toLowerCase().trim();
-      items.forEach(function (item) {
-        var text = item.textContent.toLowerCase();
-        var show = !q || text.indexOf(q) !== -1;
-        item.style.display = show ? "block" : "none";
+    function filter() {
+      var q = input.value.toLowerCase().trim();
+      cards.forEach(function (card) {
+        var text = card.textContent.toLowerCase();
+        card.style.display = (!q || text.indexOf(q) !== -1) ? "block" : "none";
       });
     }
 
-    search.addEventListener("input", applySearch);
+    input.addEventListener("input", filter);
   })();
   </script>
 </body>
