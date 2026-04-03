@@ -642,6 +642,40 @@
       });
     }
 
+    var searchAliases = [
+      ["ow2", "overwatch 2"],
+      ["overwatch 2", "ow2"],
+      ["cod", "call of duty"],
+      ["call of duty", "cod"],
+      ["fn", "fortnite"],
+      ["fortnite", "fn"],
+      ["abi", "arena breakout infinite"],
+      ["arena breakout infinite", "abi"],
+      ["eft", "escape from tarkov"],
+      ["escape from tarkov", "eft"],
+      ["r6", "rainbow six siege"],
+      ["rainbow six siege", "r6"],
+      ["cs2", "counter strike 2"],
+      ["counter strike 2", "cs2"],
+      ["df", "delta force"],
+      ["delta force", "df"],
+      ["wt", "warthunder"],
+      ["warthunder", "wt"],
+      ["arc", "arc raiders"],
+      ["arc raiders", "arc"]
+    ];
+
+    function withAliases(text) {
+      var lower = text.toLowerCase();
+      var extra = [];
+      searchAliases.forEach(function (pair) {
+        if (lower.indexOf(pair[0]) !== -1) {
+          extra.push(pair[1]);
+        }
+      });
+      return lower + " " + extra.join(" ");
+    }
+
     function renderSelect() {
       selectEl.innerHTML = filtered.map(function (p, i) {
         return "<option value=\"" + i + "\">" + p.name + "</option>";
@@ -668,9 +702,27 @@
         return row[0] + ": " + row[1];
       }).join("\n");
       var fixesText = item.notes.join("\n");
+      var linksText = (item.links || []).map(function (link) {
+        return link[0] + ": " + link[1];
+      }).join("\n");
 
       var commandSource = requirementsText + "\n" + fixesText;
       var commands = unique((commandSource.match(/\*[a-z0-9_]+/gi) || []));
+      var fullCardText = [
+        item.name,
+        "",
+        "Requirements",
+        requirementsText,
+        "",
+        "Fixes",
+        fixesText,
+        "",
+        "Commands",
+        commands.join("\n") || "(none)",
+        "",
+        "Links",
+        linksText || "(none)"
+      ].join("\n");
       var commandButtons = commands.length
         ? commands.map(function (cmd) {
             return "<button type=\"button\" class=\"cmd-chip\" data-cmd=\"" + cmd + "\">" + cmd + "</button>";
@@ -689,6 +741,8 @@
         + "<button type=\"button\" class=\"copy-btn\" id=\"copyReq\">Copy Requirements</button>"
         + "<button type=\"button\" class=\"copy-btn\" id=\"copyFix\">Copy Fixes</button>"
         + "<button type=\"button\" class=\"copy-btn\" id=\"copyCmd\">Copy Commands</button>"
+        + "<button type=\"button\" class=\"copy-btn\" id=\"copyLinks\">Copy Links</button>"
+        + "<button type=\"button\" class=\"copy-btn\" id=\"copyAll\">Copy Full Card</button>"
         + "</div>"
         + "<div class=\"spec-table\">" + specRows + "</div>"
         + "<h4>Important Fixes / Notes</h4><ul>" + noteRows + "</ul>"
@@ -698,6 +752,8 @@
       var copyReqBtn = document.getElementById("copyReq");
       var copyFixBtn = document.getElementById("copyFix");
       var copyCmdBtn = document.getElementById("copyCmd");
+      var copyLinksBtn = document.getElementById("copyLinks");
+      var copyAllBtn = document.getElementById("copyAll");
 
       copyReqBtn.addEventListener("click", function () {
         copyText(requirementsText, "Requirements");
@@ -707,6 +763,12 @@
       });
       copyCmdBtn.addEventListener("click", function () {
         copyText(commands.join("\n"), "Commands");
+      });
+      copyLinksBtn.addEventListener("click", function () {
+        copyText(linksText || "(none)", "Links");
+      });
+      copyAllBtn.addEventListener("click", function () {
+        copyText(fullCardText, "Full card");
       });
 
       Array.prototype.slice.call(cardEl.querySelectorAll(".cmd-chip")).forEach(function (btn) {
@@ -724,7 +786,7 @@
       var normalizedQuery = q.replace(/[^a-z0-9]+/g, " ").trim();
       filtered = products.filter(function (p) {
         var linkText = (p.links || []).map(function (l) { return l.join(" "); }).join(" ");
-        var text = (p.name + " " + p.notes.join(" ") + " " + p.specs.map(function (s) { return s.join(" "); }).join(" ") + " " + linkText).toLowerCase();
+        var text = withAliases(p.name + " " + p.notes.join(" ") + " " + p.specs.map(function (s) { return s.join(" "); }).join(" ") + " " + linkText);
         var normalizedText = text.replace(/[^a-z0-9]+/g, " ");
         return !q || text.indexOf(q) !== -1 || (normalizedQuery && normalizedText.indexOf(normalizedQuery) !== -1);
       });
