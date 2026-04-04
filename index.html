@@ -23,9 +23,12 @@
     <nav class="top-nav" aria-label="Main">
       <a class="nav-link active" href="index.html">Status</a>
       <a class="nav-link" href="presentation.html">Support Guide</a>
+      <a class="nav-link" id="authLink" href="auth.html">Login</a>
+      <a class="nav-link" id="adminLink" href="admin.html" style="display:none;">Admin</a>
     </nav>
-    <h1>Cosmo Product Status</h1>
-    <p class="subtitle">Live tracking for <strong>Updating</strong> and <strong>Testing</strong> products</p>
+    <h1 id="heroTitle">Cosmo Product Status</h1>
+    <p class="subtitle" id="heroSubtitle">Live tracking for <strong>Updating</strong> and <strong>Testing</strong> products</p>
+    <p class="status-line" id="announcementLine"></p>
     <div class="meta">
       <span id="sourceTime">Source: --</span>
       <span id="fetchedTime">Synced: --</span>
@@ -49,6 +52,14 @@
       </div>
       <p id="statusLine" class="status-line"></p>
       <div id="cards" class="cards"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Support Team Presence</h2>
+      </div>
+      <p class="status-line" id="presenceHint">Login to see support team online status.</p>
+      <div id="presenceList" class="cards"></div>
     </section>
   </main>
 
@@ -115,10 +126,19 @@ var sourceTimeEl = document.getElementById("sourceTime");
 var fetchedTimeEl = document.getElementById("fetchedTime");
 var dataAgeEl = document.getElementById("dataAge");
 var refreshCountdownEl = document.getElementById("refreshCountdown");
+var heroTitleEl = document.getElementById("heroTitle");
+var heroSubtitleEl = document.getElementById("heroSubtitle");
+var announcementLineEl = document.getElementById("announcementLine");
+var authLinkEl = document.getElementById("authLink");
+var adminLinkEl = document.getElementById("adminLink");
+var presenceHintEl = document.getElementById("presenceHint");
+var presenceListEl = document.getElementById("presenceList");
 var searchInput = document.getElementById("searchInput");
 var countBadge = document.getElementById("countBadge");
 var nextRefreshAt = 0;
 var latestFetchedAt = null;
+var manualItems = [];
+var currentUser = null;
 
 function renderItems(items) {
   if (!items.length) { cardsEl.innerHTML = ""; statusLineEl.textContent = "No products match your search."; countBadge.textContent = "(0)"; return; }
@@ -172,12 +192,98 @@ function tickTimers() {
 }
 
 function applyLiveData(data) {
-  allItems = (data && data.items && data.items.length) ? data.items : defaultData.items;
+  var baseItems = (data && data.items && data.items.length) ? data.items : defaultData.items;
+  allItems = baseItems.concat(manualItems);
   latestFetchedAt = new Date((data && data.fetchedAt) ? data.fetchedAt : defaultData.fetchedAt);
   filterItems();
   sourceTimeEl.textContent = "Source: " + ((data && data.lastUpdated) ? data.lastUpdated : defaultData.lastUpdated);
   fetchedTimeEl.textContent = "Synced: " + formatDateTime((data && data.fetchedAt) ? data.fetchedAt : defaultData.fetchedAt);
   tickTimers();
+}
+
+function renderPresence(users) {
+  if (!users || !users.length) {
+    presenceListEl.innerHTML = "";
+    presenceHintEl.textContent = "No approved users found.";
+    return;
+  }
+
+  presenceListEl.innerHTML = users.map(function (u) {
+    var badge = u.online ? "<span class='pill pill-updating'><span class='status-ring'></span>Online now</span>" : "<span class='pill pill-testing'>Last seen</span>";
+    var seenText = u.online ? "Active now" : formatDateTime(u.lastSeen);
+    return "<article class='card'><p class='brand'>" + u.role + "</p><h3 class='game'>" + u.username + "</h3>" + badge + "<p class='updated'>" + seenText + "</p></article>";
+  }).join("");
+  presenceHintEl.textContent = "";
+}
+
+function loadPresence() {
+  if (!currentUser) {
+    renderPresence([]);
+    presenceHintEl.textContent = "Login to see support team online status.";
+    return;
+  }
+  fetch("/api/users/presence")
+    .then(function (res) {
+      if (!res.ok) throw new Error("unauthorized");
+      return res.json();
+    })
+    .then(function (data) {
+      renderPresence(data.users || []);
+    })
+    .catch(function () {
+      renderPresence([]);
+      presenceHintEl.textContent = "Could not load presence list.";
+    });
+}
+
+function heartbeat() {
+  if (!currentUser) return;
+  fetch("/api/auth/heartbeat", { method: "POST" }).catch(function () {});
+}
+
+function loadSiteConfig() {
+  return fetch("/api/site/config")
+    .then(function (res) { return res.json(); })
+    .then(function (cfg) {
+      if (cfg.siteContent) {
+        heroTitleEl.textContent = cfg.siteContent.heroTitle || heroTitleEl.textContent;
+        heroSubtitleEl.textContent = cfg.siteContent.subtitle || heroSubtitleEl.textContent;
+        announcementLineEl.textContent = cfg.siteContent.announcement || "";
+      }
+      manualItems = Array.isArray(cfg.manualItems) ? cfg.manualItems : [];
+    })
+    .catch(function () {
+      manualItems = [];
+    });
+}
+
+function loadAuthState() {
+  fetch("/api/auth/me")
+    .then(function (res) {
+      if (!res.ok) throw new Error("no-session");
+      return res.json();
+    })
+    .then(function (out) {
+      currentUser = out.user;
+      authLinkEl.textContent = "Logout (" + currentUser.username + ")";
+      authLinkEl.href = "#";
+      authLinkEl.onclick = function (e) {
+        e.preventDefault();
+        fetch("/api/auth/logout", { method: "POST" }).then(function () { window.location.reload(); });
+      };
+      if (currentUser.role === "admin") {
+        adminLinkEl.style.display = "inline-flex";
+      }
+      heartbeat();
+      loadPresence();
+    })
+    .catch(function () {
+      currentUser = null;
+      authLinkEl.textContent = "Login";
+      authLinkEl.href = "auth.html";
+      adminLinkEl.style.display = "none";
+      loadPresence();
+    });
 }
 
 function loadLiveStatus() {
@@ -195,9 +301,12 @@ function loadLiveStatus() {
     });
 }
 
-loadLiveStatus();
+loadAuthState();
+loadSiteConfig().then(function () { loadLiveStatus(); });
 setInterval(loadLiveStatus, 30000);
 setInterval(tickTimers, 1000);
+setInterval(heartbeat, 30000);
+setInterval(loadPresence, 30000);
   </script>
 </body>
 </html>

@@ -1,0 +1,19 @@
+{
+  "users": [
+    {
+      "id": "1e5ed64d-a63d-42ae-b524-c2e378b19f1e",
+      "username": "mert",
+      "passwordHash": "$2b$10$5/YWt4/6vNmD9tXvMgApkup7YFJQkEBjxHi/mxhi//auWYqSRAHeu",
+      "role": "admin",
+      "approved": true,
+      "createdAt": "2026-04-04T12:12:40.006Z",
+      "lastSeen": "2026-04-04T12:12:40.007Z"
+    }
+  ],
+  "siteContent": {
+    "heroTitle": "Cosmo Product Status",
+    "subtitle": "Live tracking for Updating and Testing products",
+    "announcement": ""
+  },
+  "manualItems": []
+}

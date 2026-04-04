@@ -1,0 +1,27 @@
+{
+  "name": "new-folder-(5)",
+  "version": "1.0.0",
+  "description": "This site auto-syncs product statuses from:",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"No test suite configured\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gorgeborger2-byte/status-page.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/gorgeborger2-byte/status-page/issues"
+  },
+  "homepage": "https://github.com/gorgeborger2-byte/status-page#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0"
+  }
+}

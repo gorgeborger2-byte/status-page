@@ -500,6 +500,83 @@ body.compact-page .footer {
   color: #b4d5ff;
 }
 
+.auth-wrap,
+.admin-wrap {
+  padding-top: 1.8rem;
+  padding-bottom: 1.8rem;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.auth-panel h1,
+.admin-wrap h1,
+.admin-wrap h2 {
+  margin-top: 0;
+}
+
+.auth-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0.8rem;
+}
+
+.auth-card,
+.stack-form {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.auth-card input,
+.stack-form input,
+.auth-card button,
+.stack-form button {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #0d1e36;
+  color: var(--text);
+  padding: 0.55rem 0.72rem;
+  font: inherit;
+}
+
+.auth-card button,
+.stack-form button,
+.admin-table button {
+  cursor: pointer;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow-x: auto;
+  display: block;
+}
+
+.admin-table thead,
+.admin-table tbody,
+.admin-table tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.admin-table th,
+.admin-table td {
+  border: 1px solid var(--border);
+  padding: 0.4rem;
+  font-size: 0.82rem;
+  vertical-align: top;
+}
+
+.admin-table button {
+  margin: 0 0.2rem 0.2rem 0;
+  border: 1px solid #315079;
+  background: #123052;
+  color: #e8f0ff;
+  border-radius: 8px;
+  padding: 0.2rem 0.45rem;
+  font-size: 0.72rem;
+}
+
 .grizz-guard-msg {
   position: fixed;
   left: 50%;

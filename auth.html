@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Team Login</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="space-bg" aria-hidden="true">
+    <div class="space-nebula"></div>
+    <div class="space-stars space-stars-a"></div>
+    <div class="space-stars space-stars-b"></div>
+  </div>
+
+  <main class="container auth-wrap">
+    <section class="panel auth-panel">
+      <h1>Team Access</h1>
+      <p class="subtitle">Support accounts are created instantly, but stay pending until main admin approves.</p>
+      <div class="auth-grid">
+        <form id="loginForm" class="auth-card">
+          <h2>Login</h2>
+          <input id="loginUser" placeholder="Username" required>
+          <input id="loginPass" type="password" placeholder="Password" required>
+          <button type="submit">Login</button>
+        </form>
+
+        <form id="registerForm" class="auth-card">
+          <h2>Register Support</h2>
+          <input id="regUser" placeholder="Username" required>
+          <input id="regPass" type="password" placeholder="Password" required>
+          <button type="submit">Register</button>
+        </form>
+      </div>
+      <p id="authState" class="status-line"></p>
+      <p class="status-line">Main admin login: <code>mert</code> / <code>mert</code></p>
+      <p><a class="footer-link" href="index.html">Back to status page</a></p>
+    </section>
+  </main>
+
+  <script>
+  async function postJson(url, payload) {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || "Request failed");
+    return data;
+  }
+
+  const stateEl = document.getElementById("authState");
+
+  document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    try {
+      const username = document.getElementById("loginUser").value.trim();
+      const password = document.getElementById("loginPass").value;
+      await postJson("/api/auth/login", { username, password });
+      stateEl.textContent = "Logged in. Redirecting...";
+      setTimeout(() => { window.location.href = "index.html"; }, 500);
+    } catch (err) {
+      stateEl.textContent = err.message;
+    }
+  });
+
+  document.getElementById("registerForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    try {
+      const username = document.getElementById("regUser").value.trim();
+      const password = document.getElementById("regPass").value;
+      const out = await postJson("/api/auth/register", { username, password });
+      stateEl.textContent = out.message || "Registered. Waiting for admin approval.";
+    } catch (err) {
+      stateEl.textContent = err.message;
+    }
+  });
+  </script>
+</body>
+</html>
