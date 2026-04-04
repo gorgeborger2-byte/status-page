@@ -65,19 +65,25 @@
   <script src="auth-local.js"></script>
   <script>
   (function () {
-    var currentUser = GrizzAuth.requireApprovedSession("auth.html");
-    if (!currentUser) return;
-    GrizzAuth.touch();
+    var currentUser = null;
     var adminLinkEl = document.getElementById("adminLink");
     var logoutLinkEl = document.getElementById("logoutLink");
-    if (GrizzAuth.hasAdminAccess(currentUser)) {
-      adminLinkEl.style.display = "inline-flex";
-    }
     logoutLinkEl.addEventListener("click", function (e) {
       e.preventDefault();
-      GrizzAuth.logout();
-      window.location.replace("auth.html");
+      GrizzAuth.logout().then(function () {
+        window.location.replace("auth.html");
+      });
     });
+
+    (async function bootAuth() {
+      await GrizzAuth.init();
+      currentUser = GrizzAuth.requireApprovedSession("auth.html");
+      if (!currentUser) return;
+      await GrizzAuth.touch();
+      if (GrizzAuth.hasAdminAccess(currentUser)) {
+        adminLinkEl.style.display = "inline-flex";
+      }
+    })();
 
     var products = [
       {

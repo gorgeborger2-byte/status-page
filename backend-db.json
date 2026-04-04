@@ -1,0 +1,82 @@
+{
+  "users": [
+    {
+      "id": "owner-mert",
+      "username": "mert",
+      "passwordHash": "$2a$10$FNsrQPAi.Sr8QMl8onZy1e1l5eUQB4tcchzz80AvO7wl0pNdyIcee",
+      "role": "owner",
+      "approved": true,
+      "banned": false,
+      "createdAt": "2026-04-04T14:35:53.125Z",
+      "lastSeen": null,
+      "nickname": "Cosmo Owner",
+      "nicknameUpdatedAt": null
+    },
+    {
+      "id": "coder-yurixd666",
+      "username": "yurixd666",
+      "passwordHash": "$2a$10$WkavwiIGQDLkVPr5W6McWekE4fPAdIWskntHwURc/e.wcxD7mIHhm",
+      "role": "coder",
+      "approved": true,
+      "banned": false,
+      "createdAt": "2026-04-04T14:35:53.183Z",
+      "lastSeen": null,
+      "nickname": "Nova Coder",
+      "nicknameUpdatedAt": null
+    }
+  ],
+  "roles": [
+    {
+      "name": "owner",
+      "label": "Owner",
+      "color": "#ffd369",
+      "accent": "#ff8f3a",
+      "glow": true,
+      "adminAccess": true,
+      "system": true
+    },
+    {
+      "name": "coder",
+      "label": "Coder",
+      "color": "#67f5ff",
+      "accent": "#26a7ff",
+      "glow": true,
+      "adminAccess": true,
+      "system": true
+    },
+    {
+      "name": "manager",
+      "label": "Manager",
+      "color": "#8dfca6",
+      "accent": "#38c97a",
+      "glow": false,
+      "adminAccess": true,
+      "system": true
+    },
+    {
+      "name": "admin",
+      "label": "Admin",
+      "color": "#f9a8d4",
+      "accent": "#ec4899",
+      "glow": false,
+      "adminAccess": true,
+      "system": true
+    },
+    {
+      "name": "support",
+      "label": "Support",
+      "color": "#aac6ff",
+      "accent": "#5d88ff",
+      "glow": false,
+      "adminAccess": false,
+      "system": true
+    }
+  ],
+  "siteContent": {
+    "heroTitle": "Cosmo Product Status",
+    "subtitle": "Live tracking for Updating and Testing products",
+    "announcement": ""
+  },
+  "manualItems": [],
+  "auditLogs": []
+}

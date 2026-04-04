@@ -17,7 +17,7 @@
     <section class="panel auth-panel">
       <h1>Team Access</h1>
       <p class="subtitle">Support accounts are created instantly, but stay pending until main admin approves.</p>
-      <p class="status-line">Local mode: this frontend-only version stores accounts per browser/device.</p>
+      <p class="status-line">Shared backend mode: registrations are visible to all admins.</p>
       <div class="auth-grid">
         <form id="loginForm" class="auth-card">
           <h2>Login</h2>
@@ -42,19 +42,20 @@
   <script>
   const stateEl = document.getElementById("authState");
 
-  function ensureNotAlreadyLoggedIn() {
+  async function ensureNotAlreadyLoggedIn() {
+    await GrizzAuth.init();
     const user = GrizzAuth.getCurrentUser();
     if (user && user.approved && !user.banned) {
       window.location.replace("index.html");
     }
   }
 
-  document.getElementById("loginForm").addEventListener("submit", (e) => {
+  document.getElementById("loginForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     try {
       const username = document.getElementById("loginUser").value.trim();
       const password = document.getElementById("loginPass").value;
-      GrizzAuth.login(username, password);
+      await GrizzAuth.login(username, password);
       stateEl.textContent = "Logged in. Redirecting...";
       window.location.replace("index.html");
     } catch (err) {
@@ -62,12 +63,12 @@
     }
   });
 
-  document.getElementById("registerForm").addEventListener("submit", (e) => {
+  document.getElementById("registerForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     try {
       const username = document.getElementById("regUser").value.trim();
       const password = document.getElementById("regPass").value;
-      const out = GrizzAuth.registerSupport(username, password);
+      const out = await GrizzAuth.registerSupport(username, password);
       stateEl.textContent = out.message || "Registered. Waiting for admin approval.";
     } catch (err) {
       stateEl.textContent = err.message;

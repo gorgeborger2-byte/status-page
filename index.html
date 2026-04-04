@@ -254,7 +254,9 @@ function renderPresence(users) {
 }
 
 function loadPresence() {
-  renderPresence(GrizzAuth.getApprovedUsersWithPresence());
+  return GrizzAuth.getApprovedUsersWithPresence()
+    .then(function (users) { renderPresence(users); })
+    .catch(function () { renderPresence([]); });
 }
 
 function heartbeat() {
@@ -263,30 +265,37 @@ function heartbeat() {
 }
 
 function loadSiteConfig() {
-  var cfg = GrizzAuth.getSiteContent();
-  heroTitleEl.textContent = cfg.heroTitle || heroTitleEl.textContent;
-  heroSubtitleEl.textContent = cfg.subtitle || heroSubtitleEl.textContent;
-  announcementLineEl.textContent = cfg.announcement || "";
-  manualItems = GrizzAuth.getManualItems();
-  return Promise.resolve();
+  return GrizzAuth.getSiteContent()
+    .then(function (cfg) {
+      heroTitleEl.textContent = cfg.heroTitle || heroTitleEl.textContent;
+      heroSubtitleEl.textContent = cfg.subtitle || heroSubtitleEl.textContent;
+      announcementLineEl.textContent = cfg.announcement || "";
+      return GrizzAuth.getManualItems();
+    })
+    .then(function (items) {
+      manualItems = items || [];
+    });
 }
 
 function loadAuthState() {
-  currentUser = GrizzAuth.requireApprovedSession("auth.html");
-  if (!currentUser) return;
-  profileLinkEl.style.display = "inline-flex";
-  authLinkEl.textContent = "Logout (" + (currentUser.displayName || "No Nickname") + ")";
-  authLinkEl.href = "#";
-  authLinkEl.onclick = function (e) {
-    e.preventDefault();
-    GrizzAuth.logout();
-    window.location.href = "auth.html";
-  };
-  if (GrizzAuth.hasAdminAccess(currentUser)) {
-    adminLinkEl.style.display = "inline-flex";
-  }
-  heartbeat();
-  loadPresence();
+  return GrizzAuth.init().then(function () {
+    currentUser = GrizzAuth.requireApprovedSession("auth.html");
+    if (!currentUser) return;
+    profileLinkEl.style.display = "inline-flex";
+    authLinkEl.textContent = "Logout (" + (currentUser.displayName || "No Nickname") + ")";
+    authLinkEl.href = "#";
+    authLinkEl.onclick = function (e) {
+      e.preventDefault();
+      GrizzAuth.logout().then(function () {
+        window.location.href = "auth.html";
+      });
+    };
+    if (GrizzAuth.hasAdminAccess(currentUser)) {
+      adminLinkEl.style.display = "inline-flex";
+    }
+    heartbeat();
+    return loadPresence();
+  });
 }
 
 function loadLiveStatus() {
@@ -304,12 +313,14 @@ function loadLiveStatus() {
     });
 }
 
-loadAuthState();
-loadSiteConfig().then(function () { loadLiveStatus(); }).catch(function () {});
+loadAuthState()
+  .then(function () { return loadSiteConfig(); })
+  .then(function () { loadLiveStatus(); })
+  .catch(function () {});
 setInterval(loadLiveStatus, 30000);
 setInterval(tickTimers, 1000);
 setInterval(heartbeat, 30000);
-setInterval(loadPresence, 30000);
+setInterval(function () { loadPresence(); }, 30000);
   </script>
 </body>
 </html>

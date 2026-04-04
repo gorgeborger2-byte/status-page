@@ -1,21 +1,35 @@
 # Cosmo Status Site
 
-This version uses a frontend admin/auth system (no backend required to run pages).
+This version uses a shared backend (Express + JSON DB) so all staff devices see the same users, approvals, roles, and profile data.
+
+## Run
+
+1. Install packages:
+   - `npm install`
+2. Start server:
+   - `npm start`
+3. Open:
+   - `http://localhost:3000`
 
 ## Pages
 
 - `auth.html` - login/register page
-- `admin.html` - admin panel (approve users, roles, ban, remove, content edits, manual items)
+- `admin.html` - full admin panel (users/roles/content/manual items + backend observability)
 - `index.html` - protected main status page
 - `presentation.html` - protected support guide page
+- `profile.html` - nickname + password change page
 
 ## Auth Rules
 
-- Privileged accounts are auto-seeded in `auth-local.js`
+- Privileged accounts are auto-seeded by backend:
+  - owner: `mert / mert`
+  - coder: `yurixd666 / yurixd666`
 - Support users register from `auth.html`
 - New users stay pending until admin approves in `admin.html`
 - Pending or banned users cannot access protected pages
+- Nickname can change once every 3 weeks
+- Password change requires original password
 
 ## Storage
 
-All auth/admin data is stored in browser `localStorage` via `auth-local.js`.
+All shared data is in `backend-db.json` via `server.js` APIs.

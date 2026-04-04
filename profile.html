@@ -58,19 +58,15 @@
   <script>
   (function () {
     const stateEl = document.getElementById("profileState");
-    const user = GrizzAuth.requireApprovedSession("auth.html");
-    if (!user) return;
-    GrizzAuth.touch();
     const profileBadgeEl = document.getElementById("profileBadge");
+    let user = null;
 
     document.getElementById("logoutLink").addEventListener("click", (e) => {
       e.preventDefault();
-      GrizzAuth.logout();
-      window.location.replace("auth.html");
+      GrizzAuth.logout().then(function () {
+        window.location.replace("auth.html");
+      });
     });
-    if (GrizzAuth.hasAdminAccess(user)) {
-      document.getElementById("adminLink").style.display = "inline-flex";
-    }
 
     function formatDate(value) {
       if (!value) return "-";
@@ -78,7 +74,7 @@
       return Number.isNaN(d.getTime()) ? value : d.toLocaleString();
     }
 
-    function renderIdentity() {
+    async function renderIdentity() {
       const current = GrizzAuth.getCurrentUser();
       if (!current) {
         window.location.replace("auth.html");
@@ -95,7 +91,7 @@
       document.getElementById("identityInfo").textContent = `Role: ${current.roleLabel} | Usernames are private to regular users.`;
       document.getElementById("nicknameInput").value = current.nickname || "";
 
-      const cooldown = GrizzAuth.getNicknameCooldown(current.id);
+      const cooldown = await GrizzAuth.getNicknameCooldown();
       if (cooldown.canChange) {
         document.getElementById("nicknameCooldown").textContent = "Nickname can be changed now.";
       } else {
@@ -103,23 +99,23 @@
       }
     }
 
-    document.getElementById("nicknameForm").addEventListener("submit", (e) => {
+    document.getElementById("nicknameForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       try {
         const current = GrizzAuth.getCurrentUser();
-        GrizzAuth.updateNickname(current.id, document.getElementById("nicknameInput").value);
-        renderIdentity();
+        await GrizzAuth.updateNickname(current.id, document.getElementById("nicknameInput").value);
+        await renderIdentity();
         stateEl.textContent = "Nickname saved.";
       } catch (err) {
         stateEl.textContent = err.message;
       }
     });
 
-    document.getElementById("passwordForm").addEventListener("submit", (e) => {
+    document.getElementById("passwordForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       try {
         const current = GrizzAuth.getCurrentUser();
-        GrizzAuth.changePassword(
+        await GrizzAuth.changePassword(
           current.id,
           document.getElementById("currentPassword").value,
           document.getElementById("newPassword").value
@@ -131,7 +127,16 @@
       }
     });
 
-    renderIdentity();
+    (async function boot() {
+      await GrizzAuth.init();
+      user = GrizzAuth.requireApprovedSession("auth.html");
+      if (!user) return;
+      await GrizzAuth.touch();
+      if (GrizzAuth.hasAdminAccess(user)) {
+        document.getElementById("adminLink").style.display = "inline-flex";
+      }
+      await renderIdentity();
+    })();
   })();
   </script>
 </body>

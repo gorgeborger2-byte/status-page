@@ -17,7 +17,7 @@
     <section class="panel admin-hero">
       <h1>Admin Panel</h1>
       <p class="subtitle">Manage users, roles, website text, and manual product items from one place.</p>
-      <p class="status-line">Local mode note: accounts are saved per browser/device in this frontend-only build.</p>
+      <p class="status-line">Shared backend mode enabled. All staff accounts sync through the server.</p>
       <p id="adminState" class="status-line"></p>
       <p><a class="footer-link" href="index.html">Back to status page</a></p>
     </section>
@@ -73,6 +73,16 @@
         </form>
         <div id="itemsTable"></div>
       </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Backend Observability</h2>
+          <button id="refreshInspectBtn" type="button">Refresh</button>
+        </div>
+        <p class="status-line">Inspect recent activity, logs, and live backend store snapshots.</p>
+        <div id="adminLogs"></div>
+        <pre id="storeInspect" class="raw-block" style="margin-top:0.8rem; max-height:260px;">Loading backend snapshot...</pre>
+      </section>
     </div>
   </main>
 
@@ -80,10 +90,8 @@
   <script>
   (function () {
   const adminState = document.getElementById("adminState");
-  const currentAdmin = GrizzAuth.requireAdminSession("auth.html");
-  if (!currentAdmin) {
-    return;
-  }
+  let currentAdmin = null;
+  let rolesCache = [];
 
   function esc(value) {
     return String(value || "").replace(/[&<>"']/g, function (char) {
@@ -105,31 +113,30 @@
     return `<span class="role-badge ${cls} ${glowClass}" style="--role-color:${esc(color)};--role-accent:${esc(accent)}">${esc(roleLabel || roleName)}</span>`;
   }
 
-  function renderStats(users) {
-    const pending = users.filter((u) => !u.approved && !u.banned).length;
-    const approved = users.filter((u) => u.approved && !u.banned).length;
-    const banned = users.filter((u) => u.banned).length;
-    const online = GrizzAuth.getApprovedUsersWithPresence().filter((u) => u.online).length;
+  function renderStats(stats) {
     document.getElementById("statsGrid").innerHTML = [
-      ["Approved users", approved],
-      ["Pending approval", pending],
-      ["Banned users", banned],
-      ["Online now", online]
-    ].map(([label, value]) => `<article class="stat-card"><p>${label}</p><h3>${value}</h3></article>`).join("");
+      ["Approved users", stats.approved || 0],
+      ["Pending approval", stats.pending || 0],
+      ["Banned users", stats.banned || 0],
+      ["Online now", stats.online || 0],
+      ["Roles", stats.roles || 0],
+      ["Manual items", stats.manualItems || 0]
+    ].map(function (row) {
+      return `<article class="stat-card"><p>${row[0]}</p><h3>${row[1]}</h3></article>`;
+    }).join("");
   }
 
-  function loadUsers() {
-    const roles = GrizzAuth.listRoles();
-    const users = GrizzAuth.listUsers();
+  async function loadUsers() {
+    const users = await GrizzAuth.listUsers();
     const rows = users.map((u) => {
-      const options = roles.map((r) => {
+      const options = rolesCache.map((r) => {
         const selected = r.name === u.role ? "selected" : "";
         return `<option value="${esc(r.name)}" ${selected}>${esc(r.label)}</option>`;
       }).join("");
       return `<tr>
         <td>
           <strong>${esc(u.displayName)}</strong>
-          <div class="mini-muted">@${esc(u.username)}</div>
+          <div class="mini-muted">@${esc(u.username || "-")}</div>
         </td>
         <td>${roleBadge(u.roleStyle, u.roleLabel, u.role)}</td>
         <td>${u.banned ? "Banned" : (u.approved ? "Approved" : "Pending")}</td>
@@ -146,12 +153,11 @@
       </tr>`;
     }).join("");
     document.getElementById("usersTable").innerHTML = `<table class="admin-table"><thead><tr><th>User</th><th>Role</th><th>Status</th><th>Last Seen</th><th>Actions</th></tr></thead><tbody>${rows}</tbody></table>`;
-    renderStats(users);
   }
 
-  function loadRoles() {
-    const roles = GrizzAuth.listRoles();
-    const rows = roles.map((r) => {
+  async function loadRoles() {
+    rolesCache = await GrizzAuth.listRoles();
+    const rows = rolesCache.map((r) => {
       return `<tr>
         <td>${roleBadge(r, r.label, r.name)}</td>
         <td>${r.adminAccess ? "Admin" : "Standard"}</td>
@@ -161,46 +167,63 @@
     document.getElementById("rolesTable").innerHTML = `<table class="admin-table"><thead><tr><th>Role</th><th>Access</th><th>Action</th></tr></thead><tbody>${rows}</tbody></table>`;
   }
 
-  function loadContentAndItems() {
-    const content = GrizzAuth.getSiteContent();
-    const items = GrizzAuth.getManualItems();
+  async function loadContentAndItems() {
+    const content = await GrizzAuth.getSiteContent();
+    const items = await GrizzAuth.getManualItems();
     document.getElementById("heroTitle").value = content.heroTitle || "";
     document.getElementById("heroSubtitle").value = content.subtitle || "";
     document.getElementById("announcement").value = content.announcement || "";
 
-    const rows = items.map((i) => `<tr><td>${i.brand}</td><td>${i.game}</td><td>${i.status}</td><td>${i.updated || ""}</td><td><button data-remove-item="${i.id}">Remove</button></td></tr>`).join("");
+    const rows = items.map((i) => `<tr><td>${esc(i.brand)}</td><td>${esc(i.game)}</td><td>${esc(i.status)}</td><td>${esc(i.updated || "")}</td><td><button data-remove-item="${i.id}">Remove</button></td></tr>`).join("");
     document.getElementById("itemsTable").innerHTML = `<table class="admin-table"><thead><tr><th>Brand</th><th>Game</th><th>Status</th><th>Updated</th><th>Action</th></tr></thead><tbody>${rows}</tbody></table>`;
   }
 
-  document.getElementById("usersTable").addEventListener("click", (e) => {
+  async function loadObservability() {
+    const overview = await GrizzAuth.getAdminOverview();
+    const store = await GrizzAuth.getAdminStore();
+    renderStats(overview.stats || {});
+    const logRows = (overview.recentLogs || []).map((l) => {
+      return `<tr><td>${formatDate(l.at)}</td><td>${esc(l.actor)}</td><td>${esc(l.action)}</td><td>${esc(l.target)}</td><td>${esc(l.details || "")}</td></tr>`;
+    }).join("");
+    document.getElementById("adminLogs").innerHTML = `<table class="admin-table"><thead><tr><th>Time</th><th>Actor</th><th>Action</th><th>Target</th><th>Details</th></tr></thead><tbody>${logRows}</tbody></table>`;
+    document.getElementById("storeInspect").textContent = JSON.stringify(store, null, 2);
+  }
+
+  async function refreshAll() {
+    await loadRoles();
+    await loadUsers();
+    await loadContentAndItems();
+    await loadObservability();
+  }
+
+  document.getElementById("usersTable").addEventListener("click", async (e) => {
     const target = e.target;
     try {
       if (target.dataset.roleSave) {
         const userId = target.dataset.roleSave;
         const select = document.querySelector(`[data-role-select="${userId}"]`);
-        GrizzAuth.setUserRole(userId, select.value);
+        await GrizzAuth.setUserRole(userId, select.value);
       }
       if (target.dataset.approve) {
-        GrizzAuth.updateUser(target.dataset.approve, { approved: target.dataset.val === "true" });
+        await GrizzAuth.updateUser(target.dataset.approve, { approved: target.dataset.val === "true" });
       }
       if (target.dataset.ban) {
-        GrizzAuth.updateUser(target.dataset.ban, { banned: target.dataset.val === "true" });
+        await GrizzAuth.updateUser(target.dataset.ban, { banned: target.dataset.val === "true" });
       }
       if (target.dataset.delete) {
-        GrizzAuth.removeUser(target.dataset.delete, currentAdmin.id);
+        await GrizzAuth.removeUser(target.dataset.delete);
       }
-      loadUsers();
-      loadRoles();
+      await refreshAll();
       adminState.textContent = "User update saved.";
     } catch (err) {
       adminState.textContent = err.message;
     }
   });
 
-  document.getElementById("roleForm").addEventListener("submit", (e) => {
+  document.getElementById("roleForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     try {
-      GrizzAuth.createRole({
+      await GrizzAuth.createRole({
         name: document.getElementById("roleName").value,
         label: document.getElementById("roleLabel").value,
         color: document.getElementById("roleColor").value,
@@ -211,78 +234,95 @@
       e.target.reset();
       document.getElementById("roleColor").value = "#7db2ff";
       document.getElementById("roleAccent").value = "#2f6dff";
-      loadRoles();
-      loadUsers();
+      await refreshAll();
       adminState.textContent = "Role created.";
     } catch (err) {
       adminState.textContent = err.message;
     }
   });
 
-  document.getElementById("rolesTable").addEventListener("click", (e) => {
+  document.getElementById("rolesTable").addEventListener("click", async (e) => {
     const roleName = e.target.dataset.removeRole;
     if (!roleName) return;
     try {
-      GrizzAuth.removeRole(roleName);
-      loadRoles();
-      loadUsers();
+      await GrizzAuth.removeRole(roleName);
+      await refreshAll();
       adminState.textContent = "Role removed. Affected users moved to Support.";
     } catch (err) {
       adminState.textContent = err.message;
     }
   });
 
-  document.getElementById("contentForm").addEventListener("submit", (e) => {
+  document.getElementById("contentForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     try {
-      GrizzAuth.setSiteContent({
+      await GrizzAuth.setSiteContent({
         heroTitle: document.getElementById("heroTitle").value,
         subtitle: document.getElementById("heroSubtitle").value,
         announcement: document.getElementById("announcement").value
       });
+      await loadObservability();
       adminState.textContent = "Website content saved.";
     } catch (err) {
       adminState.textContent = err.message;
     }
   });
 
-  document.getElementById("itemForm").addEventListener("submit", (e) => {
+  document.getElementById("itemForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     try {
-      GrizzAuth.addManualItem({
+      await GrizzAuth.addManualItem({
         brand: document.getElementById("itemBrand").value,
         game: document.getElementById("itemGame").value,
         status: document.getElementById("itemStatus").value,
         updated: document.getElementById("itemUpdated").value
       });
       e.target.reset();
-      loadContentAndItems();
+      await loadContentAndItems();
+      await loadObservability();
       adminState.textContent = "Manual item added.";
     } catch (err) {
       adminState.textContent = err.message;
     }
   });
 
-  document.getElementById("itemsTable").addEventListener("click", (e) => {
+  document.getElementById("itemsTable").addEventListener("click", async (e) => {
     const id = e.target.dataset.removeItem;
     if (!id) return;
     try {
-      GrizzAuth.removeManualItem(id);
-      loadContentAndItems();
+      await GrizzAuth.removeManualItem(id);
+      await loadContentAndItems();
+      await loadObservability();
       adminState.textContent = "Manual item removed.";
     } catch (err) {
       adminState.textContent = err.message;
     }
   });
 
-  GrizzAuth.touch();
-  loadUsers();
-  loadRoles();
-  loadContentAndItems();
-  setInterval(function () {
-    loadUsers();
-    loadRoles();
-  }, 12000);
+  document.getElementById("refreshInspectBtn").addEventListener("click", async function () {
+    try {
+      await loadObservability();
+      adminState.textContent = "Backend snapshot refreshed.";
+    } catch (err) {
+      adminState.textContent = err.message;
+    }
+  });
+
+  (async function boot() {
+    try {
+      await GrizzAuth.init();
+      currentAdmin = GrizzAuth.requireAdminSession("auth.html");
+      if (!currentAdmin) return;
+      await GrizzAuth.touch();
+      await refreshAll();
+      setInterval(function () {
+        GrizzAuth.touch();
+        refreshAll();
+      }, 12000);
+    } catch (err) {
+      adminState.textContent = err.message;
+    }
+  })();
   })();
   </script>
 </body>
