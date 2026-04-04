@@ -70,6 +70,7 @@
 
   <script src="guard.js" defer></script>
   <script src="ui-effects.js" defer></script>
+  <script src="auth-local.js"></script>
   <script>
 const defaultData = {
   lastUpdated: "April 3, 2026 - 9:59 PM",
@@ -222,69 +223,43 @@ function loadPresence() {
     presenceHintEl.textContent = "Login to see support team online status.";
     return;
   }
-  fetch("/api/users/presence", { credentials: "same-origin" })
-    .then(function (res) {
-      if (!res.ok) throw new Error("unauthorized");
-      return res.json();
-    })
-    .then(function (data) {
-      renderPresence(data.users || []);
-    })
-    .catch(function () {
-      renderPresence([]);
-      presenceHintEl.textContent = "Could not load presence list.";
-    });
+  renderPresence(GrizzAuth.getApprovedUsersWithPresence());
 }
 
 function heartbeat() {
   if (!currentUser) return;
-  fetch("/api/auth/heartbeat", { method: "POST", credentials: "same-origin" }).catch(function () {});
+  GrizzAuth.touch();
 }
 
 function loadSiteConfig() {
-  return fetch("/api/site/config", { credentials: "same-origin" })
-    .then(function (res) { return res.json(); })
-    .then(function (cfg) {
-      if (cfg.siteContent) {
-        heroTitleEl.textContent = cfg.siteContent.heroTitle || heroTitleEl.textContent;
-        heroSubtitleEl.textContent = cfg.siteContent.subtitle || heroSubtitleEl.textContent;
-        announcementLineEl.textContent = cfg.siteContent.announcement || "";
-      }
-      manualItems = Array.isArray(cfg.manualItems) ? cfg.manualItems : [];
-    })
-    .catch(function () {
-      manualItems = [];
-    });
+  var cfg = GrizzAuth.getSiteContent();
+  heroTitleEl.textContent = cfg.heroTitle || heroTitleEl.textContent;
+  heroSubtitleEl.textContent = cfg.subtitle || heroSubtitleEl.textContent;
+  announcementLineEl.textContent = cfg.announcement || "";
+  manualItems = GrizzAuth.getManualItems();
+  return Promise.resolve();
 }
 
 function loadAuthState() {
-  fetch("/api/auth/me", { credentials: "same-origin" })
-    .then(function (res) {
-      if (!res.ok) throw new Error("no-session");
-      return res.json();
-    })
-    .then(function (out) {
-      currentUser = out.user;
-      authLinkEl.textContent = "Logout (" + currentUser.username + ")";
-      authLinkEl.href = "#";
-      authLinkEl.onclick = function (e) {
-        e.preventDefault();
-        fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" }).then(function () { window.location.reload(); });
-      };
-      if (currentUser.role === "admin") {
-        adminLinkEl.style.display = "inline-flex";
-      }
-      heartbeat();
-      loadPresence();
-    })
-    .catch(function () {
-      window.location.href = "auth.html";
-    });
+  currentUser = GrizzAuth.requireApprovedSession("auth.html");
+  if (!currentUser) return;
+  authLinkEl.textContent = "Logout (" + currentUser.username + ")";
+  authLinkEl.href = "#";
+  authLinkEl.onclick = function (e) {
+    e.preventDefault();
+    GrizzAuth.logout();
+    window.location.href = "auth.html";
+  };
+  if (currentUser.role === "admin") {
+    adminLinkEl.style.display = "inline-flex";
+  }
+  heartbeat();
+  loadPresence();
 }
 
 function loadLiveStatus() {
   nextRefreshAt = Date.now() + 30000;
-  fetch("/api/status-feed?t=" + Date.now(), { cache: "no-store", credentials: "same-origin" })
+  fetch("data/status.json?t=" + Date.now(), { cache: "no-store" })
     .then(function (res) {
       if (!res.ok) throw new Error("HTTP " + res.status);
       return res.json();

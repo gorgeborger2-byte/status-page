@@ -1,38 +1,23 @@
-# Cosmo Status Web App (Backend + Admin)
+# Cosmo Status Site
 
-This project now runs as a real backend web app (Express), not just static pages.
+This version uses a frontend admin/auth system (no backend required to run pages).
 
-## Features
+## Pages
 
-- Team login and support registration
-- Support registration without email verification
-- New support users stay **pending** until manually approved by admin
-- Main admin account seeded automatically:
+- `auth.html` - login/register page
+- `admin.html` - admin panel (approve users, roles, ban, remove, content edits, manual items)
+- `index.html` - protected main status page
+- `presentation.html` - protected support guide page
+
+## Auth Rules
+
+- Default admin account is auto-seeded:
   - Username: `mert`
   - Password: `mert`
-- Admin panel permissions:
-  - Approve/unapprove users
-  - Assign roles (`admin` / `support`)
-  - Remove users
-  - Edit website content (title, subtitle, announcement)
-  - Add/remove manual status items
-- Main status page shows approved users with `Online now` or `Last seen`
+- Support users register from `auth.html`
+- New users stay pending until admin approves in `admin.html`
+- Pending or banned users cannot access protected pages
 
-## Run locally
+## Storage
 
-```bash
-npm install
-npm start
-```
-
-Open:
-
-- Main page: `http://localhost:3000/index.html`
-- Auth page: `http://localhost:3000/auth.html`
-- Admin page: `http://localhost:3000/admin.html`
-
-## Notes
-
-- User data/content are stored in `backend-db.json`
-- Session cookie auth is used
-- Approval is **manual only** (no auto-approval)
+All auth/admin data is stored in browser `localStorage` via `auth-local.js`.

@@ -49,14 +49,13 @@
     </section>
   </main>
 
+  <script src="auth-local.js"></script>
   <script>
+  (function () {
   const adminState = document.getElementById("adminState");
-
-  async function api(url, options = {}) {
-    const res = await fetch(url, Object.assign({ credentials: "same-origin" }, options));
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data.error || "Request failed");
-    return data;
+  const currentAdmin = GrizzAuth.requireAdminSession("auth.html");
+  if (!currentAdmin) {
+    return;
   }
 
   function formatDate(value) {
@@ -65,89 +64,68 @@
     return Number.isNaN(d.getTime()) ? value : d.toLocaleString();
   }
 
-  async function ensureAdmin() {
-    try {
-      const me = await api("/api/auth/me");
-      if (!me.user || me.user.role !== "admin") {
-        window.location.href = "auth.html";
-        return false;
-      }
-      return true;
-    } catch {
-      window.location.href = "auth.html";
-      return false;
-    }
-  }
-
-  async function loadUsers() {
-    const out = await api("/api/admin/users");
-    const rows = out.users.map((u) => {
+  function loadUsers() {
+    const users = GrizzAuth.listUsers();
+    const rows = users.map((u) => {
       return `<tr>
         <td>${u.username}</td>
         <td>${u.role}</td>
-        <td>${u.approved ? "Approved" : "Pending"}</td>
+        <td>${u.banned ? "Banned" : (u.approved ? "Approved" : "Pending")}</td>
         <td>${formatDate(u.lastSeen)}</td>
         <td>
           <button data-approve="${u.id}" data-val="true">Approve</button>
           <button data-approve="${u.id}" data-val="false">Unapprove</button>
+          <button data-ban="${u.id}" data-val="true">Ban</button>
+          <button data-ban="${u.id}" data-val="false">Unban</button>
           <button data-role="${u.id}" data-val="support">Make Support</button>
           <button data-role="${u.id}" data-val="admin">Make Admin</button>
           <button data-delete="${u.id}">Remove</button>
         </td>
       </tr>`;
     }).join("");
-
     document.getElementById("usersTable").innerHTML = `<table class="admin-table"><thead><tr><th>User</th><th>Role</th><th>Status</th><th>Last Seen</th><th>Actions</th></tr></thead><tbody>${rows}</tbody></table>`;
   }
 
-  async function loadContentAndItems() {
-    const out = await api("/api/admin/content");
-    document.getElementById("heroTitle").value = out.siteContent.heroTitle || "";
-    document.getElementById("heroSubtitle").value = out.siteContent.subtitle || "";
-    document.getElementById("announcement").value = out.siteContent.announcement || "";
+  function loadContentAndItems() {
+    const content = GrizzAuth.getSiteContent();
+    const items = GrizzAuth.getManualItems();
+    document.getElementById("heroTitle").value = content.heroTitle || "";
+    document.getElementById("heroSubtitle").value = content.subtitle || "";
+    document.getElementById("announcement").value = content.announcement || "";
 
-    const rows = (out.manualItems || []).map((i) => `<tr><td>${i.brand}</td><td>${i.game}</td><td>${i.status}</td><td>${i.updated || ""}</td><td><button data-remove-item="${i.id}">Remove</button></td></tr>`).join("");
+    const rows = items.map((i) => `<tr><td>${i.brand}</td><td>${i.game}</td><td>${i.status}</td><td>${i.updated || ""}</td><td><button data-remove-item="${i.id}">Remove</button></td></tr>`).join("");
     document.getElementById("itemsTable").innerHTML = `<table class="admin-table"><thead><tr><th>Brand</th><th>Game</th><th>Status</th><th>Updated</th><th>Action</th></tr></thead><tbody>${rows}</tbody></table>`;
   }
 
-  document.getElementById("usersTable").addEventListener("click", async (e) => {
+  document.getElementById("usersTable").addEventListener("click", (e) => {
     const target = e.target;
     try {
       if (target.dataset.approve) {
-        await api(`/api/admin/users/${target.dataset.approve}/approve`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ approved: target.dataset.val === "true" })
-        });
+        GrizzAuth.updateUser(target.dataset.approve, { approved: target.dataset.val === "true" });
+      }
+      if (target.dataset.ban) {
+        GrizzAuth.updateUser(target.dataset.ban, { banned: target.dataset.val === "true" });
       }
       if (target.dataset.role) {
-        await api(`/api/admin/users/${target.dataset.role}/role`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ role: target.dataset.val })
-        });
+        GrizzAuth.updateUser(target.dataset.role, { role: target.dataset.val });
       }
       if (target.dataset.delete) {
-        await api(`/api/admin/users/${target.dataset.delete}`, { method: "DELETE" });
+        GrizzAuth.removeUser(target.dataset.delete, currentAdmin.id);
       }
-      await loadUsers();
+      loadUsers();
       adminState.textContent = "User update saved.";
     } catch (err) {
       adminState.textContent = err.message;
     }
   });
 
-  document.getElementById("contentForm").addEventListener("submit", async (e) => {
+  document.getElementById("contentForm").addEventListener("submit", (e) => {
     e.preventDefault();
     try {
-      await api("/api/admin/content", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          heroTitle: document.getElementById("heroTitle").value,
-          subtitle: document.getElementById("heroSubtitle").value,
-          announcement: document.getElementById("announcement").value
-        })
+      GrizzAuth.setSiteContent({
+        heroTitle: document.getElementById("heroTitle").value,
+        subtitle: document.getElementById("heroSubtitle").value,
+        announcement: document.getElementById("announcement").value
       });
       adminState.textContent = "Website content saved.";
     } catch (err) {
@@ -155,43 +133,38 @@
     }
   });
 
-  document.getElementById("itemForm").addEventListener("submit", async (e) => {
+  document.getElementById("itemForm").addEventListener("submit", (e) => {
     e.preventDefault();
     try {
-      await api("/api/admin/manual-items", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          brand: document.getElementById("itemBrand").value,
-          game: document.getElementById("itemGame").value,
-          status: document.getElementById("itemStatus").value,
-          updated: document.getElementById("itemUpdated").value
-        })
+      GrizzAuth.addManualItem({
+        brand: document.getElementById("itemBrand").value,
+        game: document.getElementById("itemGame").value,
+        status: document.getElementById("itemStatus").value,
+        updated: document.getElementById("itemUpdated").value
       });
       e.target.reset();
-      await loadContentAndItems();
+      loadContentAndItems();
       adminState.textContent = "Manual item added.";
     } catch (err) {
       adminState.textContent = err.message;
     }
   });
 
-  document.getElementById("itemsTable").addEventListener("click", async (e) => {
+  document.getElementById("itemsTable").addEventListener("click", (e) => {
     const id = e.target.dataset.removeItem;
     if (!id) return;
     try {
-      await api(`/api/admin/manual-items/${id}`, { method: "DELETE" });
-      await loadContentAndItems();
+      GrizzAuth.removeManualItem(id);
+      loadContentAndItems();
       adminState.textContent = "Manual item removed.";
     } catch (err) {
       adminState.textContent = err.message;
     }
   });
 
-  (async function init() {
-    if (!(await ensureAdmin())) return;
-    await loadUsers();
-    await loadContentAndItems();
+  GrizzAuth.touch();
+  loadUsers();
+  loadContentAndItems();
   })();
   </script>
 </body>

@@ -38,45 +38,23 @@
     </section>
   </main>
 
+  <script src="auth-local.js"></script>
   <script>
-  async function postJson(url, payload) {
-    const res = await fetch(url, {
-      method: "POST",
-      credentials: "same-origin",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      if (res.status === 404 || res.status === 405) {
-        throw new Error("Backend API is not running here. Open the backend server URL (localhost:3000 or deployed backend), not GitHub Pages static URL.");
-      }
-      throw new Error(data.error || "Request failed");
-    }
-    return data;
-  }
-
   const stateEl = document.getElementById("authState");
 
-  async function ensureNotAlreadyLoggedIn() {
-    try {
-      const res = await fetch("/api/auth/me", { credentials: "same-origin" });
-      if (!res.ok) return;
-      const out = await res.json();
-      if (out && out.user) {
-        window.location.replace("index.html");
-      }
-    } catch (_) {
-      // ignore
+  function ensureNotAlreadyLoggedIn() {
+    const user = GrizzAuth.getCurrentUser();
+    if (user && user.approved && !user.banned) {
+      window.location.replace("index.html");
     }
   }
 
-  document.getElementById("loginForm").addEventListener("submit", async (e) => {
+  document.getElementById("loginForm").addEventListener("submit", (e) => {
     e.preventDefault();
     try {
       const username = document.getElementById("loginUser").value.trim();
       const password = document.getElementById("loginPass").value;
-      await postJson("/api/auth/login", { username, password });
+      GrizzAuth.login(username, password);
       stateEl.textContent = "Logged in. Redirecting...";
       window.location.replace("index.html");
     } catch (err) {
@@ -84,12 +62,12 @@
     }
   });
 
-  document.getElementById("registerForm").addEventListener("submit", async (e) => {
+  document.getElementById("registerForm").addEventListener("submit", (e) => {
     e.preventDefault();
     try {
       const username = document.getElementById("regUser").value.trim();
       const password = document.getElementById("regPass").value;
-      const out = await postJson("/api/auth/register", { username, password });
+      const out = GrizzAuth.registerSupport(username, password);
       stateEl.textContent = out.message || "Registered. Waiting for admin approval.";
     } catch (err) {
       stateEl.textContent = err.message;

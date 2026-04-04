@@ -59,8 +59,13 @@
 
   <script src="guard.js" defer></script>
   <script src="ui-effects.js" defer></script>
+  <script src="auth-local.js"></script>
   <script>
   (function () {
+    var currentUser = GrizzAuth.requireApprovedSession("auth.html");
+    if (!currentUser) return;
+    GrizzAuth.touch();
+
     var products = [
       {
         name: "Global Links + Commands",
