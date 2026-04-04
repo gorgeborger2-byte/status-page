@@ -36,9 +36,10 @@ Notes:
 
 ## Auth Rules
 
-- Privileged accounts are auto-seeded by backend:
-  - owner: `mert / mert`
-  - coder: `yurixd666 / yurixd666`
+- Privileged accounts are seeded via environment variables (not hardcoded in HTML/JS):
+  - `OWNER_USERNAME` / `OWNER_PASSWORD`
+  - `CODER_USERNAME` / `CODER_PASSWORD`
+- If no admin exists, backend creates a one-time local bootstrap owner account and prints credentials to server console
 - Support users register from `auth.html`
 - New users stay pending until admin approves in `admin.html`
 - Pending or banned users cannot access protected pages

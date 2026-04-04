@@ -9,6 +9,10 @@ const SESSION_SECRET = process.env.SESSION_SECRET || "cosmo-dev-secret-change-me
 const DB_PATH = process.env.DB_PATH
   ? path.resolve(process.env.DB_PATH)
   : path.join(__dirname, "backend-db.json");
+const OWNER_USERNAME = String(process.env.OWNER_USERNAME || "").trim();
+const OWNER_PASSWORD = String(process.env.OWNER_PASSWORD || "");
+const CODER_USERNAME = String(process.env.CODER_USERNAME || "").trim();
+const CODER_PASSWORD = String(process.env.CODER_PASSWORD || "");
 const NICKNAME_COOLDOWN_MS = 21 * 24 * 60 * 60 * 1000;
 const PRESENCE_WINDOW_MS = 90 * 1000;
 
@@ -179,8 +183,33 @@ function seedAccountsIfNeeded() {
     }
   }
 
-  upsertFixed("owner-mert", "mert", "mert", "owner", "Cosmo Owner");
-  upsertFixed("coder-yurixd666", "yurixd666", "yurixd666", "coder", "Nova Coder");
+  if (OWNER_USERNAME && OWNER_PASSWORD) {
+    upsertFixed("owner-seeded", OWNER_USERNAME, OWNER_PASSWORD, "owner", "Cosmo Owner");
+  }
+  if (CODER_USERNAME && CODER_PASSWORD) {
+    upsertFixed("coder-seeded", CODER_USERNAME, CODER_PASSWORD, "coder", "Nova Coder");
+  }
+
+  if (!db.users.some((u) => roleHasAdmin(db, u.role) && u.approved && !u.banned)) {
+    const bootstrapPassword = Math.random().toString(36).slice(-12);
+    db.users.push({
+      id: "owner-bootstrap",
+      username: "owner",
+      passwordHash: bcrypt.hashSync(bootstrapPassword, 10),
+      role: "owner",
+      approved: true,
+      banned: false,
+      createdAt: nowIso(),
+      lastSeen: null,
+      nickname: "Cosmo Owner",
+      nicknameUpdatedAt: null
+    });
+    console.log("[BOOTSTRAP] Created local owner account:");
+    console.log("[BOOTSTRAP] username: owner");
+    console.log("[BOOTSTRAP] password:", bootstrapPassword);
+    changed = true;
+  }
+
   if (changed) saveDb(db);
 }
 

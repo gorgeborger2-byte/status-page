@@ -89,7 +89,7 @@
     try {
       const res = await fetch("/api/auth/session?t=" + Date.now(), { cache: "no-store", signal: controller.signal });
       if (!res.ok) throw new Error("status " + res.status);
-      linkHealthEl.textContent = "Link health: backend reachable on this URL.";
+      linkHealthEl.textContent = "";
     } catch (err) {
       linkHealthEl.textContent = "Link health: this URL cannot reach backend. This is likely an old/broken link. Ask admin for the latest link.";
     } finally {

@@ -32,6 +32,7 @@ body {
   color: var(--text);
   position: relative;
   background: #080511;
+  overflow-x: hidden;
 }
 
 .space-bg {
@@ -204,6 +205,10 @@ body.compact-page .footer {
   padding: 0.35rem 0.9rem;
   font-size: 0.85rem;
   transition: all 0.2s ease;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .nav-link:hover {
@@ -793,6 +798,7 @@ body.compact-page .footer {
   color: var(--text);
   padding: 0.55rem 0.72rem;
   font: inherit;
+  min-height: 44px;
 }
 
 .auth-card button,
@@ -824,6 +830,7 @@ body.compact-page .footer {
   border-radius: 8px;
   padding: 0.2rem 0.45rem;
   font-size: 0.72rem;
+  min-height: 34px;
 }
 
 .grizz-guard-msg {
@@ -939,6 +946,54 @@ body.compact-page .footer {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 0.8rem;
+}
+
+.commands-grid {
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+.command-card {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.command-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.command-head h4 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.command-response {
+  margin: 0;
+  max-height: 280px;
+  overflow: auto;
+}
+
+.single-guide-card .spec-table p {
+  flex-wrap: wrap;
+  gap: 0.25rem 0.45rem;
+}
+
+.single-guide-card .spec-table strong {
+  overflow-wrap: anywhere;
+}
+
+.single-guide-card,
+.single-guide-card * {
+  max-width: 100%;
+}
+
+.single-guide-card a,
+.full-text-block,
+.raw-block {
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .compact-panel {
@@ -1170,6 +1225,50 @@ body.compact-page .footer {
   .presence-grid {
     grid-template-columns: 1fr;
   }
+
+  .admin-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .admin-table th,
+  .admin-table td {
+    min-width: 120px;
+  }
+
+  .profile-display {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .meta {
+    gap: 0.5rem;
+    font-size: 0.84rem;
+  }
+
+  .compact-controls button,
+  .compact-controls input,
+  .compact-controls select {
+    width: 100%;
+  }
+
+  .single-guide-card {
+    overflow: hidden;
+  }
+
+  .compact-panel {
+    overflow: hidden;
+  }
+
+  .full-text-block {
+    max-height: 250px;
+    font-size: 0.78rem;
+  }
+
+  .full-slides {
+    padding: 0.55rem;
+  }
 }
 
 .embed-panel {
@@ -1239,6 +1338,73 @@ body.compact-page .footer {
 
   .panel {
     padding: 0.9rem;
+  }
+
+  .top-nav {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem;
+  }
+
+  .nav-link {
+    width: 100%;
+    text-align: center;
+    padding: 0.5rem 0.6rem;
+  }
+
+  .panel-header {
+    align-items: flex-start;
+    gap: 0.6rem;
+  }
+
+  .filter-row {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .auth-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .guide-grid,
+  .commands-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .single-guide-card .spec-table p {
+    display: block;
+    padding: 0.45rem 0.6rem;
+  }
+
+  .single-guide-card .spec-table span {
+    display: inline-block;
+    margin-bottom: 0.18rem;
+  }
+
+  .full-slides-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.45rem;
+  }
+
+  .full-slides-head button {
+    width: 100%;
+  }
+
+  .full-text-block {
+    max-height: 210px;
+    font-size: 0.75rem;
+  }
+
+  .command-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .command-head .copy-btn {
+    width: 100%;
   }
 
   .cards {
