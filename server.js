@@ -9,6 +9,7 @@ const app = express();
 const PORT = Number(process.env.PORT || 3000);
 const DB_PATH = path.join(__dirname, "backend-db.json");
 const ONLINE_WINDOW_MS = 90 * 1000;
+const STATUS_FILE = path.join(__dirname, "data", "status.json");
 
 function nowIso() {
   return new Date().toISOString();
@@ -72,6 +73,31 @@ function requireAuth(req, res, next) {
   const user = authUser(req, db);
   if (!user) {
     return res.status(401).json({ error: "Not authenticated" });
+  }
+  req.db = db;
+  req.user = user;
+  return next();
+}
+
+function requirePageAuth(req, res, next) {
+  const db = loadDb();
+  const user = authUser(req, db);
+  if (!user) {
+    return res.redirect("/auth.html");
+  }
+  req.db = db;
+  req.user = user;
+  return next();
+}
+
+function requireAdminPage(req, res, next) {
+  const db = loadDb();
+  const user = authUser(req, db);
+  if (!user) {
+    return res.redirect("/auth.html");
+  }
+  if (user.role !== "admin") {
+    return res.redirect("/index.html");
   }
   req.db = db;
   req.user = user;
@@ -204,9 +230,27 @@ app.get("/api/users/presence", requireAuth, (req, res) => {
   return res.json({ users });
 });
 
-app.get("/api/site/config", (req, res) => {
-  const db = loadDb();
-  return res.json({ siteContent: db.siteContent, manualItems: db.manualItems });
+app.get("/api/site/config", requireAuth, (req, res) => {
+  return res.json({ siteContent: req.db.siteContent, manualItems: req.db.manualItems });
+});
+
+app.get("/api/status-feed", requireAuth, (req, res) => {
+  let statusData = { items: [], fetchedAt: nowIso(), lastUpdated: "--" };
+  if (fs.existsSync(STATUS_FILE)) {
+    try {
+      statusData = JSON.parse(fs.readFileSync(STATUS_FILE, "utf8"));
+    } catch (e) {
+      // fallback to empty
+    }
+  }
+
+  const items = (statusData.items || []).concat(req.db.manualItems || []);
+  return res.json({
+    source: statusData.source || "",
+    fetchedAt: statusData.fetchedAt || nowIso(),
+    lastUpdated: statusData.lastUpdated || "--",
+    items,
+  });
 });
 
 app.get("/api/admin/users", requireAdmin, (req, res) => {
@@ -308,7 +352,50 @@ app.delete("/api/admin/manual-items/:id", requireAdmin, (req, res) => {
   return res.json({ ok: true });
 });
 
-app.use(express.static(__dirname));
+app.get("/", requirePageAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
+app.get("/index.html", requirePageAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
+app.get("/presentation.html", requirePageAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, "presentation.html"));
+});
+
+app.get("/admin.html", requireAdminPage, (req, res) => {
+  res.sendFile(path.join(__dirname, "admin.html"));
+});
+
+app.get("/auth.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "auth.html"));
+});
+
+app.get("/slides_full.txt", requirePageAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, "slides_full.txt"));
+});
+
+app.get("/data/status.json", requirePageAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, "data", "status.json"));
+});
+
+app.use((req, res, next) => {
+  const blocked = new Set([
+    "/server.js",
+    "/backend-db.json",
+    "/package.json",
+    "/package-lock.json",
+    "/grizz-ginger-boy-installer.nsi",
+    "/grizz-ginger-boy-installer.iss",
+  ]);
+  if (blocked.has(req.path)) {
+    return res.status(404).end();
+  }
+  return next();
+});
+
+app.use(express.static(__dirname, { index: false }));
 
 app.listen(PORT, () => {
   console.log("Server running on http://localhost:" + PORT);
