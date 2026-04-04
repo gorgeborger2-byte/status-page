@@ -47,7 +47,12 @@
       body: JSON.stringify(payload)
     });
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data.error || "Request failed");
+    if (!res.ok) {
+      if (res.status === 404 || res.status === 405) {
+        throw new Error("Backend API is not running here. Open the backend server URL (localhost:3000 or deployed backend), not GitHub Pages static URL.");
+      }
+      throw new Error(data.error || "Request failed");
+    }
     return data;
   }
 
