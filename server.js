@@ -6,7 +6,9 @@ const bcrypt = require("bcryptjs");
 
 const PORT = Number(process.env.PORT || 3000);
 const SESSION_SECRET = process.env.SESSION_SECRET || "cosmo-dev-secret-change-me";
-const DB_PATH = path.join(__dirname, "backend-db.json");
+const DB_PATH = process.env.DB_PATH
+  ? path.resolve(process.env.DB_PATH)
+  : path.join(__dirname, "backend-db.json");
 const NICKNAME_COOLDOWN_MS = 21 * 24 * 60 * 60 * 1000;
 const PRESENCE_WINDOW_MS = 90 * 1000;
 
@@ -41,6 +43,10 @@ function normalizeUsername(value) {
 }
 
 function safeReadDb() {
+  const dirPath = path.dirname(DB_PATH);
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true });
+  }
   if (!fs.existsSync(DB_PATH)) {
     fs.writeFileSync(DB_PATH, JSON.stringify({ users: [], roles: [], siteContent: DEFAULT_SITE_CONTENT, manualItems: [], auditLogs: [] }, null, 2));
   }

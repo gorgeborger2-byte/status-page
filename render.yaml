@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: cosmo-status-backend
+    runtime: node
+    plan: starter
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /auth.html
+    envVars:
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: DB_PATH
+        value: /var/data/backend-db.json
+    disk:
+      name: cosmo-status-data
+      mountPath: /var/data
+      sizeGB: 1
