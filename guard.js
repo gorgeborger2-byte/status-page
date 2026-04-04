@@ -1,4 +1,5 @@
 (function () {
+  var isTouchDevice = ("ontouchstart" in window) || (navigator.maxTouchPoints > 0);
   var overlayVisible = false;
 
   function ensureOverlay() {
@@ -63,15 +64,18 @@
     }, 1800);
   }
 
-  document.addEventListener("contextmenu", function (event) {
-    event.preventDefault();
-    showGuardMessage();
-    showBigGuard("contextmenu");
-  });
+  if (!isTouchDevice) {
+    document.addEventListener("contextmenu", function (event) {
+      event.preventDefault();
+      showGuardMessage();
+      showBigGuard("contextmenu");
+    });
+  }
 
-  document.addEventListener("keydown", function (event) {
-    var key = (event.key || "").toLowerCase();
-    var blocked = false;
+  if (!isTouchDevice) {
+    document.addEventListener("keydown", function (event) {
+      var key = (event.key || "").toLowerCase();
+      var blocked = false;
 
     if (key === "f12") {
       blocked = true;
@@ -85,20 +89,21 @@
       blocked = true;
     }
 
-    if (blocked) {
-      event.preventDefault();
-      event.stopPropagation();
-      showGuardMessage();
-      showBigGuard("keyboard");
-    }
-  }, true);
+      if (blocked) {
+        event.preventDefault();
+        event.stopPropagation();
+        showGuardMessage();
+        showBigGuard("keyboard");
+      }
+    }, true);
+  }
 
-  // Mobile browsers: do not trigger inspect overlay on touch/scroll gestures.
-
-  setInterval(function () {
-    var devtoolsOpen = (window.outerWidth - window.innerWidth > 160) || (window.outerHeight - window.innerHeight > 160);
-    if (devtoolsOpen && !overlayVisible) {
-      showBigGuard("devtools-detected");
-    }
-  }, 800);
+  if (!isTouchDevice) {
+    setInterval(function () {
+      var devtoolsOpen = (window.outerWidth - window.innerWidth > 160) || (window.outerHeight - window.innerHeight > 160);
+      if (devtoolsOpen && !overlayVisible) {
+        showBigGuard("devtools-detected");
+      }
+    }, 800);
+  }
 })();
