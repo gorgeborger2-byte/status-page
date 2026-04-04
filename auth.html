@@ -32,15 +32,70 @@
           <input id="regPass" type="password" placeholder="Password" required>
           <button type="submit">Register</button>
         </form>
+
+        <section class="auth-card auth-link-share">
+          <h2>Share This Link</h2>
+          <p class="status-line">If login fails, copy the new link below and open it again.</p>
+          <p class="status-line" id="linkModeHint"></p>
+          <p class="status-line" id="linkHealth"></p>
+          <input id="activeAuthLink" readonly>
+          <button type="button" class="copy-btn" id="copyAuthLinkBtn">Copy Login Link</button>
+        </section>
       </div>
       <p id="authState" class="status-line"></p>
       <p><a class="footer-link" href="index.html">Back to status page</a></p>
     </section>
   </main>
 
+  <script src="guard.js" defer></script>
   <script src="auth-local.js"></script>
   <script>
   const stateEl = document.getElementById("authState");
+  const activeAuthLinkEl = document.getElementById("activeAuthLink");
+  const linkModeHintEl = document.getElementById("linkModeHint");
+  const linkHealthEl = document.getElementById("linkHealth");
+
+  function getAuthLink() {
+    return window.location.origin + "/auth.html";
+  }
+
+  function setupShareLinks() {
+    activeAuthLinkEl.value = getAuthLink();
+    if (window.location.hostname.indexOf("trycloudflare.com") !== -1) {
+      linkModeHintEl.textContent = "Temporary tunnel mode: copy this exact link each time. Old links stop working after tunnel restart.";
+    } else {
+      linkModeHintEl.textContent = "Permanent mode: share this exact link with all staff for login and registration.";
+    }
+  }
+
+  async function copyText(value, successMessage) {
+    try {
+      await navigator.clipboard.writeText(value);
+      stateEl.textContent = successMessage;
+    } catch (err) {
+      stateEl.textContent = "Copy failed. Manually copy the link field.";
+    }
+  }
+
+  document.getElementById("copyAuthLinkBtn").addEventListener("click", function () {
+    copyText(getAuthLink(), "Login link copied. Share this exact URL with staff.");
+  });
+
+  async function checkLinkHealth() {
+    const controller = new AbortController();
+    const timeout = setTimeout(function () {
+      controller.abort();
+    }, 4500);
+    try {
+      const res = await fetch("/api/auth/session?t=" + Date.now(), { cache: "no-store", signal: controller.signal });
+      if (!res.ok) throw new Error("status " + res.status);
+      linkHealthEl.textContent = "Link health: backend reachable on this URL.";
+    } catch (err) {
+      linkHealthEl.textContent = "Link health: this URL cannot reach backend. This is likely an old/broken link. Ask admin for the latest link.";
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
 
   async function ensureNotAlreadyLoggedIn() {
     await GrizzAuth.init();
@@ -75,6 +130,8 @@
     }
   });
 
+  setupShareLinks();
+  checkLinkHealth();
   ensureNotAlreadyLoggedIn();
   </script>
 </body>

@@ -173,7 +173,7 @@ function seedAccountsIfNeeded() {
     if (!user.approved) { user.approved = true; changed = true; }
     if (user.banned) { user.banned = false; changed = true; }
     if (!user.nickname && nickname) { user.nickname = nickname; changed = true; }
-    if (!user.passwordHash || !bcrypt.compareSync(password, user.passwordHash)) {
+    if (!user.passwordHash) {
       user.passwordHash = bcrypt.hashSync(password, 10);
       changed = true;
     }
@@ -526,6 +526,27 @@ app.delete("/api/admin/roles/:name", authRequired, adminRequired, (req, res) => 
   audit(req.db, req.user.username, "role:remove", roleName, "removed role and reassigned users");
   saveDb(req.db);
   res.json({ ok: true });
+});
+
+app.use((req, res, next) => {
+  const p = String(req.path || "").toLowerCase();
+  const blockedExact = new Set([
+    "/backend-db.json",
+    "/server.js",
+    "/package.json",
+    "/package-lock.json",
+    "/render.yaml"
+  ]);
+  const blockedPrefixes = [
+    "/node_modules/",
+    "/runtime-logs/",
+    "/scripts/",
+    "/.github/"
+  ];
+  if (blockedExact.has(p) || blockedPrefixes.some((prefix) => p.startsWith(prefix))) {
+    return res.status(404).send("Not found");
+  }
+  return next();
 });
 
 app.use(express.static(__dirname));
