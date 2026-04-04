@@ -116,7 +116,8 @@ footer,
 
 body.compact-page {
   height: 100vh;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
 }
@@ -148,6 +149,7 @@ body.compact-page .footer {
 
 .top-nav {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.6rem;
   margin-bottom: 1rem;
 }
@@ -207,7 +209,7 @@ body.compact-page .footer {
 .panel-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   flex-wrap: wrap;
   gap: 1rem;
   margin-bottom: 0.8rem;
@@ -226,6 +228,7 @@ body.compact-page .footer {
 
 .filter-row {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
 }
 
@@ -593,6 +596,7 @@ body.compact-page .footer {
   grid-template-columns: 1.2fr 1fr auto auto auto;
   gap: 0.55rem;
   margin-bottom: 0.5rem;
+  align-items: center;
 }
 
 .compact-controls input,
@@ -604,6 +608,7 @@ body.compact-page .footer {
   color: var(--text);
   padding: 0.55rem 0.7rem;
   font: inherit;
+  min-height: 38px;
 }
 
 .compact-controls button {
@@ -782,6 +787,20 @@ body.compact-page .footer {
   .compact-controls {
     grid-template-columns: 1fr;
   }
+
+  body.compact-page {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  body.compact-page main.container {
+    display: block;
+    min-height: auto;
+  }
+
+  .single-guide-card {
+    max-height: 56vh;
+  }
 }
 
 .embed-panel {
@@ -826,6 +845,24 @@ body.compact-page .footer {
 @media (max-width: 700px) {
   .masthead {
     padding-top: 2rem;
+  }
+
+  .top-nav {
+    gap: 0.45rem;
+  }
+
+  .nav-link {
+    padding: 0.32rem 0.72rem;
+    font-size: 0.8rem;
+  }
+
+  .meta {
+    gap: 0.45rem 0.8rem;
+    font-size: 0.84rem;
+  }
+
+  .filter-row {
+    width: 100%;
   }
 
   .panel {
