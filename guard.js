@@ -93,6 +93,29 @@
     }
   }, true);
 
+  if ("ontouchstart" in window) {
+    var longPressTimer = null;
+
+    document.addEventListener("touchstart", function (event) {
+      if (!event.touches || event.touches.length !== 1) {
+        return;
+      }
+      clearTimeout(longPressTimer);
+      longPressTimer = setTimeout(function () {
+        showGuardMessage();
+        showBigGuard("mobile-long-press");
+      }, 650);
+    }, { passive: true });
+
+    function clearLongPress() {
+      clearTimeout(longPressTimer);
+    }
+
+    document.addEventListener("touchend", clearLongPress, { passive: true });
+    document.addEventListener("touchcancel", clearLongPress, { passive: true });
+    document.addEventListener("touchmove", clearLongPress, { passive: true });
+  }
+
   setInterval(function () {
     var devtoolsOpen = (window.outerWidth - window.innerWidth > 160) || (window.outerHeight - window.innerHeight > 160);
     if (devtoolsOpen && !overlayVisible) {

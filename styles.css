@@ -546,6 +546,30 @@ body.compact-page .footer {
   cursor: pointer;
 }
 
+@media (max-width: 640px) {
+  .grizz-guard-box {
+    width: min(94vw, 520px);
+    padding: 0.95rem;
+  }
+
+  .grizz-guard-title {
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+  }
+
+  .grizz-guard-main {
+    font-size: clamp(1.35rem, 7vw, 2.1rem);
+  }
+
+  .grizz-guard-sub {
+    font-size: 0.84rem;
+  }
+
+  .grizz-guard-close {
+    width: 100%;
+  }
+}
+
 .guide-search {
   margin-bottom: 1rem;
 }
