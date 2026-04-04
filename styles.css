@@ -219,6 +219,27 @@ body.compact-page .footer {
   margin-bottom: 1rem;
 }
 
+.status-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(300px, 1fr);
+  gap: 0.9rem;
+  align-items: start;
+}
+
+.main-status-panel,
+.presence-panel {
+  min-width: 0;
+}
+
+.presence-panel .cards {
+  grid-template-columns: 1fr;
+}
+
+.presence-panel {
+  position: sticky;
+  top: 1rem;
+}
+
 .search-box input {
   width: 100%;
   padding: 0.9rem 1.2rem;
@@ -506,6 +527,176 @@ body.compact-page .footer {
   padding-bottom: 1.8rem;
   display: grid;
   gap: 0.9rem;
+}
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.65rem;
+}
+
+.stat-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(13, 29, 51, 0.75);
+  padding: 0.7rem;
+}
+
+.stat-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.stat-card h3 {
+  margin: 0.2rem 0 0;
+  font-size: 1.4rem;
+  font-family: "Chakra Petch", sans-serif;
+}
+
+.inline-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+}
+
+.check-line {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.mini-muted {
+  color: #9fb4d8;
+  font-size: 0.78rem;
+  margin-top: 0.2rem;
+}
+
+.role-select {
+  border: 1px solid #315079;
+  background: #0f2643;
+  color: #e8f0ff;
+  border-radius: 8px;
+  padding: 0.25rem 0.4rem;
+  margin-right: 0.3rem;
+  margin-bottom: 0.2rem;
+  font: inherit;
+  font-size: 0.74rem;
+}
+
+.role-badge {
+  --role-color: #9bb5da;
+  --role-accent: #4666b3;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--role-color) 60%, #ffffff 5%);
+  background: color-mix(in srgb, var(--role-accent) 20%, #0b1c35);
+  color: var(--role-color);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  font-size: 0.72rem;
+  padding: 0.2rem 0.55rem;
+}
+
+.role-glow {
+  animation: roleGlow 2.4s ease-in-out infinite;
+}
+
+.role-owner {
+  animation: roleOwnerPulse 2.2s ease-in-out infinite;
+}
+
+.role-coder {
+  animation: roleCoderShift 2.8s linear infinite;
+}
+
+@keyframes roleGlow {
+  0%,
+  100% { box-shadow: 0 0 0 rgba(90, 140, 255, 0); }
+  50% { box-shadow: 0 0 12px color-mix(in srgb, var(--role-accent) 35%, transparent); }
+}
+
+@keyframes roleOwnerPulse {
+  0%,
+  100% { transform: translateY(0); box-shadow: 0 0 0 rgba(255, 145, 54, 0); }
+  50% { transform: translateY(-1px); box-shadow: 0 0 13px rgba(255, 145, 54, 0.45); }
+}
+
+@keyframes roleCoderShift {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(28deg); }
+}
+
+.presence-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin-top: 0.8rem;
+}
+
+.presence-col {
+  border: 1px solid rgba(64, 95, 138, 0.45);
+  border-radius: 12px;
+  background: rgba(8, 19, 35, 0.45);
+  padding: 0.75rem;
+}
+
+.presence-col h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-family: "Chakra Petch", sans-serif;
+}
+
+.presence-col h3 span {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.profile-wrap {
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+.profile-grid {
+  margin-top: 0.85rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.profile-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(13, 29, 51, 0.75);
+  padding: 0.8rem;
+}
+
+.profile-card h2 {
+  margin-top: 0;
+}
+
+.profile-display {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  min-width: 220px;
+  margin-top: 0.75rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--role-color, #9bb5da) 60%, #ffffff 5%);
+  background: color-mix(in srgb, var(--role-accent, #4666b3) 22%, #0b1c35);
+  color: var(--role-color, #9bb5da);
+  font-family: "Chakra Petch", sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 16px color-mix(in srgb, var(--role-accent, #4666b3) 45%, transparent);
 }
 
 .auth-panel h1,
@@ -894,6 +1085,12 @@ body.compact-page .footer {
   .compact-controls {
     grid-template-columns: 1fr;
   }
+
+  .admin-grid,
+  .profile-grid,
+  .presence-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .embed-panel {
@@ -938,6 +1135,14 @@ body.compact-page .footer {
 @media (max-width: 700px) {
   .masthead {
     padding-top: 2rem;
+  }
+
+  .status-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .presence-panel {
+    position: static;
   }
 
   .panel {

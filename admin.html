@@ -14,39 +14,65 @@
   </div>
 
   <main class="container admin-wrap">
-    <section class="panel">
+    <section class="panel admin-hero">
       <h1>Admin Panel</h1>
-      <p class="subtitle">Approve users, assign roles, remove users, edit website text, add/remove custom items.</p>
+      <p class="subtitle">Manage users, roles, website text, and manual product items from one place.</p>
       <p id="adminState" class="status-line"></p>
       <p><a class="footer-link" href="index.html">Back to status page</a></p>
     </section>
 
     <section class="panel">
-      <h2>Users</h2>
-      <div id="usersTable"></div>
+      <h2>Overview</h2>
+      <div id="statsGrid" class="admin-stats"></div>
     </section>
 
-    <section class="panel">
-      <h2>Website Content</h2>
-      <form id="contentForm" class="stack-form">
-        <input id="heroTitle" placeholder="Hero title">
-        <input id="heroSubtitle" placeholder="Hero subtitle">
-        <input id="announcement" placeholder="Announcement text">
-        <button type="submit">Save Content</button>
-      </form>
-    </section>
+    <div class="admin-grid">
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Users</h2>
+        </div>
+        <p class="status-line">Manager and coder roles have full admin privileges.</p>
+        <div id="usersTable"></div>
+      </section>
 
-    <section class="panel">
-      <h2>Manual Items</h2>
-      <form id="itemForm" class="stack-form">
-        <input id="itemBrand" placeholder="Brand" required>
-        <input id="itemGame" placeholder="Game" required>
-        <input id="itemStatus" placeholder="Status (Updating/Testing)" required>
-        <input id="itemUpdated" placeholder="Updated label (optional)">
-        <button type="submit">Add Item</button>
-      </form>
-      <div id="itemsTable"></div>
-    </section>
+      <section class="panel">
+        <h2>Roles</h2>
+        <form id="roleForm" class="stack-form">
+          <input id="roleName" placeholder="Role name (example: qa)" required>
+          <input id="roleLabel" placeholder="Role label (example: QA Team)">
+          <div class="inline-fields">
+            <input id="roleColor" type="color" value="#7db2ff" aria-label="Role color">
+            <input id="roleAccent" type="color" value="#2f6dff" aria-label="Role accent">
+          </div>
+          <label class="check-line"><input id="roleAdmin" type="checkbox"> Admin access (can open admin panel)</label>
+          <label class="check-line"><input id="roleGlow" type="checkbox"> Glow animation</label>
+          <button type="submit">Create Role</button>
+        </form>
+        <div id="rolesTable"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Website Content</h2>
+        <form id="contentForm" class="stack-form">
+          <input id="heroTitle" placeholder="Hero title">
+          <input id="heroSubtitle" placeholder="Hero subtitle">
+          <input id="announcement" placeholder="Announcement text">
+          <button type="submit">Save Content</button>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>Manual Items</h2>
+        <form id="itemForm" class="stack-form">
+          <input id="itemBrand" placeholder="Brand" required>
+          <input id="itemGame" placeholder="Game" required>
+          <input id="itemStatus" placeholder="Status (Updating/Testing)" required>
+          <input id="itemUpdated" placeholder="Updated label (optional)">
+          <button type="submit">Add Item</button>
+        </form>
+        <div id="itemsTable"></div>
+      </section>
+    </div>
   </main>
 
   <script src="auth-local.js"></script>
@@ -58,32 +84,80 @@
     return;
   }
 
+  function esc(value) {
+    return String(value || "").replace(/[&<>"']/g, function (char) {
+      return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char];
+    });
+  }
+
   function formatDate(value) {
     if (!value) return "-";
     const d = new Date(value);
     return Number.isNaN(d.getTime()) ? value : d.toLocaleString();
   }
 
+  function roleBadge(roleStyle, roleLabel, roleName) {
+    const cls = (roleName === "owner" || roleName === "coder") ? `role-${roleName}` : "";
+    const color = roleStyle && roleStyle.color ? roleStyle.color : "#9bb5da";
+    const accent = roleStyle && roleStyle.accent ? roleStyle.accent : "#4666b3";
+    const glowClass = roleStyle && roleStyle.glow ? "role-glow" : "";
+    return `<span class="role-badge ${cls} ${glowClass}" style="--role-color:${esc(color)};--role-accent:${esc(accent)}">${esc(roleLabel || roleName)}</span>`;
+  }
+
+  function renderStats(users) {
+    const pending = users.filter((u) => !u.approved && !u.banned).length;
+    const approved = users.filter((u) => u.approved && !u.banned).length;
+    const banned = users.filter((u) => u.banned).length;
+    const online = GrizzAuth.getApprovedUsersWithPresence().filter((u) => u.online).length;
+    document.getElementById("statsGrid").innerHTML = [
+      ["Approved users", approved],
+      ["Pending approval", pending],
+      ["Banned users", banned],
+      ["Online now", online]
+    ].map(([label, value]) => `<article class="stat-card"><p>${label}</p><h3>${value}</h3></article>`).join("");
+  }
+
   function loadUsers() {
+    const roles = GrizzAuth.listRoles();
     const users = GrizzAuth.listUsers();
     const rows = users.map((u) => {
+      const options = roles.map((r) => {
+        const selected = r.name === u.role ? "selected" : "";
+        return `<option value="${esc(r.name)}" ${selected}>${esc(r.label)}</option>`;
+      }).join("");
       return `<tr>
-        <td>${u.username}</td>
-        <td>${u.role}</td>
+        <td>
+          <strong>${esc(u.displayName)}</strong>
+          <div class="mini-muted">@${esc(u.username)}</div>
+        </td>
+        <td>${roleBadge(u.roleStyle, u.roleLabel, u.role)}</td>
         <td>${u.banned ? "Banned" : (u.approved ? "Approved" : "Pending")}</td>
         <td>${formatDate(u.lastSeen)}</td>
         <td>
+          <select class="role-select" data-role-select="${u.id}">${options}</select>
+          <button data-role-save="${u.id}">Save Role</button>
           <button data-approve="${u.id}" data-val="true">Approve</button>
           <button data-approve="${u.id}" data-val="false">Unapprove</button>
           <button data-ban="${u.id}" data-val="true">Ban</button>
           <button data-ban="${u.id}" data-val="false">Unban</button>
-          <button data-role="${u.id}" data-val="support">Make Support</button>
-          <button data-role="${u.id}" data-val="admin">Make Admin</button>
           <button data-delete="${u.id}">Remove</button>
         </td>
       </tr>`;
     }).join("");
     document.getElementById("usersTable").innerHTML = `<table class="admin-table"><thead><tr><th>User</th><th>Role</th><th>Status</th><th>Last Seen</th><th>Actions</th></tr></thead><tbody>${rows}</tbody></table>`;
+    renderStats(users);
+  }
+
+  function loadRoles() {
+    const roles = GrizzAuth.listRoles();
+    const rows = roles.map((r) => {
+      return `<tr>
+        <td>${roleBadge(r, r.label, r.name)}</td>
+        <td>${r.adminAccess ? "Admin" : "Standard"}</td>
+        <td>${r.system ? "System" : `<button data-remove-role="${esc(r.name)}">Remove</button>`}</td>
+      </tr>`;
+    }).join("");
+    document.getElementById("rolesTable").innerHTML = `<table class="admin-table"><thead><tr><th>Role</th><th>Access</th><th>Action</th></tr></thead><tbody>${rows}</tbody></table>`;
   }
 
   function loadContentAndItems() {
@@ -100,20 +174,58 @@
   document.getElementById("usersTable").addEventListener("click", (e) => {
     const target = e.target;
     try {
+      if (target.dataset.roleSave) {
+        const userId = target.dataset.roleSave;
+        const select = document.querySelector(`[data-role-select="${userId}"]`);
+        GrizzAuth.setUserRole(userId, select.value);
+      }
       if (target.dataset.approve) {
         GrizzAuth.updateUser(target.dataset.approve, { approved: target.dataset.val === "true" });
       }
       if (target.dataset.ban) {
         GrizzAuth.updateUser(target.dataset.ban, { banned: target.dataset.val === "true" });
       }
-      if (target.dataset.role) {
-        GrizzAuth.updateUser(target.dataset.role, { role: target.dataset.val });
-      }
       if (target.dataset.delete) {
         GrizzAuth.removeUser(target.dataset.delete, currentAdmin.id);
       }
       loadUsers();
+      loadRoles();
       adminState.textContent = "User update saved.";
+    } catch (err) {
+      adminState.textContent = err.message;
+    }
+  });
+
+  document.getElementById("roleForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    try {
+      GrizzAuth.createRole({
+        name: document.getElementById("roleName").value,
+        label: document.getElementById("roleLabel").value,
+        color: document.getElementById("roleColor").value,
+        accent: document.getElementById("roleAccent").value,
+        adminAccess: document.getElementById("roleAdmin").checked,
+        glow: document.getElementById("roleGlow").checked
+      });
+      e.target.reset();
+      document.getElementById("roleColor").value = "#7db2ff";
+      document.getElementById("roleAccent").value = "#2f6dff";
+      loadRoles();
+      loadUsers();
+      adminState.textContent = "Role created.";
+    } catch (err) {
+      adminState.textContent = err.message;
+    }
+  });
+
+  document.getElementById("rolesTable").addEventListener("click", (e) => {
+    const roleName = e.target.dataset.removeRole;
+    if (!roleName) return;
+    try {
+      GrizzAuth.removeRole(roleName);
+      loadRoles();
+      loadUsers();
+      adminState.textContent = "Role removed. Affected users moved to Support.";
     } catch (err) {
       adminState.textContent = err.message;
     }
@@ -164,6 +276,7 @@
 
   GrizzAuth.touch();
   loadUsers();
+  loadRoles();
   loadContentAndItems();
   })();
   </script>

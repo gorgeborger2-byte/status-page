@@ -23,6 +23,7 @@
     <nav class="top-nav" aria-label="Main">
       <a class="nav-link active" href="index.html">Status</a>
       <a class="nav-link" href="presentation.html">Support Guide</a>
+      <a class="nav-link" id="profileLink" href="profile.html" style="display:none;">Profile</a>
       <a class="nav-link" id="authLink" href="auth.html">Login</a>
       <a class="nav-link" id="adminLink" href="admin.html" style="display:none;">Admin</a>
     </nav>
@@ -41,26 +42,37 @@
     <div class="search-box">
       <input type="text" id="searchInput" placeholder="Search game or product..." autocomplete="off">
     </div>
-    <section class="panel" aria-live="polite">
-      <div class="panel-header">
-        <h2>All Products <span id="countBadge"></span></h2>
-        <div class="filter-row">
-          <button class="filter-btn active" data-filter="all">All</button>
-          <button class="filter-btn" data-filter="Updating">Updating</button>
-          <button class="filter-btn" data-filter="Testing">Testing</button>
+    <div class="status-layout">
+      <section class="panel main-status-panel" aria-live="polite">
+        <div class="panel-header">
+          <h2>All Products <span id="countBadge"></span></h2>
+          <div class="filter-row">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="Updating">Updating</button>
+            <button class="filter-btn" data-filter="Testing">Testing</button>
+          </div>
         </div>
-      </div>
-      <p id="statusLine" class="status-line"></p>
-      <div id="cards" class="cards"></div>
-    </section>
+        <p id="statusLine" class="status-line"></p>
+        <div id="cards" class="cards"></div>
+      </section>
 
-    <section class="panel">
-      <div class="panel-header">
-        <h2>Support Team Presence</h2>
-      </div>
-      <p class="status-line" id="presenceHint">Login to see support team online status.</p>
-      <div id="presenceList" class="cards"></div>
-    </section>
+      <section class="panel presence-panel">
+        <div class="panel-header">
+          <h2>Support Team Presence <span id="presenceCountBadge"></span></h2>
+        </div>
+        <p class="status-line" id="presenceHint">Tracking user online and offline status.</p>
+        <div class="presence-grid">
+          <article class="presence-col">
+            <h3>Online <span id="onlineCount">0</span></h3>
+            <div id="presenceOnline" class="cards"></div>
+          </article>
+          <article class="presence-col">
+            <h3>Offline <span id="offlineCount">0</span></h3>
+            <div id="presenceOffline" class="cards"></div>
+          </article>
+        </div>
+      </section>
+    </div>
   </main>
 
   <footer class="container footer">
@@ -130,10 +142,15 @@ var refreshCountdownEl = document.getElementById("refreshCountdown");
 var heroTitleEl = document.getElementById("heroTitle");
 var heroSubtitleEl = document.getElementById("heroSubtitle");
 var announcementLineEl = document.getElementById("announcementLine");
+var profileLinkEl = document.getElementById("profileLink");
 var authLinkEl = document.getElementById("authLink");
 var adminLinkEl = document.getElementById("adminLink");
 var presenceHintEl = document.getElementById("presenceHint");
-var presenceListEl = document.getElementById("presenceList");
+var presenceCountBadgeEl = document.getElementById("presenceCountBadge");
+var onlineCountEl = document.getElementById("onlineCount");
+var offlineCountEl = document.getElementById("offlineCount");
+var presenceOnlineEl = document.getElementById("presenceOnline");
+var presenceOfflineEl = document.getElementById("presenceOffline");
 var searchInput = document.getElementById("searchInput");
 var countBadge = document.getElementById("countBadge");
 var nextRefreshAt = 0;
@@ -204,25 +221,39 @@ function applyLiveData(data) {
 
 function renderPresence(users) {
   if (!users || !users.length) {
-    presenceListEl.innerHTML = "";
+    presenceOnlineEl.innerHTML = "";
+    presenceOfflineEl.innerHTML = "";
+    onlineCountEl.textContent = "0";
+    offlineCountEl.textContent = "0";
+    presenceCountBadgeEl.textContent = "(0)";
     presenceHintEl.textContent = "No approved users found.";
     return;
   }
 
-  presenceListEl.innerHTML = users.map(function (u) {
-    var badge = u.online ? "<span class='pill pill-updating'><span class='status-ring'></span>Online now</span>" : "<span class='pill pill-testing'>Last seen</span>";
-    var seenText = u.online ? "Active now" : formatDateTime(u.lastSeen);
-    return "<article class='card'><p class='brand'>" + u.role + "</p><h3 class='game'>" + u.username + "</h3>" + badge + "<p class='updated'>" + seenText + "</p></article>";
-  }).join("");
+  var online = users.filter(function (u) { return u.online; });
+  var offline = users.filter(function (u) { return !u.online; });
+
+  function renderUserCard(u) {
+    var badge = u.online
+      ? "<span class='pill pill-updating'><span class='status-ring'></span>Online now</span>"
+      : "<span class='pill pill-testing'>Offline</span>";
+    var seenText = u.online ? "Active now" : (u.lastSeen ? ("Last seen: " + formatDateTime(u.lastSeen)) : "Never active");
+    var roleClass = (u.role === "owner" || u.role === "coder") ? ("role-" + u.role) : "";
+    var glowClass = (u.roleStyle && u.roleStyle.glow) ? "role-glow" : "";
+    var roleStyle = u.roleStyle || {};
+    var roleBadge = "<span class='role-badge " + roleClass + " " + glowClass + "' style='--role-color:" + (roleStyle.color || "#9bb5da") + ";--role-accent:" + (roleStyle.accent || "#4666b3") + "'>" + (u.roleLabel || u.role) + "</span>";
+    return "<article class='card'><p class='brand'>" + roleBadge + "</p><h3 class='game'>" + (u.displayName || "No Nickname") + "</h3>" + badge + "<p class='updated'>" + seenText + "</p></article>";
+  }
+
+  presenceOnlineEl.innerHTML = online.map(renderUserCard).join("") || "<p class='status-line'>No users online.</p>";
+  presenceOfflineEl.innerHTML = offline.map(renderUserCard).join("") || "<p class='status-line'>No users offline.</p>";
+  onlineCountEl.textContent = String(online.length);
+  offlineCountEl.textContent = String(offline.length);
+  presenceCountBadgeEl.textContent = "(" + users.length + ")";
   presenceHintEl.textContent = "";
 }
 
 function loadPresence() {
-  if (!currentUser) {
-    renderPresence([]);
-    presenceHintEl.textContent = "Login to see support team online status.";
-    return;
-  }
   renderPresence(GrizzAuth.getApprovedUsersWithPresence());
 }
 
@@ -243,14 +274,15 @@ function loadSiteConfig() {
 function loadAuthState() {
   currentUser = GrizzAuth.requireApprovedSession("auth.html");
   if (!currentUser) return;
-  authLinkEl.textContent = "Logout (" + currentUser.username + ")";
+  profileLinkEl.style.display = "inline-flex";
+  authLinkEl.textContent = "Logout (" + (currentUser.displayName || "No Nickname") + ")";
   authLinkEl.href = "#";
   authLinkEl.onclick = function (e) {
     e.preventDefault();
     GrizzAuth.logout();
     window.location.href = "auth.html";
   };
-  if (currentUser.role === "admin") {
+  if (GrizzAuth.hasAdminAccess(currentUser)) {
     adminLinkEl.style.display = "inline-flex";
   }
   heartbeat();

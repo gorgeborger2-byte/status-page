@@ -23,6 +23,9 @@
     <nav class="top-nav" aria-label="Main">
       <a class="nav-link" href="index.html">Status</a>
       <a class="nav-link active" href="presentation.html">Support Guide</a>
+      <a class="nav-link" href="profile.html">Profile</a>
+      <a class="nav-link" id="adminLink" href="admin.html" style="display:none;">Admin</a>
+      <a class="nav-link" id="logoutLink" href="#">Logout</a>
     </nav>
     <h1>Cosmo Support Guide</h1>
     <p class="subtitle">Compact mode - one product at a time (no long scrolling)</p>
@@ -65,6 +68,16 @@
     var currentUser = GrizzAuth.requireApprovedSession("auth.html");
     if (!currentUser) return;
     GrizzAuth.touch();
+    var adminLinkEl = document.getElementById("adminLink");
+    var logoutLinkEl = document.getElementById("logoutLink");
+    if (GrizzAuth.hasAdminAccess(currentUser)) {
+      adminLinkEl.style.display = "inline-flex";
+    }
+    logoutLinkEl.addEventListener("click", function (e) {
+      e.preventDefault();
+      GrizzAuth.logout();
+      window.location.replace("auth.html");
+    });
 
     var products = [
       {

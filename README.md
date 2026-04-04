@@ -11,9 +11,7 @@ This version uses a frontend admin/auth system (no backend required to run pages
 
 ## Auth Rules
 
-- Default admin account is auto-seeded:
-  - Username: `mert`
-  - Password: `mert`
+- Privileged accounts are auto-seeded in `auth-local.js`
 - Support users register from `auth.html`
 - New users stay pending until admin approves in `admin.html`
 - Pending or banned users cannot access protected pages
