@@ -186,7 +186,9 @@ app.post("/api/auth/login", (req, res) => {
   user.lastSeen = nowIso();
   saveDb(db);
   req.session.userId = user.id;
-  return res.json({ ok: true, user: { username: user.username, role: user.role, approved: user.approved } });
+  return req.session.save(() => {
+    res.json({ ok: true, user: { username: user.username, role: user.role, approved: user.approved } });
+  });
 });
 
 app.post("/api/auth/logout", (req, res) => {

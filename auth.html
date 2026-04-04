@@ -42,6 +42,7 @@
   async function postJson(url, payload) {
     const res = await fetch(url, {
       method: "POST",
+      credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     });
@@ -52,6 +53,19 @@
 
   const stateEl = document.getElementById("authState");
 
+  async function ensureNotAlreadyLoggedIn() {
+    try {
+      const res = await fetch("/api/auth/me", { credentials: "same-origin" });
+      if (!res.ok) return;
+      const out = await res.json();
+      if (out && out.user) {
+        window.location.replace("index.html");
+      }
+    } catch (_) {
+      // ignore
+    }
+  }
+
   document.getElementById("loginForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     try {
@@ -59,7 +73,7 @@
       const password = document.getElementById("loginPass").value;
       await postJson("/api/auth/login", { username, password });
       stateEl.textContent = "Logged in. Redirecting...";
-      setTimeout(() => { window.location.href = "index.html"; }, 500);
+      window.location.replace("index.html");
     } catch (err) {
       stateEl.textContent = err.message;
     }
@@ -76,6 +90,8 @@
       stateEl.textContent = err.message;
     }
   });
+
+  ensureNotAlreadyLoggedIn();
   </script>
 </body>
 </html>

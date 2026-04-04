@@ -222,7 +222,7 @@ function loadPresence() {
     presenceHintEl.textContent = "Login to see support team online status.";
     return;
   }
-  fetch("/api/users/presence")
+  fetch("/api/users/presence", { credentials: "same-origin" })
     .then(function (res) {
       if (!res.ok) throw new Error("unauthorized");
       return res.json();
@@ -238,11 +238,11 @@ function loadPresence() {
 
 function heartbeat() {
   if (!currentUser) return;
-  fetch("/api/auth/heartbeat", { method: "POST" }).catch(function () {});
+  fetch("/api/auth/heartbeat", { method: "POST", credentials: "same-origin" }).catch(function () {});
 }
 
 function loadSiteConfig() {
-  return fetch("/api/site/config")
+  return fetch("/api/site/config", { credentials: "same-origin" })
     .then(function (res) { return res.json(); })
     .then(function (cfg) {
       if (cfg.siteContent) {
@@ -258,7 +258,7 @@ function loadSiteConfig() {
 }
 
 function loadAuthState() {
-  fetch("/api/auth/me")
+  fetch("/api/auth/me", { credentials: "same-origin" })
     .then(function (res) {
       if (!res.ok) throw new Error("no-session");
       return res.json();
@@ -269,7 +269,7 @@ function loadAuthState() {
       authLinkEl.href = "#";
       authLinkEl.onclick = function (e) {
         e.preventDefault();
-        fetch("/api/auth/logout", { method: "POST" }).then(function () { window.location.reload(); });
+        fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" }).then(function () { window.location.reload(); });
       };
       if (currentUser.role === "admin") {
         adminLinkEl.style.display = "inline-flex";
@@ -284,7 +284,7 @@ function loadAuthState() {
 
 function loadLiveStatus() {
   nextRefreshAt = Date.now() + 30000;
-  fetch("/api/status-feed?t=" + Date.now(), { cache: "no-store" })
+  fetch("/api/status-feed?t=" + Date.now(), { cache: "no-store", credentials: "same-origin" })
     .then(function (res) {
       if (!res.ok) throw new Error("HTTP " + res.status);
       return res.json();
