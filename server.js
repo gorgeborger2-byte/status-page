@@ -713,7 +713,7 @@ app.get("/", (req, res) => {
 
 app.use(express.static(__dirname, {
   index: false,
-  fallthrough: false,
+  fallthrough: true,
   dotfiles: "ignore",
   etag: true,
   maxAge: "5m"
