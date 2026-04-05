@@ -117,8 +117,8 @@ if (!dashboardResponse.ok) {
 }
 
 const html = await dashboardResponse.text();
-if (!html.includes("Cosmo Status Dashboard")) {
-  throw new Error("Authenticated dashboard HTML not found.");
+if (html.includes("Status Page Login") || html.includes("Status Login - Cosmo")) {
+  throw new Error("Authentication failed: dashboard returned login page.");
 }
 
 const lastUpdatedMatch = html.match(/<div class="last-updated">([\s\S]*?)<\/div>/i);
