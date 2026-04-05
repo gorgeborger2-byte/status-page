@@ -65,6 +65,13 @@ function normalizeUsername(value) {
   return String(value || "").trim().toLowerCase();
 }
 
+function userRecencyTs(user) {
+  const candidates = [user.nicknameUpdatedAt, user.lastSeen, user.createdAt]
+    .map((v) => (v ? Date.parse(v) : 0))
+    .filter((v) => Number.isFinite(v));
+  return candidates.length ? Math.max(...candidates) : 0;
+}
+
 function safeReadDb() {
   const dirPath = path.dirname(DB_PATH);
   if (!fs.existsSync(dirPath)) {
@@ -115,6 +122,24 @@ function safeReadDb() {
     nickname: String(u.nickname || "").trim(),
     nicknameUpdatedAt: u.nicknameUpdatedAt || null
   }));
+
+  const dedupedByUsername = new Map();
+  db.users.forEach((u) => {
+    const key = normalizeUsername(u.username);
+    if (!key) return;
+    const existing = dedupedByUsername.get(key);
+    if (!existing) {
+      dedupedByUsername.set(key, u);
+      return;
+    }
+
+    const existingScore = userRecencyTs(existing) + (existing.approved ? 1000 : 0) + (existing.banned ? -500 : 0);
+    const nextScore = userRecencyTs(u) + (u.approved ? 1000 : 0) + (u.banned ? -500 : 0);
+    if (nextScore >= existingScore) {
+      dedupedByUsername.set(key, u);
+    }
+  });
+  db.users = Array.from(dedupedByUsername.values());
 
   return db;
 }
