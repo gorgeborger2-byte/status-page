@@ -270,7 +270,8 @@ function getClientIp(req) {
 }
 
 function checkAuthRateLimit(req, res, next) {
-  const key = `${getClientIp(req)}:${req.path}`;
+  const username = normalizeUsername(req.body && req.body.username);
+  const key = `${getClientIp(req)}:${req.path}:${username || "anon"}`;
   const now = Date.now();
   const row = authRateLimitMap.get(key);
   if (!row || now - row.startedAt > AUTH_WINDOW_MS) {
@@ -284,6 +285,15 @@ function checkAuthRateLimit(req, res, next) {
   return next();
 }
 
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, value] of authRateLimitMap.entries()) {
+    if (!value || now - value.startedAt > AUTH_WINDOW_MS * 2) {
+      authRateLimitMap.delete(key);
+    }
+  }
+}, AUTH_WINDOW_MS).unref();
+
 app.use((req, res, next) => {
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("X-Frame-Options", "DENY");
@@ -291,6 +301,25 @@ app.use((req, res, next) => {
   res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()") ;
   res.setHeader("Cross-Origin-Resource-Policy", "same-origin");
   next();
+});
+
+app.use((req, res, next) => {
+  const unsafe = req.method === "POST" || req.method === "PUT" || req.method === "PATCH" || req.method === "DELETE";
+  if (!unsafe || !String(req.path || "").startsWith("/api/")) return next();
+
+  const origin = req.headers.origin;
+  const host = req.headers.host;
+  if (origin && host) {
+    try {
+      const originUrl = new URL(origin);
+      if (originUrl.host !== host) {
+        return res.status(403).json({ error: "Cross-site request blocked" });
+      }
+    } catch (e) {
+      return res.status(403).json({ error: "Invalid request origin" });
+    }
+  }
+  return next();
 });
 
 app.use(express.json({ limit: "1mb" }));
@@ -371,10 +400,13 @@ app.post("/api/auth/login", checkAuthRateLimit, (req, res) => {
   if (!user.approved) return res.status(403).json({ error: "Pending admin approval" });
 
   user.lastSeen = nowIso();
-  req.session.userId = user.id;
-  audit(db, user.username, "login", user.username, "session started");
-  saveDb(db);
-  res.json({ user: sanitizeUser(db, user, { includeUsername: true }) });
+  req.session.regenerate((err) => {
+    if (err) return res.status(500).json({ error: "Session error" });
+    req.session.userId = user.id;
+    audit(db, user.username, "login", user.username, "session started");
+    saveDb(db);
+    return res.json({ user: sanitizeUser(db, user, { includeUsername: true }) });
+  });
 });
 
 app.post("/api/auth/logout", authRequired, (req, res) => {
@@ -646,7 +678,7 @@ app.delete("/api/admin/users/:id", authRequired, adminRequired, (req, res) => {
   const idx = req.db.users.findIndex((u) => u.id === req.params.id);
   if (idx === -1) return res.status(404).json({ error: "User not found" });
   const target = req.db.users[idx];
-  if (["mert", "yurixd666"].includes(normalizeUsername(target.username))) {
+  if (["owner-seeded", "coder-seeded", "owner-bootstrap"].includes(String(target.id || ""))) {
     return res.status(400).json({ error: "Privileged seeded accounts cannot be removed" });
   }
   req.db.users.splice(idx, 1);
