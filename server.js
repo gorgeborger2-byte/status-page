@@ -18,7 +18,7 @@ const NICKNAME_COOLDOWN_MS = 21 * 24 * 60 * 60 * 1000;
 const PRESENCE_WINDOW_MS = 45 * 1000;
 const AUTH_WINDOW_MS = 10 * 60 * 1000;
 const AUTH_MAX_ATTEMPTS = 25;
-const STATUS_SYNC_INTERVAL_MS = 5 * 60 * 1000;
+const STATUS_SYNC_INTERVAL_MS = Math.max(30 * 1000, Number(process.env.STATUS_SYNC_INTERVAL_MS || 30 * 1000));
 
 const PUBLIC_FILE_ALLOWLIST = new Set([
   "/auth.html",
@@ -770,7 +770,7 @@ function readStatusPayload() {
 
 app.get("/api/status", authRequired, async (req, res) => {
   if (process.env.STATUS_PASSWORD) {
-    const stale = !lastStatusSyncAt || (Date.now() - lastStatusSyncAt > 60000);
+    const stale = !lastStatusSyncAt || (Date.now() - lastStatusSyncAt > Math.max(25 * 1000, STATUS_SYNC_INTERVAL_MS + 5000));
     if (stale) {
       await runStatusSync("api");
     }
