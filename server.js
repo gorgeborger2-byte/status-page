@@ -264,15 +264,29 @@ app.disable("x-powered-by");
 app.set("trust proxy", 1);
 
 const authRateLimitMap = new Map();
+const authRateLimitGlobalMap = new Map();
 
 function getClientIp(req) {
   return String((req.headers["cf-connecting-ip"] || req.ip || req.socket.remoteAddress || "unknown")).slice(0, 90);
 }
 
 function checkAuthRateLimit(req, res, next) {
+  const ip = getClientIp(req);
   const username = normalizeUsername(req.body && req.body.username);
-  const key = `${getClientIp(req)}:${req.path}:${username || "anon"}`;
+  const key = `${ip}:${req.path}:${username || "anon"}`;
+  const globalKey = `${ip}:${req.path}`;
   const now = Date.now();
+
+  const globalRow = authRateLimitGlobalMap.get(globalKey);
+  if (!globalRow || now - globalRow.startedAt > AUTH_WINDOW_MS) {
+    authRateLimitGlobalMap.set(globalKey, { startedAt: now, attempts: 1 });
+  } else {
+    globalRow.attempts += 1;
+    if (globalRow.attempts > AUTH_MAX_ATTEMPTS * 2) {
+      return res.status(429).json({ error: "Too many attempts. Please wait and try again." });
+    }
+  }
+
   const row = authRateLimitMap.get(key);
   if (!row || now - row.startedAt > AUTH_WINDOW_MS) {
     authRateLimitMap.set(key, { startedAt: now, attempts: 1 });
@@ -290,6 +304,11 @@ setInterval(() => {
   for (const [key, value] of authRateLimitMap.entries()) {
     if (!value || now - value.startedAt > AUTH_WINDOW_MS * 2) {
       authRateLimitMap.delete(key);
+    }
+  }
+  for (const [key, value] of authRateLimitGlobalMap.entries()) {
+    if (!value || now - value.startedAt > AUTH_WINDOW_MS * 2) {
+      authRateLimitGlobalMap.delete(key);
     }
   }
 }, AUTH_WINDOW_MS).unref();

@@ -159,14 +159,29 @@ var latestFetchedAt = null;
 var manualItems = [];
 var currentUser = null;
 
+function esc(value) {
+  return String(value || "").replace(/[&<>"']/g, function (char) {
+    return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char];
+  });
+}
+
+function safeCssColor(value, fallback) {
+  var v = String(value || "").trim();
+  if (/^#[0-9a-fA-F]{3,8}$/.test(v)) return v;
+  if (/^rgba?\([0-9\s.,%]+\)$/.test(v)) return v;
+  if (/^hsla?\([0-9\s.,%]+\)$/.test(v)) return v;
+  return fallback;
+}
+
 function renderItems(items) {
   if (!items.length) { cardsEl.innerHTML = ""; statusLineEl.textContent = "No products match your search."; countBadge.textContent = "(0)"; return; }
   cardsEl.innerHTML = items.map(function(item) {
-    var isTesting = item.status.toLowerCase() === "testing";
+    var status = String(item.status || "").toLowerCase();
+    var isTesting = status === "testing";
     var pill = isTesting
       ? "<span class=\"pill pill-testing\">Testing<span class=\"loading-dots\"><i></i><i></i><i></i></span></span>"
       : "<span class=\"pill pill-updating\"><span class=\"status-ring\"></span>Updating</span>";
-    return "<article class=\"card\"><p class=\"brand\">"+item.brand+"</p><h3 class=\"game\">"+item.game+"</h3>"+pill+"<p class=\"updated\">Updated: "+item.updated+"</p></article>";
+    return "<article class=\"card\"><p class=\"brand\">" + esc(item.brand) + "</p><h3 class=\"game\">" + esc(item.game) + "</h3>" + pill + "<p class=\"updated\">Updated: " + esc(item.updated) + "</p></article>";
   }).join("");
   statusLineEl.textContent = "";
   countBadge.textContent = "("+items.length+")";
@@ -175,8 +190,12 @@ function renderItems(items) {
 function filterItems() {
   var query = searchInput.value.toLowerCase().trim();
   var filtered = allItems;
-  if (currentFilter !== "all") filtered = filtered.filter(function(i) { return i.status === currentFilter; });
-  if (query) filtered = filtered.filter(function(i) { return i.game.toLowerCase().includes(query) || i.brand.toLowerCase().includes(query); });
+  if (currentFilter !== "all") filtered = filtered.filter(function(i) { return String(i.status || "") === currentFilter; });
+  if (query) filtered = filtered.filter(function(i) {
+    var game = String(i.game || "").toLowerCase();
+    var brand = String(i.brand || "").toLowerCase();
+    return game.includes(query) || brand.includes(query);
+  });
   renderItems(filtered);
 }
 
@@ -239,11 +258,13 @@ function renderPresence(users) {
       ? "<span class='pill pill-updating'><span class='status-ring'></span>Online now</span>"
       : "<span class='pill pill-testing'>Offline</span>";
     var seenText = u.online ? "Active now" : (u.lastSeen ? ("Last seen: " + formatDateTime(u.lastSeen)) : "Never active");
-    var roleClass = (u.role === "owner" || u.role === "coder") ? ("role-" + u.role) : "";
+    var roleClass = (u.role === "owner" || u.role === "coder") ? ("role-" + esc(u.role)) : "";
     var glowClass = (u.roleStyle && u.roleStyle.glow) ? "role-glow" : "";
     var roleStyle = u.roleStyle || {};
-    var roleBadge = "<span class='role-badge " + roleClass + " " + glowClass + "' style='--role-color:" + (roleStyle.color || "#9bb5da") + ";--role-accent:" + (roleStyle.accent || "#4666b3") + "'>" + (u.roleLabel || u.role) + "</span>";
-    return "<article class='card'><p class='brand'>" + roleBadge + "</p><h3 class='game'>" + (u.displayName || "No Nickname") + "</h3>" + badge + "<p class='updated'>" + seenText + "</p></article>";
+    var safeColor = safeCssColor(roleStyle.color, "#9bb5da");
+    var safeAccent = safeCssColor(roleStyle.accent, "#4666b3");
+    var roleBadge = "<span class='role-badge " + roleClass + " " + glowClass + "' style='--role-color:" + esc(safeColor) + ";--role-accent:" + esc(safeAccent) + "'>" + esc(u.roleLabel || u.role) + "</span>";
+    return "<article class='card'><p class='brand'>" + roleBadge + "</p><h3 class='game'>" + esc(u.displayName || "No Nickname") + "</h3>" + badge + "<p class='updated'>" + esc(seenText) + "</p></article>";
   }
 
   presenceOnlineEl.innerHTML = online.map(renderUserCard).join("") || "<p class='status-line'>No users online.</p>";
