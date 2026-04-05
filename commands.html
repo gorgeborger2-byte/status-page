@@ -69,6 +69,7 @@
     var cardsEl = document.getElementById("commandCards");
     var isAdmin = false;
     var liveCommands = [];
+    var renderedRows = [];
     var adminPanelEl = document.getElementById("commandAdminPanel");
     var addCommandFormEl = document.getElementById("addCommandForm");
     var adminCommandStateEl = document.getElementById("adminCommandState");
@@ -136,6 +137,7 @@
           || item.command.toLowerCase().indexOf(query) !== -1
           || item.response.toLowerCase().indexOf(query) !== -1;
       });
+      renderedRows = rows;
 
       stateEl.textContent = rows.length + " command(s) shown";
       cardsEl.innerHTML = rows.map(function (item, idx) {
@@ -152,7 +154,7 @@
     cardsEl.addEventListener("click", function (event) {
       var idx = event.target.getAttribute("data-copy");
       if (idx !== null) {
-        var item = liveCommands[Number(idx)];
+        var item = renderedRows[Number(idx)];
         if (!item) return;
         copyResponse(item.command, item.response);
         return;
