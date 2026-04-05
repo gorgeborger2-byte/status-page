@@ -3,6 +3,7 @@ const session = require("express-session");
 const fs = require("fs");
 const path = require("path");
 const bcrypt = require("bcryptjs");
+const { spawn } = require("child_process");
 
 const PORT = Number(process.env.PORT || 3000);
 const SESSION_SECRET = process.env.SESSION_SECRET || "cosmo-dev-secret-change-me";
@@ -17,6 +18,7 @@ const NICKNAME_COOLDOWN_MS = 21 * 24 * 60 * 60 * 1000;
 const PRESENCE_WINDOW_MS = 45 * 1000;
 const AUTH_WINDOW_MS = 10 * 60 * 1000;
 const AUTH_MAX_ATTEMPTS = 25;
+const STATUS_SYNC_INTERVAL_MS = 5 * 60 * 1000;
 
 const PUBLIC_FILE_ALLOWLIST = new Set([
   "/auth.html",
@@ -31,6 +33,7 @@ const PUBLIC_FILE_ALLOWLIST = new Set([
   "/ui-effects.js",
   "/data/status.json"
 ]);
+const STATUS_JSON_PATH = path.join(__dirname, "data", "status.json");
 
 const DEFAULT_SITE_CONTENT = {
   heroTitle: "Cosmo Product Status",
@@ -716,6 +719,89 @@ app.use(express.static(__dirname, {
   maxAge: "5m"
 }));
 
+let isStatusSyncRunning = false;
+let statusSyncPromise = null;
+let lastStatusSyncAt = 0;
+let lastStatusSyncOk = false;
+
+function runStatusSync(trigger) {
+  if (!process.env.STATUS_PASSWORD) return Promise.resolve(false);
+  if (isStatusSyncRunning && statusSyncPromise) return statusSyncPromise;
+  isStatusSyncRunning = true;
+
+  statusSyncPromise = new Promise((resolve) => {
+    const child = spawn(process.execPath, [path.join(__dirname, "scripts", "fetch-status.mjs")], {
+      cwd: __dirname,
+      env: process.env,
+      stdio: ["ignore", "pipe", "pipe"]
+    });
+
+    let stderr = "";
+    child.stdout.on("data", (buf) => {
+      console.log(`[status-sync:${trigger}] ${String(buf).trim()}`);
+    });
+    child.stderr.on("data", (buf) => {
+      stderr += String(buf);
+    });
+    child.on("close", (code) => {
+      lastStatusSyncAt = Date.now();
+      lastStatusSyncOk = code === 0;
+      if (code !== 0) {
+        console.error(`[status-sync:${trigger}] failed with code ${code}`);
+        if (stderr.trim()) console.error(stderr.trim());
+      }
+      isStatusSyncRunning = false;
+      resolve(code === 0);
+    });
+  });
+
+  return statusSyncPromise;
+}
+
+function readStatusPayload() {
+  try {
+    if (!fs.existsSync(STATUS_JSON_PATH)) return null;
+    const raw = fs.readFileSync(STATUS_JSON_PATH, "utf8");
+    return JSON.parse(raw);
+  } catch (e) {
+    return null;
+  }
+}
+
+app.get("/api/status", authRequired, async (req, res) => {
+  if (process.env.STATUS_PASSWORD) {
+    const stale = !lastStatusSyncAt || (Date.now() - lastStatusSyncAt > 60000);
+    if (stale) {
+      await runStatusSync("api");
+    }
+  }
+
+  const payload = readStatusPayload();
+  if (!payload) {
+    return res.status(503).json({ error: "Status feed not available yet" });
+  }
+
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+  res.setHeader("Pragma", "no-cache");
+  return res.json({
+    ...payload,
+    syncInfo: {
+      lastStatusSyncAt: lastStatusSyncAt ? new Date(lastStatusSyncAt).toISOString() : null,
+      lastStatusSyncOk
+    }
+  });
+});
+
+function startStatusSyncLoop() {
+  if (!process.env.STATUS_PASSWORD) {
+    console.log("[status-sync] disabled: STATUS_PASSWORD is not set");
+    return;
+  }
+  runStatusSync("startup");
+  setInterval(() => runStatusSync("interval"), STATUS_SYNC_INTERVAL_MS);
+}
+
 app.listen(PORT, () => {
   console.log(`Cosmo backend running on http://localhost:${PORT}`);
+  startStatusSyncLoop();
 });

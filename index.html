@@ -301,7 +301,7 @@ function loadAuthState() {
 
 function loadLiveStatus() {
   nextRefreshAt = Date.now() + 30000;
-  fetch("data/status.json?t=" + Date.now(), { cache: "no-store" })
+  fetch("/api/status?t=" + Date.now(), { cache: "no-store", credentials: "include" })
     .then(function (res) {
       if (!res.ok) throw new Error("HTTP " + res.status);
       return res.json();

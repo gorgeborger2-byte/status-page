@@ -100,11 +100,15 @@ if (!cookieMap.size) {
   throw new Error("Login failed: no session cookie returned.");
 }
 
-const dashboardUrl = new URL("status.php", statusUrl).toString();
+const dashboardUrlObj = new URL("status.php", statusUrl);
+dashboardUrlObj.searchParams.set("t", String(Date.now()));
+const dashboardUrl = dashboardUrlObj.toString();
 const dashboardResponse = await fetch(dashboardUrl, {
   headers: {
     Cookie: cookieHeader(cookieMap),
     "User-Agent": "Mozilla/5.0 (compatible; StatusSyncBot/1.0)",
+    "Cache-Control": "no-cache, no-store, must-revalidate",
+    Pragma: "no-cache",
   },
 });
 
