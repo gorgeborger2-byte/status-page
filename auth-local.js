@@ -88,6 +88,9 @@
   }
 
   function touch() {
+    if (typeof document !== "undefined" && document.visibilityState === "hidden") {
+      return Promise.resolve({ ok: false, skipped: true });
+    }
     return request("/api/auth/touch", { method: "POST" }).catch(function () {
       return { ok: false };
     });
@@ -144,6 +147,28 @@
 
   function getManualItems() {
     return request("/api/manual-items").then(function (data) { return data.items || []; });
+  }
+
+  function getCommands() {
+    return request("/api/commands").then(function (data) { return data.commands || []; });
+  }
+
+  function addCommand(command, response) {
+    return request("/api/admin/commands", {
+      method: "POST",
+      body: JSON.stringify({ command: command, response: response })
+    }).then(function (data) { return data.command; });
+  }
+
+  function removeCommand(id) {
+    return request("/api/admin/commands/" + encodeURIComponent(id), { method: "DELETE" });
+  }
+
+  function bootstrapCommands(commands) {
+    return request("/api/admin/commands/bootstrap", {
+      method: "POST",
+      body: JSON.stringify({ commands: commands || [] })
+    });
   }
 
   function addManualItem(item) {
@@ -214,6 +239,10 @@
     getSiteContent: getSiteContent,
     setSiteContent: setSiteContent,
     getManualItems: getManualItems,
+    getCommands: getCommands,
+    addCommand: addCommand,
+    removeCommand: removeCommand,
+    bootstrapCommands: bootstrapCommands,
     addManualItem: addManualItem,
     removeManualItem: removeManualItem,
     getNicknameCooldown: getNicknameCooldown,

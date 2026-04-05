@@ -159,10 +159,10 @@ footer,
 }
 
 body.compact-page {
-  height: 100vh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  display: block;
 }
 
 body.compact-page .masthead {
@@ -170,10 +170,9 @@ body.compact-page .masthead {
 }
 
 body.compact-page main.container {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  padding-bottom: 0.5rem;
+  min-height: auto;
+  display: block;
+  padding-bottom: 0.9rem;
 }
 
 body.compact-page .footer {
@@ -789,6 +788,7 @@ body.compact-page .footer {
 }
 
 .auth-card input,
+.stack-form textarea,
 .stack-form input,
 .auth-card button,
 .stack-form button {
@@ -799,6 +799,11 @@ body.compact-page .footer {
   padding: 0.55rem 0.72rem;
   font: inherit;
   min-height: 44px;
+}
+
+.stack-form textarea {
+  resize: vertical;
+  min-height: 140px;
 }
 
 .auth-card button,
@@ -952,6 +957,18 @@ body.compact-page .footer {
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 }
 
+.commands-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(280px, 1fr);
+  gap: 0.9rem;
+  align-items: start;
+}
+
+.command-admin {
+  position: sticky;
+  top: 0.8rem;
+}
+
 .command-card {
   display: grid;
   gap: 0.5rem;
@@ -962,6 +979,16 @@ body.compact-page .footer {
   justify-content: space-between;
   align-items: center;
   gap: 0.6rem;
+}
+
+.command-actions {
+  display: inline-flex;
+  gap: 0.35rem;
+}
+
+.remove-btn {
+  border-color: #a04c62;
+  background: #412033;
 }
 
 .command-head h4 {
@@ -1261,6 +1288,14 @@ body.compact-page .footer {
     overflow: hidden;
   }
 
+  .commands-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .command-admin {
+    position: static;
+  }
+
   .full-text-block {
     max-height: 250px;
     font-size: 0.78rem;
@@ -1268,6 +1303,19 @@ body.compact-page .footer {
 
   .full-slides {
     padding: 0.55rem;
+  }
+
+  body.compact-page {
+    min-height: auto;
+    overflow-y: auto;
+  }
+
+  body.compact-page .masthead {
+    padding-top: 1rem;
+  }
+
+  body.compact-page .footer {
+    padding-bottom: 1rem;
   }
 }
 
@@ -1368,6 +1416,14 @@ body.compact-page .footer {
     grid-template-columns: 1fr;
   }
 
+  .commands-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .command-admin {
+    position: static;
+  }
+
   .guide-grid,
   .commands-grid {
     grid-template-columns: 1fr;
@@ -1405,6 +1461,12 @@ body.compact-page .footer {
 
   .command-head .copy-btn {
     width: 100%;
+  }
+
+  .command-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
   }
 
   .cards {

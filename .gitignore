@@ -1,0 +1,20 @@
+node_modules/
+runtime-logs/
+backend-db.json
+cookies.txt
+*.log
+
+# Local build/runtime artifacts
+dist/
+build/
+CosmoStatus-win32-x64/
+CosmoStatus-portable.zip
+*.exe
+
+# Local helper files
+commands.json
+settings.json
+launcher.py
+*.spec
+*.iss
+*.nsi

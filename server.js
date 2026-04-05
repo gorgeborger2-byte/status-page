@@ -14,7 +14,23 @@ const OWNER_PASSWORD = String(process.env.OWNER_PASSWORD || "");
 const CODER_USERNAME = String(process.env.CODER_USERNAME || "").trim();
 const CODER_PASSWORD = String(process.env.CODER_PASSWORD || "");
 const NICKNAME_COOLDOWN_MS = 21 * 24 * 60 * 60 * 1000;
-const PRESENCE_WINDOW_MS = 90 * 1000;
+const PRESENCE_WINDOW_MS = 45 * 1000;
+const AUTH_WINDOW_MS = 10 * 60 * 1000;
+const AUTH_MAX_ATTEMPTS = 25;
+
+const PUBLIC_FILE_ALLOWLIST = new Set([
+  "/auth.html",
+  "/index.html",
+  "/admin.html",
+  "/profile.html",
+  "/presentation.html",
+  "/commands.html",
+  "/styles.css",
+  "/auth-local.js",
+  "/guard.js",
+  "/ui-effects.js",
+  "/data/status.json"
+]);
 
 const DEFAULT_SITE_CONTENT = {
   heroTitle: "Cosmo Product Status",
@@ -60,6 +76,7 @@ function safeReadDb() {
   const db = parsed && typeof parsed === "object" ? parsed : {};
   if (!Array.isArray(db.users)) db.users = [];
   if (!Array.isArray(db.roles)) db.roles = [];
+  if (!Array.isArray(db.commands)) db.commands = [];
   if (!db.siteContent || typeof db.siteContent !== "object") db.siteContent = {};
   if (!Array.isArray(db.manualItems)) db.manualItems = [];
   if (!Array.isArray(db.auditLogs)) db.auditLogs = [];
@@ -176,7 +193,6 @@ function seedAccountsIfNeeded() {
     if (user.role !== role) { user.role = role; changed = true; }
     if (!user.approved) { user.approved = true; changed = true; }
     if (user.banned) { user.banned = false; changed = true; }
-    if (!user.nickname && nickname) { user.nickname = nickname; changed = true; }
     if (!user.passwordHash) {
       user.passwordHash = bcrypt.hashSync(password, 10);
       changed = true;
@@ -216,14 +232,49 @@ function seedAccountsIfNeeded() {
 seedAccountsIfNeeded();
 
 const app = express();
+app.disable("x-powered-by");
+app.set("trust proxy", 1);
+
+const authRateLimitMap = new Map();
+
+function getClientIp(req) {
+  return String((req.headers["cf-connecting-ip"] || req.ip || req.socket.remoteAddress || "unknown")).slice(0, 90);
+}
+
+function checkAuthRateLimit(req, res, next) {
+  const key = `${getClientIp(req)}:${req.path}`;
+  const now = Date.now();
+  const row = authRateLimitMap.get(key);
+  if (!row || now - row.startedAt > AUTH_WINDOW_MS) {
+    authRateLimitMap.set(key, { startedAt: now, attempts: 1 });
+    return next();
+  }
+  row.attempts += 1;
+  if (row.attempts > AUTH_MAX_ATTEMPTS) {
+    return res.status(429).json({ error: "Too many attempts. Please wait and try again." });
+  }
+  return next();
+}
+
+app.use((req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("Referrer-Policy", "same-origin");
+  res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()") ;
+  res.setHeader("Cross-Origin-Resource-Policy", "same-origin");
+  next();
+});
+
 app.use(express.json({ limit: "1mb" }));
 app.use(session({
+  name: "cosmo.sid",
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
     sameSite: "lax",
+    secure: false,
     maxAge: 1000 * 60 * 60 * 24 * 14
   }
 }));
@@ -247,7 +298,7 @@ function adminRequired(req, res, next) {
   next();
 }
 
-app.post("/api/auth/register", (req, res) => {
+app.post("/api/auth/register", checkAuthRateLimit, (req, res) => {
   const username = String(req.body.username || "").trim();
   const password = String(req.body.password || "");
   if (!/^[a-zA-Z0-9_.-]{3,32}$/.test(username)) {
@@ -280,7 +331,7 @@ app.post("/api/auth/register", (req, res) => {
   res.json({ ok: true, message: "Registered. Waiting for admin approval." });
 });
 
-app.post("/api/auth/login", (req, res) => {
+app.post("/api/auth/login", checkAuthRateLimit, (req, res) => {
   const username = normalizeUsername(req.body.username);
   const password = String(req.body.password || "");
   const db = safeReadDb();
@@ -300,6 +351,7 @@ app.post("/api/auth/login", (req, res) => {
 
 app.post("/api/auth/logout", authRequired, (req, res) => {
   const db = req.db;
+  req.user.lastSeen = null;
   audit(db, req.user.username, "logout", req.user.username, "session ended");
   saveDb(db);
   req.session.destroy(() => {
@@ -345,6 +397,13 @@ app.get("/api/site-content", authRequired, (req, res) => {
   res.json({ siteContent: req.db.siteContent });
 });
 
+app.get("/api/commands", authRequired, (req, res) => {
+  const commands = req.db.commands
+    .slice()
+    .sort((a, b) => String(a.command || "").localeCompare(String(b.command || "")));
+  res.json({ commands });
+});
+
 app.put("/api/site-content", authRequired, adminRequired, (req, res) => {
   req.db.siteContent.heroTitle = String(req.body.heroTitle || req.db.siteContent.heroTitle || "");
   req.db.siteContent.subtitle = String(req.body.subtitle || req.db.siteContent.subtitle || "");
@@ -381,6 +440,64 @@ app.delete("/api/manual-items/:id", authRequired, adminRequired, (req, res) => {
   const removed = req.db.manualItems[idx];
   req.db.manualItems.splice(idx, 1);
   audit(req.db, req.user.username, "manual-item:remove", `${removed.brand}/${removed.game}`, removed.status);
+  saveDb(req.db);
+  res.json({ ok: true });
+});
+
+app.post("/api/admin/commands/bootstrap", authRequired, adminRequired, (req, res) => {
+  const items = Array.isArray(req.body && req.body.commands) ? req.body.commands : [];
+  if (!items.length) return res.status(400).json({ error: "commands array is required" });
+  if (req.db.commands.length > 0) return res.json({ ok: true, skipped: true });
+
+  const mapped = items
+    .map((item) => ({
+      id: uid("cmd"),
+      command: String(item.command || "").trim(),
+      response: String(item.response || "").trim(),
+      createdAt: nowIso(),
+      updatedAt: nowIso()
+    }))
+    .filter((item) => item.command && item.response)
+    .slice(0, 500);
+
+  if (!mapped.length) return res.status(400).json({ error: "No valid commands provided" });
+  req.db.commands = mapped;
+  audit(req.db, req.user.username, "commands:bootstrap", "commands", `seeded ${mapped.length} commands`);
+  saveDb(req.db);
+  return res.json({ ok: true, created: mapped.length });
+});
+
+app.post("/api/admin/commands", authRequired, adminRequired, (req, res) => {
+  const command = String(req.body.command || "").trim();
+  const response = String(req.body.response || "").trim();
+  if (!/^\*[a-z0-9_-]{2,40}$/i.test(command)) {
+    return res.status(400).json({ error: "Command must start with * and be 3-41 chars" });
+  }
+  if (response.length < 2 || response.length > 12000) {
+    return res.status(400).json({ error: "Response must be between 2 and 12000 chars" });
+  }
+  const exists = req.db.commands.some((c) => String(c.command || "").toLowerCase() === command.toLowerCase());
+  if (exists) return res.status(400).json({ error: "Command already exists" });
+
+  const item = {
+    id: uid("cmd"),
+    command,
+    response,
+    createdAt: nowIso(),
+    updatedAt: nowIso()
+  };
+  req.db.commands.push(item);
+  audit(req.db, req.user.username, "commands:add", command, "added command");
+  saveDb(req.db);
+  res.json({ command: item });
+});
+
+app.delete("/api/admin/commands/:id", authRequired, adminRequired, (req, res) => {
+  const idx = req.db.commands.findIndex((c) => c.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: "Command not found" });
+  const removed = req.db.commands[idx];
+  req.db.commands.splice(idx, 1);
+  audit(req.db, req.user.username, "commands:remove", removed.command, "removed command");
   saveDb(req.db);
   res.json({ ok: true });
 });
@@ -468,6 +585,7 @@ app.get("/api/admin/store", authRequired, adminRequired, (req, res) => {
   res.json({
     users,
     roles: req.db.roles,
+    commands: req.db.commands,
     siteContent: req.db.siteContent,
     manualItems: req.db.manualItems,
     auditLogs: req.db.auditLogs.slice(0, 200)
@@ -578,7 +696,25 @@ app.use((req, res, next) => {
   return next();
 });
 
-app.use(express.static(__dirname));
+app.use((req, res, next) => {
+  const p = String(req.path || "").toLowerCase();
+  if (p.startsWith("/api/")) return next();
+  if (p === "/") return next();
+  if (PUBLIC_FILE_ALLOWLIST.has(p)) return next();
+  return res.status(404).send("Not found");
+});
+
+app.get("/", (req, res) => {
+  res.redirect("/auth.html");
+});
+
+app.use(express.static(__dirname, {
+  index: false,
+  fallthrough: false,
+  dotfiles: "ignore",
+  etag: true,
+  maxAge: "5m"
+}));
 
 app.listen(PORT, () => {
   console.log(`Cosmo backend running on http://localhost:${PORT}`);

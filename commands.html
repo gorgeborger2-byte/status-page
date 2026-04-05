@@ -33,11 +33,26 @@
 
   <main class="container">
     <section class="panel commands-panel">
-      <div class="search-box">
-        <input id="commandSearch" type="text" placeholder="Search command or response..." autocomplete="off">
+      <div class="commands-layout">
+        <div>
+          <div class="search-box">
+            <input id="commandSearch" type="text" placeholder="Search command or response..." autocomplete="off">
+          </div>
+          <p id="commandState" class="status-line"></p>
+          <div id="commandCards" class="guide-grid commands-grid"></div>
+        </div>
+
+        <aside id="commandAdminPanel" class="guide-card command-admin" style="display:none;">
+          <h3>Admin: Manage Commands</h3>
+          <p class="status-line">Add and remove commands live for all users.</p>
+          <form id="addCommandForm" class="stack-form">
+            <input id="newCommandName" placeholder="*command" required>
+            <textarea id="newCommandResponse" placeholder="Response text" rows="10" required></textarea>
+            <button type="submit">Add Command</button>
+          </form>
+          <p id="adminCommandState" class="status-line"></p>
+        </aside>
       </div>
-      <p id="commandState" class="status-line"></p>
-      <div id="commandCards" class="guide-grid commands-grid"></div>
     </section>
   </main>
 
@@ -52,8 +67,13 @@
     var searchEl = document.getElementById("commandSearch");
     var stateEl = document.getElementById("commandState");
     var cardsEl = document.getElementById("commandCards");
+    var isAdmin = false;
+    var liveCommands = [];
+    var adminPanelEl = document.getElementById("commandAdminPanel");
+    var addCommandFormEl = document.getElementById("addCommandForm");
+    var adminCommandStateEl = document.getElementById("adminCommandState");
 
-    var COMMANDS = [
+    var DEFAULT_COMMANDS = [
       { command: "*hwidreset", response: "Hello! Thanks for making a ticket.\nWe will ping the developer shortly in regards your request of the HWID Reset\nAnd we apologies for any inconvenience however lost time will be compensated at the end of the period! :)" },
       { command: "*checker", response: "Download Checker | https://db.cosmochecker.com/checker.exe | and open it please and SHOW A SCREENSHOT." },
       { command: "*windows", response: "Here is a Guide to Reinstalling Windows\n\n1) First, download the necessary Windows ISO file from the link below:\nhttps://db.cosmochecker.com/windows/\n\n2) Next, follow the step-by-step instructions in this video tutorial:\nhttps://www.youtube.com/watch?v=SLmM4rWirto\n\nThis will help ensure a smooth and easy installation. Let us know if you need any help!" },
@@ -111,7 +131,7 @@
 
     function renderCommands() {
       var query = searchEl.value.trim().toLowerCase();
-      var rows = COMMANDS.filter(function (item) {
+      var rows = liveCommands.filter(function (item) {
         return !query
           || item.command.toLowerCase().indexOf(query) !== -1
           || item.response.toLowerCase().indexOf(query) !== -1;
@@ -119,8 +139,11 @@
 
       stateEl.textContent = rows.length + " command(s) shown";
       cardsEl.innerHTML = rows.map(function (item, idx) {
+        var removeBtn = isAdmin
+          ? "<button class='copy-btn remove-btn' data-remove='" + esc(item.id || "") + "'>Remove</button>"
+          : "";
         return "<article class='guide-card command-card'>"
-          + "<div class='command-head'><h4>" + esc(item.command) + "</h4><button class='copy-btn' data-copy='" + idx + "'>Copy</button></div>"
+          + "<div class='command-head'><h4>" + esc(item.command) + "</h4><div class='command-actions'><button class='copy-btn' data-copy='" + idx + "'>Copy</button>" + removeBtn + "</div></div>"
           + "<pre class='raw-block command-response'>" + esc(item.response) + "</pre>"
           + "</article>";
       }).join("");
@@ -128,13 +151,59 @@
 
     cardsEl.addEventListener("click", function (event) {
       var idx = event.target.getAttribute("data-copy");
-      if (idx === null) return;
-      var item = COMMANDS[Number(idx)];
-      if (!item) return;
-      copyResponse(item.command, item.response);
+      if (idx !== null) {
+        var item = liveCommands[Number(idx)];
+        if (!item) return;
+        copyResponse(item.command, item.response);
+        return;
+      }
+      var removeId = event.target.getAttribute("data-remove");
+      if (!removeId || !isAdmin) return;
+      GrizzAuth.removeCommand(removeId).then(function () {
+        adminCommandStateEl.textContent = "Command removed.";
+        return loadCommands();
+      }).catch(function (err) {
+        adminCommandStateEl.textContent = err.message;
+      });
     });
 
     searchEl.addEventListener("input", renderCommands);
+
+    addCommandFormEl.addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (!isAdmin) return;
+      var command = document.getElementById("newCommandName").value.trim();
+      var response = document.getElementById("newCommandResponse").value.trim();
+      GrizzAuth.addCommand(command, response).then(function () {
+        addCommandFormEl.reset();
+        adminCommandStateEl.textContent = "Command added.";
+        return loadCommands();
+      }).catch(function (err) {
+        adminCommandStateEl.textContent = err.message;
+      });
+    });
+
+    function loadCommands() {
+      return GrizzAuth.getCommands().then(function (rows) {
+        if (!rows.length) {
+          liveCommands = DEFAULT_COMMANDS.slice();
+          if (isAdmin) {
+            return GrizzAuth.bootstrapCommands(DEFAULT_COMMANDS).then(function () {
+              return GrizzAuth.getCommands();
+            }).then(function (synced) {
+              liveCommands = synced || [];
+              renderCommands();
+            }).catch(function () {
+              renderCommands();
+            });
+          }
+          renderCommands();
+          return;
+        }
+        liveCommands = rows;
+        renderCommands();
+      });
+    }
 
     logoutLinkEl.addEventListener("click", function (e) {
       e.preventDefault();
@@ -150,8 +219,10 @@
       await GrizzAuth.touch();
       if (GrizzAuth.hasAdminAccess(currentUser)) {
         adminLinkEl.style.display = "inline-flex";
+        isAdmin = true;
+        adminPanelEl.style.display = "block";
       }
-      renderCommands();
+      await loadCommands();
     })();
   })();
   </script>
