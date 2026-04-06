@@ -34,26 +34,32 @@
 
   <main class="container">
     <section class="panel compact-panel">
-      <div class="compact-controls">
-        <input type="text" id="productSearch" placeholder="Search product, error, command..." autocomplete="off">
-        <select id="productSelect"></select>
-        <button id="prevBtn" type="button">Prev</button>
-        <button id="nextBtn" type="button">Next</button>
-        <button id="copyAllDataBtn" type="button">Copy All Data</button>
-      </div>
+      <div class="guide-workspace">
+        <aside class="guide-nav-pane">
+          <div class="compact-controls">
+            <input type="text" id="productSearch" placeholder="Search product, error, command..." autocomplete="off">
+            <select id="productSelect" style="display:none;"></select>
+            <button id="prevBtn" type="button">Prev</button>
+            <button id="nextBtn" type="button">Next</button>
+            <button id="copyAllDataBtn" type="button">Copy All Data</button>
+          </div>
+          <p class="status-line" id="positionLine"></p>
+          <div id="productList" class="guide-product-list"></div>
+        </aside>
 
-      <p class="status-line" id="positionLine"></p>
+        <div class="guide-content-pane">
+          <article class="guide-card single-guide-card" id="guideCard"></article>
 
-      <article class="guide-card single-guide-card" id="guideCard"></article>
-
-      <section class="full-slides">
-        <div class="full-slides-head">
-          <h4>Full Slide Text (1:1)</h4>
-          <button id="copySlidesTextBtn" type="button">Copy Full Slide Text</button>
+          <section class="full-slides">
+            <div class="full-slides-head">
+              <h4>Full Slide Text (1:1)</h4>
+              <button id="copySlidesTextBtn" type="button">Copy Full Slide Text</button>
+            </div>
+            <p class="status-line" id="fullTextSearchState"></p>
+            <pre id="fullSlidesText" class="raw-block full-text-block">Loading slide text...</pre>
+          </section>
         </div>
-        <p class="status-line" id="fullTextSearchState"></p>
-        <pre id="fullSlidesText" class="raw-block full-text-block">Loading slide text...</pre>
-      </section>
+      </div>
     </section>
   </main>
 
@@ -646,6 +652,7 @@
 
     var searchEl = document.getElementById("productSearch");
     var selectEl = document.getElementById("productSelect");
+    var productListEl = document.getElementById("productList");
     var prevBtn = document.getElementById("prevBtn");
     var nextBtn = document.getElementById("nextBtn");
     var copyAllDataBtn = document.getElementById("copyAllDataBtn");
@@ -808,6 +815,11 @@
         return "<option value=\"" + i + "\">" + p.name + "</option>";
       }).join("");
       selectEl.value = String(current);
+
+       productListEl.innerHTML = filtered.map(function (p, i) {
+        var active = i === current ? " active" : "";
+        return "<button type=\"button\" class=\"guide-nav-item" + active + "\" data-index=\"" + i + "\">" + esc(p.name) + "</button>";
+      }).join("");
     }
 
     function renderCard() {
@@ -907,6 +919,13 @@
 
       lineEl.textContent = (current + 1) + " / " + filtered.length;
       selectEl.value = String(current);
+      var activeBtn = productListEl.querySelector(".guide-nav-item.active");
+      if (activeBtn) activeBtn.classList.remove("active");
+      var nextBtn = productListEl.querySelector("[data-index='" + current + "']");
+      if (nextBtn) {
+        nextBtn.classList.add("active");
+        nextBtn.scrollIntoView({ block: "nearest" });
+      }
     }
 
     function applySearch() {
@@ -927,6 +946,13 @@
     searchEl.addEventListener("input", applySearch);
     selectEl.addEventListener("change", function () {
       current = Number(selectEl.value) || 0;
+      renderCard();
+    });
+
+    productListEl.addEventListener("click", function (event) {
+      var target = event.target;
+      if (!target || !target.dataset.index) return;
+      current = Number(target.dataset.index) || 0;
       renderCard();
     });
 
