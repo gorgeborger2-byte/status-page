@@ -40,61 +40,65 @@
     </section>
 
     <div class="admin-grid">
-      <section class="panel">
-        <div class="panel-header">
-          <h2>Users</h2>
-        </div>
-        <p class="status-line">Manager and coder roles have full admin privileges.</p>
-        <div id="usersTable"></div>
-      </section>
-
-      <section class="panel">
-        <h2>Roles</h2>
-        <form id="roleForm" class="stack-form">
-          <input id="roleName" placeholder="Role name (example: qa)" required>
-          <input id="roleLabel" placeholder="Role label (example: QA Team)">
-          <div class="inline-fields">
-            <input id="roleColor" type="color" value="#7db2ff" aria-label="Role color">
-            <input id="roleAccent" type="color" value="#2f6dff" aria-label="Role accent">
+      <div class="admin-main-col">
+        <section class="panel">
+          <div class="panel-header">
+            <h2>Users</h2>
           </div>
-          <label class="check-line"><input id="roleAdmin" type="checkbox"> Admin access (can open admin panel)</label>
-          <label class="check-line"><input id="roleGlow" type="checkbox"> Glow animation</label>
-          <button type="submit">Create Role</button>
-        </form>
-        <div id="rolesTable"></div>
-      </section>
+          <p class="status-line">Manager and coder roles have full admin privileges.</p>
+          <div id="usersTable"></div>
+        </section>
 
-      <section class="panel">
-        <h2>Website Content</h2>
-        <form id="contentForm" class="stack-form">
-          <input id="heroTitle" placeholder="Hero title">
-          <input id="heroSubtitle" placeholder="Hero subtitle">
-          <input id="announcement" placeholder="Announcement text">
-          <button type="submit">Save Content</button>
-        </form>
-      </section>
+        <section class="panel">
+          <h2>Roles</h2>
+          <form id="roleForm" class="stack-form">
+            <input id="roleName" placeholder="Role name (example: qa)" required>
+            <input id="roleLabel" placeholder="Role label (example: QA Team)">
+            <div class="inline-fields">
+              <input id="roleColor" type="color" value="#7db2ff" aria-label="Role color">
+              <input id="roleAccent" type="color" value="#2f6dff" aria-label="Role accent">
+            </div>
+            <label class="check-line"><input id="roleAdmin" type="checkbox"> Admin access (can open admin panel)</label>
+            <label class="check-line"><input id="roleGlow" type="checkbox"> Glow animation</label>
+            <button type="submit">Create Role</button>
+          </form>
+          <div id="rolesTable"></div>
+        </section>
 
-      <section class="panel">
-        <h2>Manual Items</h2>
-        <form id="itemForm" class="stack-form">
-          <input id="itemBrand" placeholder="Brand" required>
-          <input id="itemGame" placeholder="Game" required>
-          <input id="itemStatus" placeholder="Status (Updating/Testing)" required>
-          <input id="itemUpdated" placeholder="Updated label (optional)">
-          <button type="submit">Add Item</button>
-        </form>
-        <div id="itemsTable"></div>
-      </section>
+        <section class="panel">
+          <h2>Website Content</h2>
+          <form id="contentForm" class="stack-form">
+            <input id="heroTitle" placeholder="Hero title">
+            <input id="heroSubtitle" placeholder="Hero subtitle">
+            <input id="announcement" placeholder="Announcement text">
+            <button type="submit">Save Content</button>
+          </form>
+        </section>
 
-      <section class="panel">
-        <div class="panel-header">
-          <h2>Backend Observability</h2>
-          <button id="refreshInspectBtn" type="button">Refresh</button>
-        </div>
-        <p class="status-line">Inspect recent activity, logs, and live backend store snapshots.</p>
-        <div id="adminLogs"></div>
-        <pre id="storeInspect" class="raw-block" style="margin-top:0.8rem; max-height:260px;">Loading backend snapshot...</pre>
-      </section>
+        <section class="panel">
+          <h2>Manual Items</h2>
+          <form id="itemForm" class="stack-form">
+            <input id="itemBrand" placeholder="Brand" required>
+            <input id="itemGame" placeholder="Game" required>
+            <input id="itemStatus" placeholder="Status (Updating/Testing)" required>
+            <input id="itemUpdated" placeholder="Updated label (optional)">
+            <button type="submit">Add Item</button>
+          </form>
+          <div id="itemsTable"></div>
+        </section>
+      </div>
+
+      <aside class="admin-side-col">
+        <section class="panel">
+          <div class="panel-header">
+            <h2>Backend Observability</h2>
+            <button id="refreshInspectBtn" type="button">Refresh</button>
+          </div>
+          <p class="status-line">Inspect recent activity, logs, and live backend store snapshots.</p>
+          <div id="adminLogs"></div>
+          <pre id="storeInspect" class="raw-block" style="margin-top:0.8rem; max-height:260px;">Loading backend snapshot...</pre>
+        </section>
+      </aside>
     </div>
   </main>
 

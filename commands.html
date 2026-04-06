@@ -38,6 +38,11 @@
           <div class="search-box">
             <input id="commandSearch" type="text" placeholder="Search command or response..." autocomplete="off">
           </div>
+          <div class="commands-toolbar">
+            <span id="commandsCountBadge" class="meta-chip">0 commands</span>
+            <span class="meta-chip">Shared live list</span>
+            <span class="meta-chip">Click command to copy</span>
+          </div>
           <p id="commandState" class="status-line"></p>
           <div id="commandCards" class="guide-grid commands-grid"></div>
         </div>
@@ -67,6 +72,7 @@
     var searchEl = document.getElementById("commandSearch");
     var stateEl = document.getElementById("commandState");
     var cardsEl = document.getElementById("commandCards");
+    var commandsCountBadgeEl = document.getElementById("commandsCountBadge");
     var isAdmin = false;
     var liveCommands = [];
     var renderedRows = [];
@@ -140,6 +146,7 @@
       renderedRows = rows;
 
       stateEl.textContent = rows.length + " command(s) shown";
+      commandsCountBadgeEl.textContent = rows.length + " command(s)";
       cardsEl.innerHTML = rows.map(function (item, idx) {
         var removeBtn = isAdmin
           ? "<button class='copy-btn remove-btn' data-remove='" + esc(item.id || "") + "'>Remove</button>"
