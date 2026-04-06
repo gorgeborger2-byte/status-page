@@ -1,0 +1,215 @@
+:root {
+  --bg: #eef3f8 !important;
+  --bg-soft: #f7fbff !important;
+  --card: #ffffff !important;
+  --text: #162132 !important;
+  --muted: #5b6b7d !important;
+  --accent: #0ea5e9 !important;
+  --warn: #f59e0b !important;
+  --test: #0284c7 !important;
+  --border: #c6d4e3 !important;
+  --v2-shadow: 0 10px 30px rgba(14, 30, 56, 0.12);
+}
+
+.space-bg,
+.halo {
+  display: none !important;
+}
+
+body {
+  background: radial-gradient(950px 500px at 100% -20%, rgba(14, 165, 233, 0.14), transparent 62%),
+    linear-gradient(180deg, #f8fbff 0%, #edf3f9 100%) !important;
+  color: #162132 !important;
+  font-family: "Outfit", "Segoe UI", sans-serif !important;
+}
+
+.container {
+  width: min(1240px, 95vw) !important;
+  margin: 0 auto !important;
+}
+
+.masthead {
+  padding: 1.1rem 0 0.85rem !important;
+}
+
+.masthead h1,
+.panel h2,
+.panel h3,
+.guide-card h3 {
+  color: #162132 !important;
+}
+
+.top-nav {
+  position: sticky !important;
+  top: 10px !important;
+  z-index: 70 !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  overflow-x: auto !important;
+  margin-bottom: 0.9rem !important;
+  gap: 0.45rem !important;
+  padding: 0.55rem !important;
+  border: 1px solid #c9d8e8 !important;
+  border-radius: 14px !important;
+  background: rgba(255, 255, 255, 0.94) !important;
+  box-shadow: var(--v2-shadow) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+.nav-link {
+  min-height: 38px !important;
+  padding: 0.42rem 0.8rem !important;
+  border-radius: 10px !important;
+  border: 1px solid #c5d3e2 !important;
+  color: #2a3a4f !important;
+  font-weight: 600 !important;
+}
+
+.nav-link:hover {
+  border-color: #7ac9ee !important;
+  background: #e9f8ff !important;
+  color: #0f3650 !important;
+}
+
+.nav-link.active {
+  background: #0ea5e9 !important;
+  border-color: #0ea5e9 !important;
+  color: #ffffff !important;
+}
+
+.panel,
+.guide-card,
+.profile-card,
+.stat-card,
+.card,
+.embed-panel,
+.auth-card,
+.stack-form {
+  background: #ffffff !important;
+  border: 1px solid #c8d7e7 !important;
+  box-shadow: var(--v2-shadow) !important;
+}
+
+.card h3,
+.card p,
+.guide-card,
+.admin-table,
+.admin-table td,
+.admin-table th {
+  color: #1d2b3f !important;
+}
+
+.subtitle,
+.status-line,
+.mini-muted,
+.meta,
+.updated,
+.footer {
+  color: #5b6b7d !important;
+}
+
+.search-box input,
+.auth-card input,
+.stack-form input,
+.stack-form textarea,
+.compact-controls input,
+.compact-controls select,
+.compact-controls button,
+.role-select,
+select,
+textarea,
+input {
+  background: #f7fbff !important;
+  border: 1px solid #bfd0e2 !important;
+  color: #152339 !important;
+}
+
+.search-box input:focus,
+.auth-card input:focus,
+.stack-form input:focus,
+.stack-form textarea:focus,
+.compact-controls input:focus,
+.compact-controls select:focus,
+.role-select:focus,
+select:focus,
+textarea:focus,
+input:focus {
+  border-color: #0ea5e9 !important;
+  outline: 2px solid rgba(14, 165, 233, 0.28) !important;
+  outline-offset: 1px !important;
+}
+
+.filter-btn,
+.copy-btn,
+.admin-table button,
+.full-slides-head button,
+#refreshBtn,
+button {
+  background: #0ea5e9 !important;
+  border: 1px solid #0ea5e9 !important;
+  color: #ffffff !important;
+}
+
+.filter-btn.active {
+  background: #0369a1 !important;
+  border-color: #0369a1 !important;
+  color: #ffffff !important;
+}
+
+.meta-chip {
+  background: #eef8ff !important;
+  border: 1px solid #b6ddf1 !important;
+  color: #1f4a67 !important;
+}
+
+.presence-panel {
+  position: static !important;
+  transform: none !important;
+  max-height: none !important;
+  width: auto !important;
+}
+
+.presence-panel::before {
+  content: none !important;
+}
+
+.status-layout,
+.commands-layout,
+.guide-workspace,
+.admin-grid {
+  gap: 1rem !important;
+}
+
+a,
+.footer-link {
+  color: #0369a1 !important;
+}
+
+a:hover,
+.footer-link:hover {
+  color: #0ea5e9 !important;
+}
+
+@media (max-width: 900px) {
+  .top-nav {
+    position: static !important;
+    gap: 0.35rem !important;
+    padding: 0.45rem !important;
+  }
+
+  .nav-link {
+    min-width: 84px !important;
+    font-size: 0.78rem !important;
+  }
+
+  body {
+    padding-bottom: 0 !important;
+  }
+
+  .guide-workspace,
+  .commands-layout,
+  .admin-grid,
+  .status-layout {
+    grid-template-columns: 1fr !important;
+  }
+}

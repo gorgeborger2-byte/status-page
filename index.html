@@ -3,117 +3,347 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cosmo Support Hub</title>
+  <title>Cosmo Product Status</title>
+  <meta name="description" content="Live product status board showing only Updating and Testing states.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="app.css?v=20260406k">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Chakra+Petch:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=20260406c">
+  <link rel="stylesheet" href="modern-v2.css?v=20260406e">
 </head>
-<body data-page="status">
-  <div class="landing-bg"></div>
-  <div class="landing-wrap">
-    <header class="landing-nav panel">
-      <div class="brand">
-        <div class="brand-mark" aria-hidden="true"></div>
-        <div>
-          <h1>CosmoSupport</h1>
-          <p id="whoami">Loading...</p>
-        </div>
-      </div>
-      <nav class="landing-links" aria-label="Main navigation">
-        <a class="jump-link" href="#home">Home</a>
-        <a class="jump-link" href="#status">Status</a>
-        <a class="jump-link" href="#commands">Commands</a>
-        <a class="jump-link" href="#guide">Guide</a>
-        <a class="jump-link" href="#presence">Presence</a>
-        <a href="profile.html" data-auth-only>Profile</a>
-        <a href="admin.html" data-boss-only>Admin</a>
-        <a href="auth.html" data-guest-only>Login</a>
-        <button id="logoutBtn" data-auth-only>Logout</button>
-      </nav>
-    </header>
-
-    <section class="hero panel" id="home">
-      <div class="hero-copy">
-        <p class="hero-eyebrow">Cosmo Support Tool</p>
-        <h2 id="title">Find the answer, copy it, and close the ticket fast.</h2>
-        <p id="subtitle">Single-page support workflow for status, commands, and full guide content.</p>
-        <p class="state" id="announce"></p>
-      </div>
-      <div class="hero-actions">
-        <span class="chip" id="syncChip">Synced -</span>
-        <span class="chip" id="countChip">-</span>
-        <span class="chip" id="presenceChip">-</span>
-      </div>
-    </section>
-
-    <section class="panel section" id="status">
-      <div class="section-head">
-        <h3>Live Product Status</h3>
-        <p class="muted">Search and filter all product states in real time.</p>
-      </div>
-      <div class="toolbar">
-        <input id="searchInput" placeholder="Search product, brand, status..." autocomplete="off">
-        <button class="secondary active" data-filter="all">All</button>
-        <button class="secondary" data-filter="updating">Updating</button>
-        <button class="secondary" data-filter="testing">Testing</button>
-      </div>
-      <p class="state" id="statusState"></p>
-      <div class="cards" id="statusHost"></div>
-    </section>
-
-    <section class="panel section" id="commands">
-      <div class="section-head">
-        <h3>Support Commands</h3>
-        <p class="muted">Everything needed for ticket replies without leaving this page.</p>
-      </div>
-      <div class="toolbar">
-        <input id="commandSearchInline" placeholder="Search command and response..." autocomplete="off">
-        <span class="chip" id="commandCountInline">0 commands</span>
-      </div>
-      <p class="state" id="commandStateInline"></p>
-      <div class="stack" id="commandHostInline"></div>
-    </section>
-
-    <section class="panel section" id="guide">
-      <div class="section-head">
-        <h3>Support Guide (33 Slides)</h3>
-        <p class="muted">Scrollable full guide with quick section jump and live search.</p>
-      </div>
-      <div class="toolbar">
-        <input id="guideSearchInline" placeholder="Search in all 33 slides..." autocomplete="off">
-        <span class="chip" id="slideCountInline">0 slides</span>
-        <button type="button" class="secondary" id="copySlideInline">Copy Slide</button>
-      </div>
-      <p class="state" id="guideStateInline"></p>
-      <div class="guide-layout">
-        <aside class="guide-slides" id="slidesNavInline"></aside>
-        <article class="guide-content">
-          <h3 id="slideTitleInline">Select a slide</h3>
-          <pre id="slideBodyInline" class="slide-pre"></pre>
-        </article>
-      </div>
-    </section>
-
-    <section class="panel section" id="presence">
-      <div class="section-head">
-        <h3>Support Team Presence</h3>
-        <p class="muted">See who is currently available in support.</p>
-      </div>
-      <div class="grid-2">
-        <div>
-          <p class="muted">Online</p>
-          <div class="presence" id="onlineHost"></div>
-        </div>
-        <div>
-          <p class="muted">Offline</p>
-          <div class="presence" id="offlineHost"></div>
-        </div>
-      </div>
-    </section>
-
-    <p class="state" id="globalState"></p>
+<body>
+  <div class="space-bg" aria-hidden="true">
+    <div class="space-nebula"></div>
+    <div class="space-stars space-stars-a"></div>
+    <div class="space-stars space-stars-b"></div>
   </div>
-  <script src="app.js?v=20260406k" defer></script>
+  <div class="halo halo-a" aria-hidden="true"></div>
+  <div class="halo halo-b" aria-hidden="true"></div>
+
+  <header class="container masthead">
+    <nav class="top-nav" aria-label="Main">
+      <a class="nav-link active" href="index.html">Status</a>
+      <a class="nav-link" href="presentation.html">Support Guide</a>
+      <a class="nav-link" href="commands.html">Commands</a>
+      <a class="nav-link" id="profileLink" href="profile.html" style="display:none;">Profile</a>
+      <a class="nav-link" id="authLink" href="auth.html">Login</a>
+      <a class="nav-link" id="adminLink" href="admin.html" style="display:none;">Admin</a>
+    </nav>
+    <h1 id="heroTitle">Cosmo Product Status</h1>
+    <p class="subtitle" id="heroSubtitle">Live tracking for <strong>Updating</strong> and <strong>Testing</strong> products</p>
+    <p class="status-line" id="announcementLine"></p>
+    <div class="meta">
+      <span id="sourceTime">Source: --</span>
+      <span id="fetchedTime">Synced: --</span>
+      <span id="dataAge">Data age: --</span>
+      <span id="refreshCountdown">Next refresh: --</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Search game or product..." autocomplete="off">
+    </div>
+    <div class="status-layout">
+      <section class="panel main-status-panel" aria-live="polite">
+        <div class="panel-header">
+          <h2>All Products <span id="countBadge"></span></h2>
+          <div class="filter-row">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="Updating">Updating</button>
+            <button class="filter-btn" data-filter="Testing">Testing</button>
+          </div>
+        </div>
+        <p id="statusLine" class="status-line"></p>
+        <div id="cards" class="cards"></div>
+      </section>
+
+      <section class="panel presence-panel">
+        <div class="panel-header">
+          <h2>Support Team Presence <span id="presenceCountBadge"></span></h2>
+        </div>
+        <p class="status-line" id="presenceHint">Tracking user online and offline status.</p>
+        <div class="presence-grid">
+          <article class="presence-col">
+            <h3>Online <span id="onlineCount">0</span></h3>
+            <div id="presenceOnline" class="cards"></div>
+          </article>
+          <article class="presence-col">
+            <h3>Offline <span id="offlineCount">0</span></h3>
+            <div id="presenceOffline" class="cards"></div>
+          </article>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="container footer">
+    <p>Live backend sync + realtime support workflows</p>
+    <p><a class="footer-link" href="presentation.html">Open Embedded Support Guide</a></p>
+  </footer>
+
+  <script src="guard.js?v=20260406c" defer></script>
+  <script src="ui-effects.js?v=20260406c" defer></script>
+  <script src="auth-local.js?v=20260406c"></script>
+  <script>
+const defaultData = {
+  lastUpdated: "April 3, 2026 - 9:59 PM",
+  fetchedAt: "2026-04-03T20:00:08.083Z",
+  items: [
+    {brand: "AstroZoom", game: "Arena Breakout", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "AstroZoom", game: "Call of Duty", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "AstroZoom", game: "Delta Force", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "AstroZoom", game: "FragPunk", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "AstroZoom", game: "Rust", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "Forge", game: "Apex-Full", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "Forge", game: "Apex-Lite", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "Forge", game: "BF6", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "Forge", game: "EFT-Full", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "Forge", game: "EFT-Lite", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "Forge", game: "Fortnite", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "Forge", game: "Rust", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "Hero", game: "Apex Legends", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "Hero", game: "Delta Force", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "Hero", game: "EFT Full", status: "Updating", updated: "Apr 3, 2026 9:59 PM"},
+    {brand: "Hero", game: "Rainbow Six Siege: Full", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "Hero", game: "Rainbow Six Siege: Lite", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "Hero", game: "Rust", status: "Updating", updated: "Apr 3, 2026 9:54 PM"},
+    {brand: "Kane", game: "Active Matter", status: "Updating", updated: "Feb 15, 2026 8:15 PM"},
+    {brand: "Kane", game: "Dark and Darker", status: "Updating", updated: "Mar 20, 2026 11:47 AM"},
+    {brand: "Kane", game: "Gray Zone Warfare", status: "Updating", updated: "Jan 20, 2026 8:12 PM"},
+    {brand: "Kane", game: "Spoofer", status: "Testing", updated: "Feb 12, 2026 9:52 AM"},
+    {brand: "Kane", game: "THE FINALS", status: "Updating", updated: "Mar 27, 2026 8:16 AM"},
+    {brand: "Kane", game: "WarThunder", status: "Updating", updated: "Apr 1, 2026 1:30 PM"},
+    {brand: "Liquid", game: "Apex", status: "Testing", updated: "Apr 3, 2026 7:06 PM"},
+    {brand: "Liquid", game: "Arena Breakout", status: "Updating", updated: "Dec 24, 2025 3:00 AM"},
+    {brand: "Liquid", game: "Delta Force", status: "Updating", updated: "Feb 12, 2026 11:55 AM"},
+    {brand: "Liquid", game: "EFT", status: "Updating", updated: "Apr 3, 2026 6:30 PM"},
+    {brand: "Liquid", game: "EFT Chams", status: "Updating", updated: "Apr 3, 2026 6:30 PM"},
+    {brand: "Liquid", game: "Hunt: Showdown", status: "Updating", updated: "Mar 18, 2026 2:04 PM"},
+    {brand: "Liquid", game: "Marvel Rivals", status: "Updating", updated: "Dec 24, 2025 3:00 AM"},
+    {brand: "Pulse", game: "ARC Raiders", status: "Updating", updated: "Apr 3, 2026 9:58 PM"},
+    {brand: "Pulse", game: "CS2", status: "Updating", updated: "Apr 3, 2026 9:58 PM"},
+    {brand: "Vex", game: "EAC Spoofer", status: "Updating", updated: "Apr 3, 2026 9:59 PM"},
+    {brand: "Viper", game: "Arena Breakout Infinite", status: "Updating", updated: "Apr 3, 2026 9:58 PM"},
+    {brand: "Viper", game: "ARK Survival Ascended", status: "Updating", updated: "Apr 3, 2026 9:58 PM"},
+    {brand: "Viper", game: "Battlefield 6", status: "Updating", updated: "Apr 3, 2026 9:58 PM"},
+    {brand: "Viper", game: "Beasts of Bermuda", status: "Updating", updated: "Apr 3, 2026 9:58 PM"},
+    {brand: "Viper", game: "Dune Awakening", status: "Updating", updated: "Feb 3, 2026 10:58 PM"},
+    {brand: "Viper", game: "Escape From Tarkov", status: "Updating", updated: "Apr 3, 2026 9:58 PM"},
+    {brand: "Viper", game: "Marathon", status: "Updating", updated: "Apr 3, 2026 9:58 PM"}
+  ]
+};
+var allItems = defaultData.items;
+var currentFilter = "all";
+var cardsEl = document.getElementById("cards");
+var statusLineEl = document.getElementById("statusLine");
+var sourceTimeEl = document.getElementById("sourceTime");
+var fetchedTimeEl = document.getElementById("fetchedTime");
+var dataAgeEl = document.getElementById("dataAge");
+var refreshCountdownEl = document.getElementById("refreshCountdown");
+var heroTitleEl = document.getElementById("heroTitle");
+var heroSubtitleEl = document.getElementById("heroSubtitle");
+var announcementLineEl = document.getElementById("announcementLine");
+var profileLinkEl = document.getElementById("profileLink");
+var authLinkEl = document.getElementById("authLink");
+var adminLinkEl = document.getElementById("adminLink");
+var presenceHintEl = document.getElementById("presenceHint");
+var presenceCountBadgeEl = document.getElementById("presenceCountBadge");
+var onlineCountEl = document.getElementById("onlineCount");
+var offlineCountEl = document.getElementById("offlineCount");
+var presenceOnlineEl = document.getElementById("presenceOnline");
+var presenceOfflineEl = document.getElementById("presenceOffline");
+var searchInput = document.getElementById("searchInput");
+var countBadge = document.getElementById("countBadge");
+var nextRefreshAt = 0;
+var latestFetchedAt = null;
+var manualItems = [];
+var currentUser = null;
+
+function esc(value) {
+  return String(value || "").replace(/[&<>"']/g, function (char) {
+    return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char];
+  });
+}
+
+function safeCssColor(value, fallback) {
+  var v = String(value || "").trim();
+  if (/^#[0-9a-fA-F]{3,8}$/.test(v)) return v;
+  if (/^rgba?\([0-9\s.,%]+\)$/.test(v)) return v;
+  if (/^hsla?\([0-9\s.,%]+\)$/.test(v)) return v;
+  return fallback;
+}
+
+function renderItems(items) {
+  if (!items.length) { cardsEl.innerHTML = ""; statusLineEl.textContent = "No products match your search."; countBadge.textContent = "(0)"; return; }
+  cardsEl.innerHTML = items.map(function(item) {
+    var status = String(item.status || "").toLowerCase();
+    var isTesting = status === "testing";
+    var pill = isTesting
+      ? "<span class=\"pill pill-testing\">Testing<span class=\"loading-dots\"><i></i><i></i><i></i></span></span>"
+      : "<span class=\"pill pill-updating\"><span class=\"status-ring\"></span>Updating</span>";
+    return "<article class=\"card\"><p class=\"brand\">" + esc(item.brand) + "</p><h3 class=\"game\">" + esc(item.game) + "</h3>" + pill + "<p class=\"updated\">Updated: " + esc(item.updated) + "</p></article>";
+  }).join("");
+  statusLineEl.textContent = "";
+  countBadge.textContent = "("+items.length+")";
+}
+
+function filterItems() {
+  var query = searchInput.value.toLowerCase().trim();
+  var filtered = allItems;
+  if (currentFilter !== "all") filtered = filtered.filter(function(i) { return String(i.status || "") === currentFilter; });
+  if (query) filtered = filtered.filter(function(i) {
+    var game = String(i.game || "").toLowerCase();
+    var brand = String(i.brand || "").toLowerCase();
+    return game.includes(query) || brand.includes(query);
+  });
+  renderItems(filtered);
+}
+
+document.querySelectorAll(".filter-btn").forEach(function(btn) {
+  btn.onclick = function() {
+    document.querySelectorAll(".filter-btn").forEach(function(b) { b.classList.remove("active"); });
+    this.classList.add("active");
+    currentFilter = this.getAttribute("data-filter");
+    filterItems();
+  };
+});
+
+searchInput.addEventListener("input", filterItems);
+
+function formatDateTime(value) { if (!value) return "--"; var d = new Date(value); return isNaN(d.getTime()) ? value : d.toLocaleString(); }
+
+function formatAge(date) {
+  if (!date) return "--";
+  var diffSec = Math.max(0, Math.floor((Date.now() - date.getTime()) / 1000));
+  if (diffSec < 60) return diffSec + "s";
+  var mins = Math.floor(diffSec / 60);
+  var secs = diffSec % 60;
+  return mins + "m " + secs + "s";
+}
+
+function tickTimers() {
+  if (nextRefreshAt > 0) {
+    var secLeft = Math.max(0, Math.ceil((nextRefreshAt - Date.now()) / 1000));
+    refreshCountdownEl.textContent = "Next refresh: " + secLeft + "s";
+  }
+  dataAgeEl.textContent = "Data age: " + formatAge(latestFetchedAt);
+}
+
+function applyLiveData(data) {
+  var baseItems = (data && data.items && data.items.length) ? data.items : defaultData.items;
+  allItems = baseItems.concat(manualItems);
+  latestFetchedAt = new Date((data && data.fetchedAt) ? data.fetchedAt : defaultData.fetchedAt);
+  filterItems();
+  sourceTimeEl.textContent = "Source: " + ((data && data.lastUpdated) ? data.lastUpdated : defaultData.lastUpdated);
+  fetchedTimeEl.textContent = "Synced: " + formatDateTime((data && data.fetchedAt) ? data.fetchedAt : defaultData.fetchedAt);
+  tickTimers();
+}
+
+function renderPresence(users) {
+  if (!users || !users.length) {
+    presenceOnlineEl.innerHTML = "";
+    presenceOfflineEl.innerHTML = "";
+    onlineCountEl.textContent = "0";
+    offlineCountEl.textContent = "0";
+    presenceCountBadgeEl.textContent = "(0)";
+    presenceHintEl.textContent = "No approved users found.";
+    return;
+  }
+
+  var online = users.filter(function (u) { return u.online; });
+  var offline = users.filter(function (u) { return !u.online; });
+
+  function renderUserCard(u) {
+    var badge = u.online
+      ? "<span class='pill pill-updating'><span class='status-ring'></span>Online now</span>"
+      : "<span class='pill pill-testing'>Offline</span>";
+    var seenText = u.online ? "Active now" : (u.lastSeen ? ("Last seen: " + formatDateTime(u.lastSeen)) : "Never active");
+    var roleClass = (u.role === "owner" || u.role === "coder") ? ("role-" + esc(u.role)) : "";
+    var glowClass = (u.roleStyle && u.roleStyle.glow) ? "role-glow" : "";
+    var roleStyle = u.roleStyle || {};
+    var safeColor = safeCssColor(roleStyle.color, "#9bb5da");
+    var safeAccent = safeCssColor(roleStyle.accent, "#4666b3");
+    var roleBadge = "<span class='role-badge " + roleClass + " " + glowClass + "' style='--role-color:" + esc(safeColor) + ";--role-accent:" + esc(safeAccent) + "'>" + esc(u.roleLabel || u.role) + "</span>";
+    return "<article class='card'><p class='brand'>" + roleBadge + "</p><h3 class='game'>" + esc(u.displayName || "No Nickname") + "</h3>" + badge + "<p class='updated'>" + esc(seenText) + "</p></article>";
+  }
+
+  presenceOnlineEl.innerHTML = online.map(renderUserCard).join("") || "<p class='status-line'>No users online.</p>";
+  presenceOfflineEl.innerHTML = offline.map(renderUserCard).join("") || "<p class='status-line'>No users offline.</p>";
+  onlineCountEl.textContent = String(online.length);
+  offlineCountEl.textContent = String(offline.length);
+  presenceCountBadgeEl.textContent = "(" + users.length + ")";
+  presenceHintEl.textContent = "";
+}
+
+function loadPresence() {
+  return GrizzAuth.getApprovedUsersWithPresence()
+    .then(function (users) { renderPresence(users); })
+    .catch(function () { renderPresence([]); });
+}
+
+function heartbeat() {
+  if (!currentUser) return;
+  GrizzAuth.touch();
+}
+
+function loadSiteConfig() {
+  return GrizzAuth.getSiteContent()
+    .then(function (cfg) {
+      heroTitleEl.textContent = cfg.heroTitle || heroTitleEl.textContent;
+      heroSubtitleEl.textContent = cfg.subtitle || heroSubtitleEl.textContent;
+      announcementLineEl.textContent = cfg.announcement || "";
+      return GrizzAuth.getManualItems();
+    })
+    .then(function (items) {
+      manualItems = items || [];
+    });
+}
+
+function loadAuthState() {
+  return GrizzAuth.init().then(function () {
+    currentUser = GrizzAuth.requireApprovedSession("auth.html");
+    if (!currentUser) return;
+    profileLinkEl.style.display = "inline-flex";
+    authLinkEl.textContent = "Logout (" + (currentUser.displayName || "No Nickname") + ")";
+    authLinkEl.href = "#";
+    authLinkEl.onclick = function (e) {
+      e.preventDefault();
+      GrizzAuth.logout().then(function () {
+        window.location.href = "auth.html";
+      });
+    };
+    if (GrizzAuth.hasAdminAccess(currentUser)) {
+      adminLinkEl.style.display = "inline-flex";
+    }
+    heartbeat();
+    return loadPresence();
+  });
+}
+
+function loadLiveStatus() {
+  nextRefreshAt = Date.now() + 30000;
+  fetch("/api/status?t=" + Date.now(), { cache: "no-store", credentials: "include" })
+    .then(function (res) {
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return res.json();
+    })
+    .then(function (data) {
+      applyLiveData(data);
+    })
+    .catch(function () {
+      applyLiveData(defaultData);
+    });
+}
+
+loadAuthState()
+  .then(function () { return loadSiteConfig(); })
+  .then(function () { loadLiveStatus(); })
+  .catch(function () {});
+setInterval(loadLiveStatus, 30000);
+setInterval(tickTimers, 1000);
+setInterval(heartbeat, 15000);
+setInterval(function () { loadPresence(); }, 30000);
+  </script>
 </body>
 </html>

@@ -3,61 +3,238 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Commands</title>
+  <title>Cosmo Commands</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="app.css?v=20260406k">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Chakra+Petch:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=20260406c">
+  <link rel="stylesheet" href="modern-v2.css?v=20260406e">
 </head>
-<body data-page="commands">
-  <div class="shell">
-    <aside class="sidebar">
-      <div class="brand"><div class="brand-mark"></div><div><h1>Cosmo Ops</h1><p id="whoami">Loading...</p></div></div>
-      <nav class="nav">
-        <a href="index.html">Status</a>
-        <a href="presentation.html">Guide</a>
-        <a class="active" href="commands.html">Commands</a>
-        <a href="profile.html" data-auth-only>Profile</a>
-        <a href="admin.html" data-boss-only>Admin</a>
-        <button id="logoutBtn" data-auth-only>Logout</button>
-      </nav>
-    </aside>
+<body>
+  <div class="space-bg" aria-hidden="true">
+    <div class="space-nebula"></div>
+    <div class="space-stars space-stars-a"></div>
+    <div class="space-stars space-stars-b"></div>
+  </div>
+  <div class="halo halo-a" aria-hidden="true"></div>
+  <div class="halo halo-b" aria-hidden="true"></div>
 
-    <main class="main">
-      <header class="topbar">
-        <div><h2>Command Center</h2><p>Search and copy support responses quickly.</p></div>
-        <div class="topbar-actions"><span class="chip" id="commandCount">0 commands</span></div>
-      </header>
+  <header class="container masthead">
+    <nav class="top-nav" aria-label="Main">
+      <a class="nav-link" href="index.html">Status</a>
+      <a class="nav-link" href="presentation.html">Support Guide</a>
+      <a class="nav-link active" href="commands.html">Commands</a>
+      <a class="nav-link" href="profile.html">Profile</a>
+      <a class="nav-link" id="adminLink" href="admin.html" style="display:none;">Admin</a>
+      <a class="nav-link" id="logoutLink" href="#">Logout</a>
+    </nav>
+    <h1>Support Commands</h1>
+    <p class="subtitle">Quick copy command responses for support staff.</p>
+  </header>
 
-      <div class="grid-2">
-        <section class="panel stack">
-          <input id="commandSearch" placeholder="Search commands and responses..." autocomplete="off">
-          <p class="state" id="commandState"></p>
-          <div class="stack" id="commandHost"></div>
-        </section>
+  <main class="container">
+    <section class="panel commands-panel">
+      <div class="commands-layout">
+        <div>
+          <div class="search-box">
+            <input id="commandSearch" type="text" placeholder="Search command or response..." autocomplete="off">
+          </div>
+          <div class="commands-toolbar">
+            <span id="commandsCountBadge" class="meta-chip">0 commands</span>
+            <span class="meta-chip">Shared live list</span>
+            <span class="meta-chip">Click command to copy</span>
+          </div>
+          <p id="commandState" class="status-line"></p>
+          <div id="commandCards" class="guide-grid commands-grid"></div>
+        </div>
 
-        <section class="panel stack" id="commandAdminPanel" style="display:none;">
-          <h3>Admin Command Manager</h3>
-          <form id="addCommandForm" class="stack">
-            <input id="newCommand" placeholder="*command" required>
-            <textarea id="newResponse" placeholder="Command response" required></textarea>
+        <aside id="commandAdminPanel" class="guide-card command-admin" style="display:none;">
+          <h3>Admin: Manage Commands</h3>
+          <p class="status-line">Add and remove commands live for all users.</p>
+          <form id="addCommandForm" class="stack-form">
+            <input id="newCommandName" placeholder="*command" required>
+            <textarea id="newCommandResponse" placeholder="Response text" rows="10" required></textarea>
             <button type="submit">Add Command</button>
           </form>
-        </section>
+          <p id="adminCommandState" class="status-line"></p>
+        </aside>
       </div>
-      <p class="state" id="globalState"></p>
-    </main>
-  </div>
+    </section>
+  </main>
 
-  <nav class="mobile-nav">
-    <a href="index.html">Status</a>
-    <a href="presentation.html">Guide</a>
-    <a class="active" href="commands.html">Commands</a>
-    <a href="profile.html" data-auth-only>Profile</a>
-    <a href="admin.html" data-boss-only>Admin</a>
-    <button id="logoutBtnMobile" data-auth-only>Logout</button>
-  </nav>
+  <script src="guard.js?v=20260406c" defer></script>
+  <script src="ui-effects.js?v=20260406c" defer></script>
+  <script src="auth-local.js?v=20260406c"></script>
+  <script>
+  (function () {
+    var currentUser = null;
+    var adminLinkEl = document.getElementById("adminLink");
+    var logoutLinkEl = document.getElementById("logoutLink");
+    var searchEl = document.getElementById("commandSearch");
+    var stateEl = document.getElementById("commandState");
+    var cardsEl = document.getElementById("commandCards");
+    var commandsCountBadgeEl = document.getElementById("commandsCountBadge");
+    var isAdmin = false;
+    var liveCommands = [];
+    var renderedRows = [];
+    var adminPanelEl = document.getElementById("commandAdminPanel");
+    var addCommandFormEl = document.getElementById("addCommandForm");
+    var adminCommandStateEl = document.getElementById("adminCommandState");
 
-  <script src="app.js?v=20260406k" defer></script>
+    var DEFAULT_COMMANDS = [
+      { command: "*hwidreset", response: "Hello! Thanks for making a ticket.\nWe will ping the developer shortly in regards your request of the HWID Reset\nAnd we apologies for any inconvenience however lost time will be compensated at the end of the period! :)" },
+      { command: "*checker", response: "Download Checker | https://db.cosmochecker.com/checker.exe | and open it please and SHOW A SCREENSHOT." },
+      { command: "*windows", response: "Here is a Guide to Reinstalling Windows\n\n1) First, download the necessary Windows ISO file from the link below:\nhttps://db.cosmochecker.com/windows/\n\n2) Next, follow the step-by-step instructions in this video tutorial:\nhttps://www.youtube.com/watch?v=SLmM4rWirto\n\nThis will help ensure a smooth and easy installation. Let us know if you need any help!" },
+      { command: "*msisecureboot", response: "Please go to your bios by spamming DELETE key when your pc is booting up.\nThen go to Settings > Advanced > Windows OS Configuration and make sure Secure Boot is Disabled." },
+      { command: "*msitpm", response: "Please go to your bios by spamming DELETE key when your pc is booting up.\nThen go to Settings > Security > Trusted Computing and make sure Security Device Support is Disabled." },
+      { command: "*disabledefender", response: "Step 1: Open the Support tool\nStep 2: Go to Windows settings tab in the Support Tool\nStep 3: Go to Windows Defender and press Open\nStep 4: Press disable Windows Defender\nIf you have any further issues disabling it please let a support member know." },
+      { command: "*asustpm", response: "Step 1: Power on the system and spam Delete key to enter BIOS\nStep 2: Press F7 key to change to Advanced Mode\nStep 3: Click Advanced page and click Trusted Computing\nStep 4: Click Security Device Support and set it to Disable\nStep 5: Press F10 and click OK, system will reboot\nIf TPM is still enabled, contact support." },
+      { command: "*supporttool", response: "Please download our Support Tool and make sure everything is green.\nhttps://db.cosmochecker.com/attachments/CosmoSupportTool.exe\nIf everything is not green please fix by doing what it says." },
+      { command: "*asussecureboot", response: "Step 1: Enter BIOS and go to Advanced Mode by pressing F7\nStep 2: Select Security, then Secure Boot and set to Disabled\nStep 3: Save and Exit Setup\nIf these instructions are incorrect please report to support ASAP." },
+      { command: "*removevanguard", response: "How to remove Vanguard\n1) Go to Control Panel -> Uninstall a Program\n2) Uninstall Riot Vanguard\n3) Open CMD as admin and run:\nsc delete vgc\nsc delete vgk\n4) Restart PC\nAny issues, report to support." },
+      { command: "*review", response: "Your feedback matters! Please leave a review in <#1092468242230034502>.\nWant to save on your next purchase? Check <#1263157977272029244> for exclusive offers.\nThanks for being part of our community." },
+      { command: "*rustdesk", response: "Please download this and send ID and password.\nhttps://github.com/rustdesk/rustdesk/releases/download/1.2.3/rustdesk-1.2.3-x86_64.exe" },
+      { command: "*delay", response: "https://cdn.discordapp.com/attachments/1250007121026617425/1288703047534383155/LAUNCHER_WITH_DELAY_NO_SPOOFER.bat\nMove this .bat file to the loader file location, run the .bat file, and use the loader it executes." },
+      { command: "*rivatuner", response: "https://cdn.discordapp.com/attachments/1092479347144794243/1251948725346242652/RiveTuner_Setup.mp4" },
+      { command: "*cosmohyperv", response: "Right-click Start -> Run\nType regedit and press Enter\nGo to: Computer\\HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\DeviceGuard\nCreate DWORD (32-bit) named EnableVirtualizationBasedSecurity\nSet Value data to 0 and press OK." },
+      { command: "*cosmovirt", response: "Run CMD as administrator and type:\nbcdedit /set hypervisorlaunchtype off\nThen restart PC and try again." },
+      { command: "*cosmofast", response: "Run CMD as administrator and type:\npowercfg /h off\nThen restart PC and try again." },
+      { command: "*astrohwid", response: "Please download and run this file then copy HWID and send to chat.\nhttps://db.cosmochecker.com/attachments/hwid_grab.exe" },
+      { command: "*cosmofix", response: "1. Install https://aka.ms/vs/17/release/vc_redist.x64.exe (run as admin)\n2. Install https://aka.ms/vs/17/release/vc_redist.x86.exe (run as admin)\n3. Install https://download.microsoft.com/download/1/7/1/1718CCC4-6315-4D8E-9543-8E28A4E18C4C/dxwebsetup.exe (run as admin and uncheck bing)\n4. Install https://uk.download.nvidia.com/GFE/GFEClient/3.27.0.112/GeForce_Experience_v3.27.0.112.exe\n5. Disable Secure Boot in BIOS\n6. Disable Fast Boot in BIOS\n7. Enable CPU Virtualization in BIOS\n8. Disable TPM in BIOS\n9. Disable anti-virus in Windows\n10. Disable exploit protection in Windows\n11. Game in borderless\n12. Play on primary monitor\n13. Software cannot run inside virtual environment" },
+      { command: "*visual", response: "Please download all: https://www.techpowerup.com/download/visual-c-redistributable-runtime-package-all-in-one/\nThen restart PC and try again.\nVideo guide: https://www.youtube.com/watch?v=thdADK2SIpA" },
+      { command: "*wub", response: "Windows update blocker:\nhttps://db.cosmochecker.com/attachments/UpdateBlocker.zip" },
+      { command: "*secureboot", response: "Restart computer and enter BIOS setup (F2/F10/Del).\nEnter advanced mode if needed (often F7).\nGo to Boot or Security tab and disable Secure Boot.\nSave and exit BIOS." },
+      { command: "*restock", response: "Thank you for reporting this out-of-stock product. Restocks usually happen every 12-36 hours and are announced in update news channel." },
+      { command: "*virtualization", response: "Restart computer and enter BIOS.\nGo to Advanced/CPU configuration.\nFind virtualization option (VMX/SVM/VT-x/AMD-V/Vanderpool/VT-d/IOMMU) and set OFF/ON as needed.\nSave and exit BIOS." },
+      { command: "*defendercontrol", response: "Visit and download Defender Control: https://www.sordum.org/9480/defender-control-v2-1/\nZip password: sordum\nInstall WinRAR if needed: https://www.win-rar.com/postdownload.html?&L=0\nRun Defender Control as Administrator and click Disable Windows Defender.\nVideo guide: https://www.youtube.com/watch?v=gskUW35uO3U" },
+      { command: "*iobit", response: "1) Download IObit Unlocker\n2) Go to C:/Windows/System32\n3) Find hvix64.exe and hvax64.exe\n4) Make backup copies first\n5) Delete with IObit Unlocker (Unlock & Delete)\nWarning: these are system files, keep backup.\nVideo guide: https://www.youtube.com/watch?v=BwLetc93qV4" },
+      { command: "*vmx", response: "Run this .bat file: https://db.cosmochecker.com/attachments/fix_vmx_error.bat\nLet it finish, restart PC, then try injecting again." },
+      { command: "*kaneamdmenufix", response: "Kane AMD menu fix:\n- Download Libs.zip: https://db.cosmochecker.com/attachments/Libs.zip\n- End AMD/Radeon/CPU metrics processes in Task Manager\n- Go to C:\\Program Files\\AMD\\Cnext\\Cnext\n- Extract Libs.zip there and replace files\n- If access denied, end AMD processes and retry\nVideo guide: https://www.youtube.com/watch?v=Svf7jtNa2fI" },
+      { command: "*rivatunerapex", response: "1) Install RivaTuner setup and Global config file\n2) Run setup and click next through install\n3) Put Global file in C:\\Program Files (x86)\\RivaTuner Statistics Server\\Profiles\n4) Open RivaTuner as admin and verify settings from screenshots:\nhttps://cdn.discordapp.com/attachments/1361641234959171655/1460793925022253076/IMG_0431.png\nhttps://cdn.discordapp.com/attachments/1361641234959171655/1460793926767214797/IMG_0433.png" },
+      { command: "*kanehyperv", response: "Enable Hyper-V folders in Windows Features according to image:\nhttps://cdn.discordapp.com/attachments/1361641234959171655/1467956907615715358/image.png\nIf missing, run as admin: https://db.cosmochecker.com/attachments/install_hyperv.bat\nThen reboot and enable all Hyper-V subfolders.\nIf still failing, run in admin CMD:\nbcdedit /set {current} hypervisorlaunchtype auto\nbcdedit /set {default} hypervisorlaunchtype auto\nsfc /scannow\nThen reboot.\nIf still failing run:\nDISM /Online /Cleanup-Image /CheckHealth\nDISM /Online /Cleanup-Image /ScanHealth\nDISM /Online /Cleanup-Image /RestoreHealth\nReboot again. Ensure BIOS virtualization is enabled." },
+      { command: "*pin", response: "To remove Windows PIN:\n- Win + I -> Accounts -> Sign-in options\n- Under PIN (Windows Hello), click Remove\n- Confirm Microsoft password\nTo add password:\n- Sign-in options -> Password -> Add\n- Set password and hint\nIf PIN remove is grayed out, disable first slider under Additional settings per image:\nhttps://cdn.discordapp.com/attachments/1361641234959171655/1467958427425964196/image.png" },
+      { command: "*liquidsteelseries", response: "Use SteelSeries steps:\n- Download SteelSeries GG: https://steelseries.com/gg\n- In General settings enable Sonar\n- In SONAR -> Shortcuts set F7 for Master Volume Up\n- Press this bind before injection\nVideo: https://www.youtube.com/watch?v=WK_cDXINmj0" },
+      { command: "*proaimvirt", response: "Open admin CMD and run:\nsfc /scannow\ndism /online /cleanup-image /restorehealth\nbcdedit /set hypervisorlaunchtype auto\nRestart PC and reinject.\nEnsure BIOS virtualization is enabled." },
+      { command: "*coreiso", response: "Search Windows for Core Isolation.\nDisable all sliders and restart PC.\nImage: https://cdn.discordapp.com/attachments/1361641234959171655/1473303551143968769/coreiso.png" },
+      { command: "*coreisoval", response: "Search Windows for Core Isolation.\nSet sliders exactly like image and restart PC.\nImage: https://media.discordapp.net/attachments/1361641234959171655/1473303585033949204/coreisoval.png" },
+      { command: "*exploitoff", response: "Search Windows for Exploit protection.\nSet all options like image and restart PC.\nImage: https://media.discordapp.net/attachments/1361641234959171655/1473303621465800846/image.png" },
+      { command: "*exploiton", response: "Search Windows for Exploit protection.\nSet all options like image and restart PC.\nImage: https://media.discordapp.net/attachments/1361641234959171655/1473303677577072670/image.png" },
+      { command: "*reputation", response: "Search Windows for Reputation-based protection.\nDisable all sliders and restart PC.\nImage: https://cdn.discordapp.com/attachments/1361641234959171655/1473303708291829976/image.png" },
+      { command: "*cheatinfo", response: "Beginner cheat info:\nBattlemode: removes world ESP, leaves player ESP for PVP focus.\nAimbot FOV: controls radius where aimbot is active. Lower for less lock-on.\nAimbot Smoothness: higher for legit feel, lower for snappier aim.\nNo-recoil: tune for legit or strong recoil control.\nPrediction: improves aimbot on moving targets." }
+    ];
+
+    function esc(text) {
+      return String(text || "").replace(/[&<>"']/g, function (char) {
+        return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char];
+      });
+    }
+
+    function copyResponse(command, response) {
+      navigator.clipboard.writeText(response).then(function () {
+        stateEl.textContent = "Copied response for " + command;
+      }).catch(function () {
+        stateEl.textContent = "Copy failed. Please copy manually.";
+      });
+    }
+
+    function renderCommands() {
+      var query = searchEl.value.trim().toLowerCase();
+      var rows = liveCommands.filter(function (item) {
+        return !query
+          || item.command.toLowerCase().indexOf(query) !== -1
+          || item.response.toLowerCase().indexOf(query) !== -1;
+      });
+      renderedRows = rows;
+
+      stateEl.textContent = rows.length + " command(s) shown";
+      commandsCountBadgeEl.textContent = rows.length + " command(s)";
+      cardsEl.innerHTML = rows.map(function (item, idx) {
+        var removeBtn = isAdmin
+          ? "<button class='copy-btn remove-btn' data-remove='" + esc(item.id || "") + "'>Remove</button>"
+          : "";
+        return "<article class='guide-card command-card'>"
+          + "<div class='command-head'><h4>" + esc(item.command) + "</h4><div class='command-actions'><button class='copy-btn' data-copy='" + idx + "'>Copy</button>" + removeBtn + "</div></div>"
+          + "<pre class='raw-block command-response'>" + esc(item.response) + "</pre>"
+          + "</article>";
+      }).join("");
+    }
+
+    cardsEl.addEventListener("click", function (event) {
+      var idx = event.target.getAttribute("data-copy");
+      if (idx !== null) {
+        var item = renderedRows[Number(idx)];
+        if (!item) return;
+        copyResponse(item.command, item.response);
+        return;
+      }
+      var removeId = event.target.getAttribute("data-remove");
+      if (!removeId || !isAdmin) return;
+      GrizzAuth.removeCommand(removeId).then(function () {
+        adminCommandStateEl.textContent = "Command removed.";
+        return loadCommands();
+      }).catch(function (err) {
+        adminCommandStateEl.textContent = err.message;
+      });
+    });
+
+    searchEl.addEventListener("input", renderCommands);
+
+    addCommandFormEl.addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (!isAdmin) return;
+      var command = document.getElementById("newCommandName").value.trim();
+      var response = document.getElementById("newCommandResponse").value.trim();
+      GrizzAuth.addCommand(command, response).then(function () {
+        addCommandFormEl.reset();
+        adminCommandStateEl.textContent = "Command added.";
+        return loadCommands();
+      }).catch(function (err) {
+        adminCommandStateEl.textContent = err.message;
+      });
+    });
+
+    function loadCommands() {
+      return GrizzAuth.getCommands().then(function (rows) {
+        if (!rows.length) {
+          liveCommands = DEFAULT_COMMANDS.slice();
+          if (isAdmin) {
+            return GrizzAuth.bootstrapCommands(DEFAULT_COMMANDS).then(function () {
+              return GrizzAuth.getCommands();
+            }).then(function (synced) {
+              liveCommands = synced || [];
+              renderCommands();
+            }).catch(function () {
+              renderCommands();
+            });
+          }
+          renderCommands();
+          return;
+        }
+        liveCommands = rows;
+        renderCommands();
+      });
+    }
+
+    logoutLinkEl.addEventListener("click", function (e) {
+      e.preventDefault();
+      GrizzAuth.logout().then(function () {
+        window.location.replace("auth.html");
+      });
+    });
+
+    (async function boot() {
+      await GrizzAuth.init();
+      currentUser = GrizzAuth.requireApprovedSession("auth.html");
+      if (!currentUser) return;
+      await GrizzAuth.touch();
+      if (GrizzAuth.hasAdminAccess(currentUser)) {
+        adminLinkEl.style.display = "inline-flex";
+        isAdmin = true;
+        adminPanelEl.style.display = "block";
+      }
+      await loadCommands();
+    })();
+  })();
+  </script>
 </body>
 </html>

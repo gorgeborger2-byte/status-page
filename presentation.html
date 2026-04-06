@@ -3,57 +3,981 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Support Guide Slides</title>
+  <title>Cosmo Support Guide</title>
+  <meta name="description" content="Compact support guide view.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="app.css?v=20260406k">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Chakra+Petch:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=20260406c">
+  <link rel="stylesheet" href="modern-v2.css?v=20260406e">
 </head>
-<body data-page="presentation">
-  <div class="shell">
-    <aside class="sidebar">
-      <div class="brand"><div class="brand-mark"></div><div><h1>Cosmo Ops</h1><p id="whoami">Loading...</p></div></div>
-      <nav class="nav">
-        <a href="index.html">Status</a>
-        <a class="active" href="presentation.html">Guide</a>
-        <a href="commands.html">Commands</a>
-        <a href="profile.html" data-auth-only>Profile</a>
-        <a href="admin.html" data-boss-only>Admin</a>
-        <button id="logoutBtn" data-auth-only>Logout</button>
-      </nav>
-    </aside>
-
-    <main class="main">
-      <header class="topbar">
-        <div><h2>Support Guide (33 Slides)</h2><p>Built from your full slide source only.</p></div>
-        <div class="topbar-actions"><span class="chip" id="slideCountChip">0 slides</span></div>
-      </header>
-
-      <section class="panel stack">
-        <input id="guideSearch" placeholder="Search inside slide titles and content..." autocomplete="off">
-        <p class="state" id="guideState"></p>
-      </section>
-
-      <section class="panel guide-layout">
-        <aside class="guide-slides" id="slidesNav"></aside>
-        <article class="guide-content">
-          <h3 id="slideTitle">Select a slide</h3>
-          <pre id="slideBody" class="slide-pre"></pre>
-        </article>
-      </section>
-      <p class="state" id="globalState"></p>
-    </main>
+<body class="compact-page">
+  <div class="space-bg" aria-hidden="true">
+    <div class="space-nebula"></div>
+    <div class="space-stars space-stars-a"></div>
+    <div class="space-stars space-stars-b"></div>
   </div>
+  <div class="halo halo-a" aria-hidden="true"></div>
+  <div class="halo halo-b" aria-hidden="true"></div>
 
-  <nav class="mobile-nav">
-    <a href="index.html">Status</a>
-    <a class="active" href="presentation.html">Guide</a>
-    <a href="commands.html">Commands</a>
-    <a href="profile.html" data-auth-only>Profile</a>
-    <a href="admin.html" data-boss-only>Admin</a>
-    <button id="logoutBtnMobile" data-auth-only>Logout</button>
-  </nav>
+  <header class="container masthead">
+    <nav class="top-nav" aria-label="Main">
+      <a class="nav-link" href="index.html">Status</a>
+      <a class="nav-link active" href="presentation.html">Support Guide</a>
+      <a class="nav-link" href="commands.html">Commands</a>
+      <a class="nav-link" href="profile.html">Profile</a>
+      <a class="nav-link" id="adminLink" href="admin.html" style="display:none;">Admin</a>
+      <a class="nav-link" id="logoutLink" href="#">Logout</a>
+    </nav>
+    <h1>Cosmo Support Guide</h1>
+    <p class="subtitle">Cleaner compact workflow for fast support lookup and copy actions.</p>
+  </header>
 
-  <script src="app.js?v=20260406k" defer></script>
+  <main class="container">
+    <section class="panel compact-panel">
+      <div class="guide-workspace">
+        <aside class="guide-nav-pane">
+          <div class="compact-controls">
+            <input type="text" id="productSearch" placeholder="Search product, error, command..." autocomplete="off">
+            <select id="productSelect" style="display:none;"></select>
+            <button id="prevBtn" type="button">Prev</button>
+            <button id="nextBtn" type="button">Next</button>
+            <button id="copyAllDataBtn" type="button">Copy All Data</button>
+          </div>
+          <p class="status-line" id="positionLine"></p>
+          <div id="productList" class="guide-product-list"></div>
+        </aside>
+
+        <div class="guide-content-pane">
+          <article class="guide-card single-guide-card" id="guideCard"></article>
+
+          <section class="full-slides">
+            <div class="full-slides-head">
+              <h4>Full Slide Text (1:1)</h4>
+              <button id="copySlidesTextBtn" type="button">Copy Full Slide Text</button>
+            </div>
+            <p class="status-line" id="fullTextSearchState"></p>
+            <pre id="fullSlidesText" class="raw-block full-text-block">Loading slide text...</pre>
+          </section>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="container footer">
+    <p>Fast lookup format from your docs style.</p>
+  </footer>
+
+  <script src="guard.js?v=20260406c" defer></script>
+  <script src="ui-effects.js?v=20260406c" defer></script>
+  <script src="auth-local.js?v=20260406c"></script>
+  <script>
+  (function () {
+    var currentUser = null;
+    var adminLinkEl = document.getElementById("adminLink");
+    var logoutLinkEl = document.getElementById("logoutLink");
+    logoutLinkEl.addEventListener("click", function (e) {
+      e.preventDefault();
+      GrizzAuth.logout().then(function () {
+        window.location.replace("auth.html");
+      });
+    });
+
+    (async function bootAuth() {
+      await GrizzAuth.init();
+      currentUser = GrizzAuth.requireApprovedSession("auth.html");
+      if (!currentUser) return;
+      await GrizzAuth.touch();
+      if (GrizzAuth.hasAdminAccess(currentUser)) {
+        adminLinkEl.style.display = "inline-flex";
+      }
+    })();
+
+    var products = [
+      {
+        name: "Global Links + Commands",
+        specs: [
+          ["Support Site", "support.cosmotickets.com"],
+          ["Status Site", "support.cosmotickets.com/status"],
+          ["Status Password", "support"],
+          ["Visual Package", "Use *visual command"],
+          ["Defender Utility", "Use *defendercontrol command"],
+          ["Core Isolation", "Keep disabled unless product requires otherwise"]
+        ],
+        notes: [
+          "This card is a quick launch card for links/commands used across all products.",
+          "For product-specific requirements, switch to that product card."
+        ],
+        links: [
+          ["Support Home", "https://support.cosmotickets.com/"],
+          ["Status Dashboard", "https://support.cosmotickets.com/status/"],
+          ["Source Slides", "https://docs.google.com/presentation/d/1xdaRaAgXz_y2i9zU1DKSWTr7QxGoVlIF_zEK7KBgjpo/edit"]
+        ]
+      },
+      {
+        name: "Cosmo Naxo",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "DISABLED"],
+          ["Virtualization", "DISABLED"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "Hyper-V errors: use *cosmohyperv.",
+          "Fastboot/Hiberboot: use registry + powercfg sequence from docs.",
+          "Mapping driver failed: place PMAD driver file in system32 drivers.",
+          "Driver not running: check LargePageDrivers and remove PMAD remnants.",
+          "Escalation command: *naxoticket."
+        ],
+        links: [
+          ["PMAD file", "https://mega.nz/file/TB1A0bbZ#oLP83kATOQzucyzfaHrtAE4-JD5-U3OblZ1VnzXVwDY"]
+        ]
+      },
+      {
+        name: "Cosmo Pro",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "DISABLED"],
+          ["Virtualization", "ENABLED"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "Supports all Windows except 25H2 for most products.",
+          "Warthunder stuck at 15 percent: validate path and run python bundle flow.",
+          "If website opens but loader error persists, install python manually into temp path."
+        ],
+        links: [
+          ["Python bundle", "http://warchill.xyz/python.zip"]
+        ]
+      },
+      {
+        name: "AstroZoom",
+        specs: [
+          ["TPM", "(N/A) - ENABLED for COD"],
+          ["Secure Boot", "DISABLED - ENABLED for COD"],
+          ["Virtualization", "DISABLED"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "Windows 10 22H2 to 11 23H2; COD supports 24H2/25H2.",
+          "Loading mem_ctx: remove anti-cheats and antivirus fully.",
+          "Error #13 / 0x2: unsupported Windows version.",
+          "Timeout/hostname: use VPN (Warp/Tunnelbear).",
+          "Fortnite R0 flow: press F2 after character loads."
+        ]
+      },
+      {
+        name: "Atlas",
+        specs: [
+          ["TPM", "(N/A) - ENABLED for COD"],
+          ["Secure Boot", "DISABLED - ENABLED for COD"],
+          ["Virtualization", "DISABLED"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "ENABLED (Default)"]
+        ],
+        notes: [
+          "Meltdown/Spectre issues: disable with Inspectre.",
+          "Blue screen: disable built-in spoofer.",
+          "Failed load driver: run sfc /scannow and check core isolation.",
+          "PUBG blackscreen: remove PUBG movies folder."
+        ],
+        links: [
+          ["Inspectre", "https://www.guru3d.com/download/download-inspectre/"]
+        ]
+      },
+      {
+        name: "Forge",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "DISABLED"],
+          ["Virtualization", "DISABLED"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "BSOD flow: sfc /scannow then DISM /Online /Cleanup-image /Restorehealth.",
+          "Loader closes at 100 percent: sync PC time.",
+          "bedaisy/easyanticheat errors: run loader before game.",
+          "I2 errors: verify anti-cheat/AV removal + run loader as admin."
+        ]
+      },
+      {
+        name: "Supreme",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "DISABLED"],
+          ["Virtualization", "(N/A)"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "ENABLED (Default)"]
+        ],
+        notes: [
+          "0x0 invalid processed data: use VPN.",
+          "3B000000: run bcdedit /set hypervisorlaunchtype off.",
+          "0x1/0x2: uninstall anti-cheat and restart.",
+          "0x3/0x7: reboot and inject before spoofing."
+        ]
+      },
+      {
+        name: "Kane",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "DISABLED"],
+          ["Virtualization", "ENABLED"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "ENABLED (Default)"]
+        ],
+        notes: [
+          "vc_redist libs error: *kaneamdmenufix.",
+          "SVM/VMX: disable Windows pin then run *iobit flow.",
+          "No menu: update drivers and disable overlays.",
+          "Failed map memory: check RAM and disable startup apps.",
+          "Extra fixes include no server VPN and error 0x298 escalate."
+        ],
+        links: [
+          ["Kane video", "https://www.youtube.com/watch?v=L-55o0UnHFU"]
+        ]
+      },
+      {
+        name: "Liquid",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "DISABLED"],
+          ["Virtualization", "ENABLED"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "ENABLED (Default)"]
+        ],
+        notes: [
+          "EFT Chams: press F1 in main menu.",
+          "ARC Raiders: Steam only.",
+          "Steelseries GG sonar shortcut requirement applies to specific products.",
+          "No menu/SVM issues follow Kane-style troubleshooting stack."
+        ],
+        links: [
+          ["Steelseries GG", "https://steelseries.com/gg"]
+        ]
+      },
+      {
+        name: "ProAim",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "DISABLED"],
+          ["Virtualization", "ENABLED"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "No menu/BSOD: use latest loader; then apply delay command if needed.",
+          "If BSOD persists, collect latest C:\\Windows\\Minidump file.",
+          "Hyper-V not launched: run sfc, dism, and bcdedit hypervisor auto.",
+          "Warthunder requires DX12."
+        ],
+        links: [
+          ["Loader channel", "https://t.me/fecloaders"]
+        ]
+      },
+      {
+        name: "Cobra",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "DISABLED"],
+          ["Virtualization", "DISABLED"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "Mapping driver failed: disable anti-cheats and antivirus.",
+          "Loader connection issue: use Proton VPN.",
+          "Crash/BSOD: use no-spoofer build when required.",
+          "Disable all overlays (Discord/Steam/NVIDIA/AMD/Medal)."
+        ]
+      },
+      {
+        name: "Athena",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "DISABLED"],
+          ["Virtualization", "DISABLED"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "ARC is Steam only and requires DX12.",
+          "Error 2145/2146: escalate as corrupted upload case.",
+          "Crashing loader: use machine rename command workaround from docs."
+        ]
+      },
+      {
+        name: "Kraken (Games)",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "(N/A)"],
+          ["Virtualization", "(N/A)"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "Use NVIDIA overlay or Overwolf for AMD where required.",
+          "Roblox: use Fishstrap to avoid silent beta breakages."
+        ],
+        links: [
+          ["Fishstrap", "https://www.fishstrap.app/"]
+        ]
+      },
+      {
+        name: "Kraken Spoofer",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "(N/A)"],
+          ["Virtualization", "ENABLED"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "Enable BIOS virtualization (VT-x/VT-d or SVM).",
+          "Disable Windows Hyper-V feature if active.",
+          "Loader stuck at 11 percent: run chkdsk on all drives and reboot."
+        ]
+      },
+      {
+        name: "Inferno",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "(N/A)"],
+          ["Virtualization", "(N/A)"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "Driver init error 1: run provided file, reboot, disable core isolation and vulnerable driver blocking.",
+          "If unresolved use loader Get Support -> Driver Error then reboot."
+        ],
+        links: [
+          ["Inferno fix file", "https://mega.nz/file/uURS0ZgL#gn9i_rBW__80V9uzexA_Cr2vPUPNGQK2aif4qtevXHs"]
+        ]
+      },
+      {
+        name: "Pulse",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "DISABLED"],
+          ["Virtualization", "DISABLED"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "Injection failed 0x1394 (ARC): close Chrome or switch browser.",
+          "Use Overwolf install + startup cleanup + inject-before-launch flow.",
+          "Loader not opening: do not keep checker/support tool open with loader."
+        ],
+        links: [
+          ["Overwolf", "https://download.overwolf.com/install/Download?utm_content=new-light&utm_source=web_app_store"]
+        ]
+      },
+      {
+        name: "Hero Valorant",
+        specs: [
+          ["TPM", "ENABLED"],
+          ["Secure Boot", "ENABLED"],
+          ["Virtualization", "ENABLED"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DEFAULT"]
+        ],
+        notes: [
+          "Requirements include Medal overlay, GPU drivers up to date, and Hyper-V ON in Windows Features.",
+          "No menu fix: install Medal and keep record with Medal enabled.",
+          "If still no menu: run bundle tool as admin and send generated bundle.enc to senior support.",
+          "Secure Boot policy fix uses BIOS Key Management (delete dbx signatures one-by-one, not delete all)."
+        ],
+        links: [
+          ["Medal", "http://medal.tv"],
+          ["Bundle tool", "https://gofile.io/d/sOW8lX"]
+        ]
+      },
+      {
+        name: "Hero OW2",
+        specs: [
+          ["TPM", "N/A"],
+          ["Secure Boot", "N/A"],
+          ["Virtualization", "N/A"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "Disable all overlays except required flow; run game in DX11.",
+          "Use latest OW2 loader package when needed.",
+          "External overlay crash fixes: disable Discord/OBS/NVIDIA/Xbox overlays.",
+          "Aimbot/ESP issues: reset to default preset, then reload cheat in menu."
+        ],
+        links: [
+          ["OW2 Loader Package", "https://mega.nz/folder/VUdnFYCC#Y3MUZeXJl_vkQt5hjvgvXw"],
+          ["Bundle tool", "https://gofile.io/d/sOW8lX"]
+        ]
+      },
+      {
+        name: "Hero Delta Force",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "ENABLED"],
+          ["Virtualization", "ENABLED"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "Steam only + DX12 only.",
+          "Before inject: set display to borderless/windowed and disable upscaling/super resolution.",
+          "Loader crash after key verification: install VC Redist x64 + x86.",
+          "No menu escalation: run bundle tool and send bundle.enc to senior support."
+        ],
+        links: [
+          ["VC Redist x64", "https://aka.ms/vs/17/release/vc_redist.x64.exe"],
+          ["VC Redist x86", "https://aka.ms/vs/17/release/vc_redist.x86.exe"],
+          ["Bundle tool", "https://gofile.io/d/sOW8lX"]
+        ]
+      },
+      {
+        name: "Hero FN/Rust/Apex/ABI/ARC",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "(N/A)"],
+          ["Virtualization", "(N/A)"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DEFAULT"]
+        ],
+        notes: [
+          "All need Medal; Hyper-V required for ARC Raiders, Valorant, Fortnite, and Apex.",
+          "Apex BSOD flow requires Windows SDK package and generating new build.",
+          "If no menu/errors persist: run bundle tool and escalate with bundle.enc.",
+          "Arena Breakout ENC ON: too many reports can require account change and wait window."
+        ],
+        links: [
+          ["Medal", "http://medal.tv"],
+          ["Windows SDK", "https://go.microsoft.com/fwlink/?linkid=2335869"],
+          ["Bundle tool", "https://gofile.io/d/sOW8lX"]
+        ]
+      },
+      {
+        name: "VOLT",
+        specs: [
+          ["TPM", "DISABLED"],
+          ["Secure Boot", "DISABLED"],
+          ["Virtualization", "ENABLED"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "Framework error: install .NET runtime packages from docs links.",
+          "No ESP tips: DayZ AA settings off; EFT disable AutoClean RAM.",
+          "Legacy BIOS/MBR errors may require GPT conversion or reinstall.",
+          "HVIX/HVAX missing: run sfc /scannow."
+        ],
+        links: [
+          ["Runtime x64", "https://builds.dotnet.microsoft.com/dotnet/Runtime/7.0.5/dotnet-runtime-7.0.5-win-x64.exe"],
+          ["Runtime x86", "https://builds.dotnet.microsoft.com/dotnet/Runtime/7.0.5/dotnet-runtime-7.0.5-win-x86.exe"],
+          ["GPT conversion video", "https://youtu.be/a54sqzcDrUU?si=Lj2PE-bUK2bLBMEg"]
+        ]
+      },
+      {
+        name: "VEX",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "DISABLED"],
+          ["Virtualization", "DISABLED"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "Warthunder requires DX11 launch parameter.",
+          "Connection issues: run network manager best-IP flow."
+        ],
+        links: [
+          ["Network manager", "https://pcheck.ru/files/networkmanager.zip"]
+        ]
+      },
+      {
+        name: "Crown",
+        specs: [
+          ["TPM", "DISABLED (except COD)"],
+          ["Secure Boot", "DISABLED (except COD)"],
+          ["Virtualization", "(N/A)"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "Marvels: run notepad as admin before injection.",
+          "Marvels 25H2 is unstable per docs."
+        ]
+      },
+      {
+        name: "Opal (FiveM)",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "(N/A)"],
+          ["Virtualization", "(N/A)"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "Steam must be open with overlay enabled.",
+          "Display cannot be fullscreen exclusive.",
+          "Error 1-4 timeout/download: use VPN.",
+          "Error 2 integrity: reinstall FiveM; Error 3 injection: anti-cheat/AV block."
+        ]
+      },
+      {
+        name: "Opal (except FiveM)",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "(N/A)"],
+          ["Virtualization", "(N/A)"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "Fatal connection error: sync PC date/time.",
+          "BSOD: remove antivirus software and mouse/keyboard overlays.",
+          "Status 502 internal server: use diagnostic mode and switch server."
+        ],
+        links: [
+          ["AV removal tool", "https://antivirus-removal-tool.com/"]
+        ]
+      },
+      {
+        name: "Viper",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "(N/A)"],
+          ["Virtualization", "(N/A)"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DEFAULT"]
+        ],
+        notes: [
+          "Disable all overlays and startup apps.",
+          "Steam as admin; no launch parameters; disable frame generation/reflex.",
+          "Failed stream: VPN and Cloudflare DNS.",
+          "The Isle/ARC extra fix: delete local saved folders.",
+          "Troubleshoot tool available in docs."
+        ],
+        links: [
+          ["Troubleshoot tool", "https://cdn.discordapp.com/attachments/1459056826317537397/1460873272760602848/Troubleshoot.exe"]
+        ]
+      },
+      {
+        name: "Breeze",
+        specs: [
+          ["TPM", "(N/A)"],
+          ["Secure Boot", "(N/A)"],
+          ["Virtualization", "(N/A)"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "Reputation-based protection, core isolation, and exploit must be off.",
+          "ARK overlay requirements differ by game.",
+          "Loader not opening: sync PC time and use Warp VPN.",
+          "Windows 11 spoofer fix and uninstall last two security updates if required."
+        ],
+        links: [
+          ["Win11 spoofer fix", "https://gofile.io/d/qVXmXC"]
+        ]
+      },
+      {
+        name: "Vortex",
+        specs: [
+          ["TPM", "(N/A) ON for required games"],
+          ["Secure Boot", "DISABLED"],
+          ["Virtualization", "ENABLED"],
+          ["Windows Defender", "DISABLED"],
+          ["Windows Firewall", "DISABLED"],
+          ["Exploit Protection", "DISABLED"]
+        ],
+        notes: [
+          "Requires Hyper-V enabled, UEFI, GPT disks, and AV removal.",
+          "InitWindows: press F2 only after Discord overlay banner appears.",
+          "LoadHyperVisor: follow hypervisor setup video.",
+          "Bad image libs: replace DLLs in system paths per docs.",
+          "Secure boot bypass valorant fix available in docs package."
+        ],
+        links: [
+          ["Hypervisor setup video", "https://youtu.be/XYVeHy5u4j4"],
+          ["Secure boot bypass pack", "https://gofile.io/d/JPNqIp"]
+        ]
+      },
+      {
+        name: "Refund / Compensation / HWID",
+        specs: [
+          ["Refund eligibility", "Insta ban before use or severe unresolved product faults"],
+          ["Refund inputs", "Key + order number + key length + game"],
+          ["Compensation", "For meaningful lost time, not repeated abuse"],
+          ["Updating products", "Ask user to wait; escalate mass-impact cases"],
+          ["Downgrade", "Preferred before refund where possible"],
+          ["HWID Reset", "Escalate to senior/reset access staff"]
+        ],
+        notes: [
+          "This card mirrors the final policy slides for support handling.",
+          "When unsure, escalate to senior support before final action."
+        ]
+      }
+    ];
+
+    var filtered = products.slice();
+    var current = 0;
+
+    var searchEl = document.getElementById("productSearch");
+    var selectEl = document.getElementById("productSelect");
+    var productListEl = document.getElementById("productList");
+    var prevBtn = document.getElementById("prevBtn");
+    var nextBtn = document.getElementById("nextBtn");
+    var copyAllDataBtn = document.getElementById("copyAllDataBtn");
+    var copySlidesTextBtn = document.getElementById("copySlidesTextBtn");
+    var lineEl = document.getElementById("positionLine");
+    var cardEl = document.getElementById("guideCard");
+    var fullSlidesTextEl = document.getElementById("fullSlidesText");
+    var fullTextSearchStateEl = document.getElementById("fullTextSearchState");
+    var fullSlidesText = "";
+    var fullSlidesTextNormalized = "";
+
+    function copyText(text, label) {
+      if (!text) return;
+      function done() {
+        lineEl.textContent = label + " copied";
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done);
+        return;
+      }
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      done();
+    }
+
+    function unique(arr) {
+      var map = {};
+      return arr.filter(function (v) {
+        var key = v.toLowerCase();
+        if (map[key]) return false;
+        map[key] = true;
+        return true;
+      });
+    }
+
+    function buildAllDataText() {
+      return products.map(function (item) {
+        var requirementsText = item.specs.map(function (row) { return row[0] + ": " + row[1]; }).join("\n");
+        var fixesText = item.notes.join("\n");
+        var linksText = (item.links || []).map(function (link) { return link[0] + ": " + link[1]; }).join("\n");
+        var commands = unique((requirementsText + "\n" + fixesText).match(/\*[a-z0-9_]+/gi) || []).join("\n");
+        return [
+          "===== " + item.name + " =====",
+          "Requirements:",
+          requirementsText || "(none)",
+          "",
+          "Fixes:",
+          fixesText || "(none)",
+          "",
+          "Commands:",
+          commands || "(none)",
+          "",
+          "Links:",
+          linksText || "(none)"
+        ].join("\n");
+      }).join("\n\n");
+    }
+
+    var searchAliases = [
+      ["ow2", "overwatch 2"],
+      ["overwatch 2", "ow2"],
+      ["cod", "call of duty"],
+      ["call of duty", "cod"],
+      ["fn", "fortnite"],
+      ["fortnite", "fn"],
+      ["abi", "arena breakout infinite"],
+      ["arena breakout infinite", "abi"],
+      ["eft", "escape from tarkov"],
+      ["escape from tarkov", "eft"],
+      ["r6", "rainbow six siege"],
+      ["rainbow six siege", "r6"],
+      ["cs2", "counter strike 2"],
+      ["counter strike 2", "cs2"],
+      ["df", "delta force"],
+      ["delta force", "df"],
+      ["wt", "warthunder"],
+      ["warthunder", "wt"],
+      ["arc", "arc raiders"],
+      ["arc raiders", "arc"]
+    ];
+
+    function withAliases(text) {
+      var lower = text.toLowerCase();
+      var extra = [];
+      searchAliases.forEach(function (pair) {
+        if (lower.indexOf(pair[0]) !== -1) {
+          extra.push(pair[1]);
+        }
+      });
+      return lower + " " + extra.join(" ");
+    }
+
+    function normalizeText(text) {
+      return text.toLowerCase().replace(/[^a-z0-9]+/g, " ");
+    }
+
+    function esc(value) {
+      return String(value || "").replace(/[&<>"']/g, function (char) {
+        return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char];
+      });
+    }
+
+    function escAttr(value) {
+      return esc(value).replace(/`/g, "&#96;");
+    }
+
+    function safeUrl(value) {
+      var raw = String(value || "").trim();
+      try {
+        var url = new URL(raw, window.location.origin);
+        if (url.protocol === "http:" || url.protocol === "https:") {
+          return url.href;
+        }
+      } catch (e) {}
+      return "#";
+    }
+
+    function updateFullTextSearch(q, normalizedQuery) {
+      if (!fullSlidesText) {
+        fullTextSearchStateEl.textContent = "Slide text not loaded yet.";
+        return;
+      }
+      if (!q) {
+        fullTextSearchStateEl.textContent = "Showing full slide export text.";
+        return;
+      }
+
+      var plainIndex = fullSlidesText.toLowerCase().indexOf(q);
+      var normalizedIndex = normalizedQuery ? fullSlidesTextNormalized.indexOf(normalizedQuery) : -1;
+      var found = plainIndex !== -1 || normalizedIndex !== -1;
+      fullTextSearchStateEl.textContent = found ? "Search also found in full slide text." : "No full-text match for this search.";
+    }
+
+    function loadFullSlidesText() {
+      fetch("slides_full.txt?t=" + Date.now(), { cache: "no-store" })
+        .then(function (res) {
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          return res.text();
+        })
+        .then(function (txt) {
+          fullSlidesText = txt.replace(/\u000b/g, "\n").replace(/\r\n/g, "\n");
+          fullSlidesTextNormalized = normalizeText(withAliases(fullSlidesText));
+          fullSlidesTextEl.textContent = fullSlidesText;
+          fullTextSearchStateEl.textContent = "Showing full slide export text.";
+        })
+        .catch(function () {
+          fullSlidesText = "Could not load full slide text file.";
+          fullSlidesTextNormalized = normalizeText(fullSlidesText);
+          fullSlidesTextEl.textContent = fullSlidesText;
+          fullTextSearchStateEl.textContent = "Failed to load full slide text.";
+        });
+    }
+
+    function buildCardBundle(item) {
+      var requirementsText = item.specs.map(function (row) { return row[0] + ": " + row[1]; }).join("\n");
+      var fixesText = item.notes.join("\n");
+      var linksText = (item.links || []).map(function (link) { return link[0] + ": " + link[1]; }).join("\n");
+      var commands = unique((requirementsText + "\n" + fixesText).match(/\*[a-z0-9_]+/gi) || []);
+      var fullCardText = [
+        item.name,
+        "",
+        "Requirements",
+        requirementsText,
+        "",
+        "Fixes",
+        fixesText,
+        "",
+        "Commands",
+        commands.join("\n") || "(none)",
+        "",
+        "Links",
+        linksText || "(none)"
+      ].join("\n");
+      return {
+        requirementsText: requirementsText,
+        fixesText: fixesText,
+        linksText: linksText,
+        commands: commands,
+        fullCardText: fullCardText
+      };
+    }
+
+    function renderNavList() {
+      selectEl.innerHTML = filtered.map(function (p, i) {
+        return "<option value=\"" + i + "\">" + p.name + "</option>";
+      }).join("");
+      selectEl.value = String(current);
+
+      productListEl.innerHTML = filtered.map(function (p, i) {
+        var active = i === current ? " active" : "";
+        return "<button type=\"button\" class=\"guide-nav-item" + active + "\" data-index=\"" + i + "\">" + esc(p.name) + "</button>";
+      }).join("");
+    }
+
+    function renderCards() {
+      if (!filtered.length) {
+        cardEl.innerHTML = "<h3>No match</h3><p>Try another search keyword.</p>";
+        lineEl.textContent = "0 products";
+        return;
+      }
+
+      cardEl.innerHTML = filtered.map(function (item, idx) {
+        var bundle = buildCardBundle(item);
+        var specRows = item.specs.map(function (row) {
+          return "<p><span>" + esc(row[0]) + "</span><strong>" + esc(row[1]) + "</strong></p>";
+        }).join("");
+        var noteRows = item.notes.map(function (n) {
+          return "<li>" + esc(n) + "</li>";
+        }).join("");
+        var commandButtons = bundle.commands.length
+          ? bundle.commands.map(function (cmd) {
+              return "<button type=\"button\" class=\"cmd-chip\" data-cmd=\"" + escAttr(cmd) + "\">" + esc(cmd) + "</button>";
+            }).join("")
+          : "<span class=\"cmd-empty\">No commands in this section</span>";
+        var linkRows = "";
+        if (item.links && item.links.length) {
+          linkRows = "<section class=\"guide-section\"><h4>Links</h4><ul>" + item.links.map(function (link) {
+            var href = safeUrl(link[1]);
+            return "<li><a class=\"footer-link\" href=\"" + escAttr(href) + "\" target=\"_blank\" rel=\"noreferrer\">" + esc(link[0]) + "</a></li>";
+          }).join("") + "</ul></section>";
+        }
+
+        return "<article class=\"guide-card guide-scroll-card\" id=\"guide-product-" + idx + "\">"
+          + "<h3>" + esc(item.name) + "</h3>"
+          + "<div class=\"copy-row\">"
+          + "<button type=\"button\" class=\"copy-btn\" data-action=\"req\" data-index=\"" + idx + "\">Copy Requirements</button>"
+          + "<button type=\"button\" class=\"copy-btn\" data-action=\"fix\" data-index=\"" + idx + "\">Copy Fixes</button>"
+          + "<button type=\"button\" class=\"copy-btn\" data-action=\"cmd\" data-index=\"" + idx + "\">Copy Commands</button>"
+          + "<button type=\"button\" class=\"copy-btn\" data-action=\"links\" data-index=\"" + idx + "\">Copy Links</button>"
+          + "<button type=\"button\" class=\"copy-btn\" data-action=\"all\" data-index=\"" + idx + "\">Copy Full Card</button>"
+          + "</div>"
+          + "<section class=\"guide-section\"><h4>Requirements</h4><div class=\"spec-table\">" + specRows + "</div></section>"
+          + "<section class=\"guide-section\"><h4>Important Fixes / Notes</h4><ul>" + noteRows + "</ul></section>"
+          + "<section class=\"guide-section\"><h4>Commands</h4><div class=\"cmd-row\">" + commandButtons + "</div></section>"
+          + linkRows
+          + "</article>";
+      }).join("");
+
+      lineEl.textContent = filtered.length + " products shown";
+      renderNavList();
+    }
+
+    function applySearch() {
+      var q = searchEl.value.toLowerCase().trim();
+      var normalizedQuery = q.replace(/[^a-z0-9]+/g, " ").trim();
+      filtered = products.filter(function (p) {
+        var linkText = (p.links || []).map(function (l) { return l.join(" "); }).join(" ");
+        var text = withAliases(p.name + " " + p.notes.join(" ") + " " + p.specs.map(function (s) { return s.join(" "); }).join(" ") + " " + linkText);
+        var normalizedText = normalizeText(text);
+        return !q || text.indexOf(q) !== -1 || (normalizedQuery && normalizedText.indexOf(normalizedQuery) !== -1);
+      });
+      current = 0;
+      renderCards();
+      updateFullTextSearch(q, normalizedQuery);
+    }
+
+    searchEl.addEventListener("input", applySearch);
+
+    productListEl.addEventListener("click", function (event) {
+      var target = event.target;
+      if (!target || !target.dataset.index) return;
+      current = Number(target.dataset.index) || 0;
+      var active = productListEl.querySelector(".guide-nav-item.active");
+      if (active) active.classList.remove("active");
+      target.classList.add("active");
+      var section = document.getElementById("guide-product-" + current);
+      if (section) section.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    prevBtn.addEventListener("click", function () {
+      if (!filtered.length) return;
+      current = (current - 1 + filtered.length) % filtered.length;
+      var section = document.getElementById("guide-product-" + current);
+      if (section) section.scrollIntoView({ behavior: "smooth", block: "start" });
+      var active = productListEl.querySelector(".guide-nav-item.active");
+      if (active) active.classList.remove("active");
+      var btn = productListEl.querySelector("[data-index='" + current + "']");
+      if (btn) btn.classList.add("active");
+    });
+
+    nextBtn.addEventListener("click", function () {
+      if (!filtered.length) return;
+      current = (current + 1) % filtered.length;
+      var section = document.getElementById("guide-product-" + current);
+      if (section) section.scrollIntoView({ behavior: "smooth", block: "start" });
+      var active = productListEl.querySelector(".guide-nav-item.active");
+      if (active) active.classList.remove("active");
+      var btn = productListEl.querySelector("[data-index='" + current + "']");
+      if (btn) btn.classList.add("active");
+    });
+
+    cardEl.addEventListener("click", function (event) {
+      var t = event.target;
+      if (!t) return;
+      if (t.classList.contains("cmd-chip")) {
+        copyText(t.getAttribute("data-cmd"), "Command");
+        return;
+      }
+      var action = t.getAttribute("data-action");
+      var idx = Number(t.getAttribute("data-index"));
+      if (!action || Number.isNaN(idx) || !filtered[idx]) return;
+      var bundle = buildCardBundle(filtered[idx]);
+      if (action === "req") copyText(bundle.requirementsText, "Requirements");
+      if (action === "fix") copyText(bundle.fixesText, "Fixes");
+      if (action === "cmd") copyText(bundle.commands.join("\n"), "Commands");
+      if (action === "links") copyText(bundle.linksText || "(none)", "Links");
+      if (action === "all") copyText(bundle.fullCardText, "Full card");
+    });
+
+    copyAllDataBtn.addEventListener("click", function () {
+      copyText(buildAllDataText(), "All data");
+    });
+
+    copySlidesTextBtn.addEventListener("click", function () {
+      copyText(fullSlidesText || "", "Full slide text");
+    });
+
+    renderCards();
+    loadFullSlidesText();
+  })();
+  </script>
 </body>
 </html>
