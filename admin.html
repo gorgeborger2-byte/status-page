@@ -13,9 +13,21 @@
     <div class="space-stars space-stars-b"></div>
   </div>
 
+  <header class="container masthead">
+    <nav class="top-nav" aria-label="Main">
+      <a class="nav-link" href="index.html">Status</a>
+      <a class="nav-link" href="presentation.html">Support Guide</a>
+      <a class="nav-link" href="commands.html">Commands</a>
+      <a class="nav-link" href="profile.html">Profile</a>
+      <a class="nav-link active" href="admin.html">Admin</a>
+    </nav>
+    <h1>Admin Control Center</h1>
+    <p class="subtitle">Unified management for users, roles, commands, content, and observability.</p>
+  </header>
+
   <main class="container admin-wrap">
     <section class="panel admin-hero">
-      <h1>Admin Panel</h1>
+      <h2>Admin Workspace</h2>
       <p class="subtitle">Manage users, roles, website text, and manual product items from one place.</p>
       <p class="status-line">Shared backend mode enabled. All staff accounts sync through the server.</p>
       <p id="adminState" class="status-line"></p>
@@ -87,6 +99,7 @@
   </main>
 
   <script src="guard.js" defer></script>
+  <script src="ui-effects.js" defer></script>
   <script src="auth-local.js"></script>
   <script>
   (function () {

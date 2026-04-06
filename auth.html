@@ -13,9 +13,20 @@
     <div class="space-stars space-stars-b"></div>
   </div>
 
+  <header class="container masthead">
+    <nav class="top-nav" aria-label="Main">
+      <a class="nav-link" href="index.html">Status</a>
+      <a class="nav-link" href="presentation.html">Support Guide</a>
+      <a class="nav-link" href="commands.html">Commands</a>
+      <a class="nav-link active" href="auth.html">Login</a>
+    </nav>
+    <h1>Team Access</h1>
+    <p class="subtitle">Modern secure access portal for support staff and admins.</p>
+  </header>
+
   <main class="container auth-wrap">
     <section class="panel auth-panel">
-      <h1>Team Access</h1>
+      <h2>Login & Registration</h2>
       <p class="subtitle">Support accounts are created instantly, but stay pending until main admin approves.</p>
       <p class="status-line">Shared backend mode: registrations are visible to all admins.</p>
       <div class="auth-grid">
@@ -48,6 +59,7 @@
   </main>
 
   <script src="guard.js" defer></script>
+  <script src="ui-effects.js" defer></script>
   <script src="auth-local.js"></script>
   <script>
   const stateEl = document.getElementById("authState");

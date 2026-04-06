@@ -29,13 +29,13 @@
       <a class="nav-link" id="logoutLink" href="#">Logout</a>
     </nav>
     <h1>Cosmo Support Guide</h1>
-    <p class="subtitle">Compact mode - one product at a time (no long scrolling)</p>
+    <p class="subtitle">Cleaner compact workflow for fast support lookup and copy actions.</p>
   </header>
 
   <main class="container">
     <section class="panel compact-panel">
       <div class="compact-controls">
-        <input type="text" id="productSearch" placeholder="Search product..." autocomplete="off">
+        <input type="text" id="productSearch" placeholder="Search product, error, command..." autocomplete="off">
         <select id="productSelect"></select>
         <button id="prevBtn" type="button">Prev</button>
         <button id="nextBtn" type="button">Next</button>
@@ -746,6 +746,27 @@
       return text.toLowerCase().replace(/[^a-z0-9]+/g, " ");
     }
 
+    function esc(value) {
+      return String(value || "").replace(/[&<>"']/g, function (char) {
+        return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char];
+      });
+    }
+
+    function escAttr(value) {
+      return esc(value).replace(/`/g, "&#96;");
+    }
+
+    function safeUrl(value) {
+      var raw = String(value || "").trim();
+      try {
+        var url = new URL(raw, window.location.origin);
+        if (url.protocol === "http:" || url.protocol === "https:") {
+          return url.href;
+        }
+      } catch (e) {}
+      return "#";
+    }
+
     function updateFullTextSearch(q, normalizedQuery) {
       if (!fullSlidesText) {
         fullTextSearchStateEl.textContent = "Slide text not loaded yet.";
@@ -798,10 +819,10 @@
 
       var item = filtered[current];
       var specRows = item.specs.map(function (row) {
-        return "<p><span>" + row[0] + "</span><strong>" + row[1] + "</strong></p>";
+        return "<p><span>" + esc(row[0]) + "</span><strong>" + esc(row[1]) + "</strong></p>";
       }).join("");
       var noteRows = item.notes.map(function (n) {
-        return "<li>" + n + "</li>";
+        return "<li>" + esc(n) + "</li>";
       }).join("");
 
       var requirementsText = item.specs.map(function (row) {
@@ -831,18 +852,19 @@
       ].join("\n");
       var commandButtons = commands.length
         ? commands.map(function (cmd) {
-            return "<button type=\"button\" class=\"cmd-chip\" data-cmd=\"" + cmd + "\">" + cmd + "</button>";
+            return "<button type=\"button\" class=\"cmd-chip\" data-cmd=\"" + escAttr(cmd) + "\">" + esc(cmd) + "</button>";
           }).join("")
         : "<span class=\"cmd-empty\">No commands in this section</span>";
 
       var linkRows = "";
       if (item.links && item.links.length) {
-        linkRows = "<h4>Links</h4><ul>" + item.links.map(function (link) {
-          return "<li><a class=\"footer-link\" href=\"" + link[1] + "\" target=\"_blank\" rel=\"noreferrer\">" + link[0] + "</a></li>";
-        }).join("") + "</ul>";
+        linkRows = "<section class=\"guide-section\"><h4>Links</h4><ul>" + item.links.map(function (link) {
+          var href = safeUrl(link[1]);
+          return "<li><a class=\"footer-link\" href=\"" + escAttr(href) + "\" target=\"_blank\" rel=\"noreferrer\">" + esc(link[0]) + "</a></li>";
+        }).join("") + "</ul></section>";
       }
 
-      cardEl.innerHTML = "<h3>" + item.name + "</h3>"
+      cardEl.innerHTML = "<h3>" + esc(item.name) + "</h3>"
         + "<div class=\"copy-row\">"
         + "<button type=\"button\" class=\"copy-btn\" id=\"copyReq\">Copy Requirements</button>"
         + "<button type=\"button\" class=\"copy-btn\" id=\"copyFix\">Copy Fixes</button>"
@@ -850,9 +872,9 @@
         + "<button type=\"button\" class=\"copy-btn\" id=\"copyLinks\">Copy Links</button>"
         + "<button type=\"button\" class=\"copy-btn\" id=\"copyAll\">Copy Full Card</button>"
         + "</div>"
-        + "<div class=\"spec-table\">" + specRows + "</div>"
-        + "<h4>Important Fixes / Notes</h4><ul>" + noteRows + "</ul>"
-        + "<h4>Commands</h4><div class=\"cmd-row\">" + commandButtons + "</div>"
+        + "<section class=\"guide-section\"><h4>Requirements</h4><div class=\"spec-table\">" + specRows + "</div></section>"
+        + "<section class=\"guide-section\"><h4>Important Fixes / Notes</h4><ul>" + noteRows + "</ul></section>"
+        + "<section class=\"guide-section\"><h4>Commands</h4><div class=\"cmd-row\">" + commandButtons + "</div></section>"
         + linkRows;
 
       var copyReqBtn = document.getElementById("copyReq");
