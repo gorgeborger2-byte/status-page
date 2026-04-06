@@ -3,149 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Team Login</title>
-  <link rel="stylesheet" href="styles.css?v=20260406c">
-  <link rel="stylesheet" href="modern-v2.css?v=20260406e">
+  <title>Team Access</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app.css?v=20260406k">
 </head>
-<body>
-  <div class="space-bg" aria-hidden="true">
-    <div class="space-nebula"></div>
-    <div class="space-stars space-stars-a"></div>
-    <div class="space-stars space-stars-b"></div>
+<body data-page="auth">
+  <div class="shell" style="grid-template-columns:1fr; width:min(1040px,95vw);">
+    <form id="loginForm" class="panel stack" style="max-width:560px;">
+      <h3>Login</h3>
+      <input id="loginUser" placeholder="Username" required>
+      <input id="loginPass" type="password" placeholder="Password" required>
+      <button id="loginSubmit" type="submit">Sign In</button>
+      <p class="muted">Accounts are created by the boss from the admin panel.</p>
+    </form>
+
+    <p class="state" id="authState"></p>
+    <p class="state" id="globalState"></p>
   </div>
-
-  <header class="container masthead">
-    <nav class="top-nav" aria-label="Main">
-      <a class="nav-link" href="index.html">Status</a>
-      <a class="nav-link" href="presentation.html">Support Guide</a>
-      <a class="nav-link" href="commands.html">Commands</a>
-      <a class="nav-link active" href="auth.html">Login</a>
-    </nav>
-    <h1>Team Access</h1>
-    <p class="subtitle">Modern secure access portal for support staff and admins.</p>
-  </header>
-
-  <main class="container auth-wrap">
-    <section class="panel auth-panel">
-      <h2>Login & Registration</h2>
-      <p class="subtitle">Support accounts are created instantly, but stay pending until main admin approves.</p>
-      <p class="status-line">Shared backend mode: registrations are visible to all admins.</p>
-      <div class="auth-grid">
-        <form id="loginForm" class="auth-card">
-          <h2>Login</h2>
-          <input id="loginUser" placeholder="Username" required>
-          <input id="loginPass" type="password" placeholder="Password" required>
-          <button type="submit">Login</button>
-        </form>
-
-        <form id="registerForm" class="auth-card">
-          <h2>Register Support</h2>
-          <input id="regUser" placeholder="Username" required>
-          <input id="regPass" type="password" placeholder="Password" required>
-          <button type="submit">Register</button>
-        </form>
-
-        <section class="auth-card auth-link-share">
-          <h2>Share This Link</h2>
-          <p class="status-line">If login fails, copy the new link below and open it again.</p>
-          <p class="status-line" id="linkModeHint"></p>
-          <p class="status-line" id="linkHealth"></p>
-          <input id="activeAuthLink" readonly>
-          <button type="button" class="copy-btn" id="copyAuthLinkBtn">Copy Login Link</button>
-        </section>
-      </div>
-      <p id="authState" class="status-line"></p>
-      <p><a class="footer-link" href="index.html">Back to status page</a></p>
-    </section>
-  </main>
-
-  <script src="guard.js?v=20260406c" defer></script>
-  <script src="ui-effects.js?v=20260406c" defer></script>
-  <script src="auth-local.js?v=20260406c"></script>
-  <script>
-  const stateEl = document.getElementById("authState");
-  const activeAuthLinkEl = document.getElementById("activeAuthLink");
-  const linkModeHintEl = document.getElementById("linkModeHint");
-  const linkHealthEl = document.getElementById("linkHealth");
-
-  function getAuthLink() {
-    return window.location.origin + "/auth.html";
-  }
-
-  function setupShareLinks() {
-    activeAuthLinkEl.value = getAuthLink();
-    if (window.location.hostname.indexOf("trycloudflare.com") !== -1) {
-      linkModeHintEl.textContent = "Temporary tunnel mode: copy this exact link each time. Old links stop working after tunnel restart.";
-    } else {
-      linkModeHintEl.textContent = "Permanent mode: share this exact link with all staff for login and registration.";
-    }
-  }
-
-  async function copyText(value, successMessage) {
-    try {
-      await navigator.clipboard.writeText(value);
-      stateEl.textContent = successMessage;
-    } catch (err) {
-      stateEl.textContent = "Copy failed. Manually copy the link field.";
-    }
-  }
-
-  document.getElementById("copyAuthLinkBtn").addEventListener("click", function () {
-    copyText(getAuthLink(), "Login link copied. Share this exact URL with staff.");
-  });
-
-  async function checkLinkHealth() {
-    const controller = new AbortController();
-    const timeout = setTimeout(function () {
-      controller.abort();
-    }, 4500);
-    try {
-      const res = await fetch("/api/auth/session?t=" + Date.now(), { cache: "no-store", signal: controller.signal });
-      if (!res.ok) throw new Error("status " + res.status);
-      linkHealthEl.textContent = "";
-    } catch (err) {
-      linkHealthEl.textContent = "Link health: this URL cannot reach backend. This is likely an old/broken link. Ask admin for the latest link.";
-    } finally {
-      clearTimeout(timeout);
-    }
-  }
-
-  async function ensureNotAlreadyLoggedIn() {
-    await GrizzAuth.init();
-    const user = GrizzAuth.getCurrentUser();
-    if (user && user.approved && !user.banned) {
-      window.location.replace("index.html");
-    }
-  }
-
-  document.getElementById("loginForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    try {
-      const username = document.getElementById("loginUser").value.trim();
-      const password = document.getElementById("loginPass").value;
-      await GrizzAuth.login(username, password);
-      stateEl.textContent = "Logged in. Redirecting...";
-      window.location.replace("index.html");
-    } catch (err) {
-      stateEl.textContent = err.message;
-    }
-  });
-
-  document.getElementById("registerForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    try {
-      const username = document.getElementById("regUser").value.trim();
-      const password = document.getElementById("regPass").value;
-      const out = await GrizzAuth.registerSupport(username, password);
-      stateEl.textContent = out.message || "Registered. Waiting for admin approval.";
-    } catch (err) {
-      stateEl.textContent = err.message;
-    }
-  });
-
-  setupShareLinks();
-  checkLinkHealth();
-  ensureNotAlreadyLoggedIn();
-  </script>
+  <script src="app.js?v=20260406k" defer></script>
 </body>
 </html>

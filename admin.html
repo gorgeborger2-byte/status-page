@@ -3,346 +3,111 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Panel</title>
-  <link rel="stylesheet" href="styles.css?v=20260406c">
-  <link rel="stylesheet" href="modern-v2.css?v=20260406e">
+  <title>Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app.css?v=20260406k">
 </head>
-<body>
-  <div class="space-bg" aria-hidden="true">
-    <div class="space-nebula"></div>
-    <div class="space-stars space-stars-a"></div>
-    <div class="space-stars space-stars-b"></div>
-  </div>
+<body data-page="admin">
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark"></div><div><h1>Cosmo Ops</h1><p id="whoami">Loading...</p></div></div>
+      <nav class="nav">
+        <a href="index.html">Status</a>
+        <a href="presentation.html">Guide</a>
+        <a href="commands.html">Commands</a>
+        <a href="profile.html" data-auth-only>Profile</a>
+        <a class="active" href="admin.html">Admin</a>
+        <button id="logoutBtn" data-auth-only>Logout</button>
+      </nav>
+    </aside>
 
-  <header class="container masthead">
-    <nav class="top-nav" aria-label="Main">
-      <a class="nav-link" href="index.html">Status</a>
-      <a class="nav-link" href="presentation.html">Support Guide</a>
-      <a class="nav-link" href="commands.html">Commands</a>
-      <a class="nav-link" href="profile.html">Profile</a>
-      <a class="nav-link active" href="admin.html">Admin</a>
-    </nav>
-    <h1>Admin Control Center</h1>
-    <p class="subtitle">Unified management for users, roles, commands, content, and observability.</p>
-  </header>
+    <main class="main">
+      <header class="topbar">
+        <div><h2>Admin Workspace</h2><p>Users, roles, content, and manual status controls.</p></div>
+      </header>
 
-  <main class="container admin-wrap">
-    <section class="panel admin-hero">
-      <h2>Admin Workspace</h2>
-      <p class="subtitle">Manage users, roles, website text, and manual product items from one place.</p>
-      <p class="status-line">Shared backend mode enabled. All staff accounts sync through the server.</p>
-      <p id="adminState" class="status-line"></p>
-      <p><a class="footer-link" href="index.html">Back to status page</a></p>
-    </section>
+      <section class="panel stack">
+        <div class="grid-3">
+          <div class="metric"><b id="mApproved">0</b><span>Approved</span></div>
+          <div class="metric"><b id="mPending">0</b><span>Pending</span></div>
+          <div class="metric"><b id="mBanned">0</b><span>Banned</span></div>
+          <div class="metric"><b id="mOnline">0</b><span>Online</span></div>
+        </div>
+        <p class="state" id="adminState"></p>
+      </section>
 
-    <section class="panel">
-      <h2>Overview</h2>
-      <div id="statsGrid" class="admin-stats"></div>
-    </section>
-
-    <div class="admin-grid">
-      <div class="admin-main-col">
-        <section class="panel">
-          <div class="panel-header">
-            <h2>Users</h2>
-          </div>
-          <p class="status-line">Manager and coder roles have full admin privileges.</p>
-          <div id="usersTable"></div>
-        </section>
-
-        <section class="panel">
-          <h2>Roles</h2>
-          <form id="roleForm" class="stack-form">
-            <input id="roleName" placeholder="Role name (example: qa)" required>
-            <input id="roleLabel" placeholder="Role label (example: QA Team)">
-            <div class="inline-fields">
-              <input id="roleColor" type="color" value="#7db2ff" aria-label="Role color">
-              <input id="roleAccent" type="color" value="#2f6dff" aria-label="Role accent">
-            </div>
-            <label class="check-line"><input id="roleAdmin" type="checkbox"> Admin access (can open admin panel)</label>
-            <label class="check-line"><input id="roleGlow" type="checkbox"> Glow animation</label>
-            <button type="submit">Create Role</button>
+      <div id="adminWorkspace" class="stack">
+        <section class="panel stack">
+          <h3>Create User Account</h3>
+          <form id="createUserForm" class="grid-2" style="grid-template-columns:1fr 1fr;">
+            <input id="createUsername" placeholder="Username" required>
+            <input id="createPassword" type="password" placeholder="Password" required>
+            <select id="createRole" required></select>
+            <button type="submit">Create User</button>
           </form>
-          <div id="rolesTable"></div>
+          <p class="muted">Boss-only access. Accounts created here can log in immediately.</p>
         </section>
 
-        <section class="panel">
-          <h2>Website Content</h2>
-          <form id="contentForm" class="stack-form">
-            <input id="heroTitle" placeholder="Hero title">
-            <input id="heroSubtitle" placeholder="Hero subtitle">
-            <input id="announcement" placeholder="Announcement text">
-            <button type="submit">Save Content</button>
-          </form>
+        <section class="panel stack">
+          <h3>User Access Control</h3>
+          <div id="usersHost"></div>
         </section>
 
-        <section class="panel">
-          <h2>Manual Items</h2>
-          <form id="itemForm" class="stack-form">
-            <input id="itemBrand" placeholder="Brand" required>
-            <input id="itemGame" placeholder="Game" required>
-            <input id="itemStatus" placeholder="Status (Updating/Testing)" required>
-            <input id="itemUpdated" placeholder="Updated label (optional)">
+        <div class="grid-2">
+          <section class="panel stack">
+            <h3>Roles</h3>
+            <form id="roleForm" class="stack">
+              <input id="roleName" placeholder="Role name (qa)" required>
+              <input id="roleLabel" placeholder="Role label" required>
+              <div class="grid-2" style="grid-template-columns:1fr 1fr;">
+                <input id="roleColor" type="color" value="#89b4ff">
+                <input id="roleAccent" type="color" value="#26b6ff">
+              </div>
+              <label><input id="roleAdmin" type="checkbox"> Admin Access</label>
+              <label><input id="roleGlow" type="checkbox"> Glow</label>
+              <button type="submit">Create Role</button>
+            </form>
+            <div class="stack" id="rolesHost"></div>
+          </section>
+
+          <section class="panel stack">
+            <h3>Homepage Content</h3>
+            <form id="siteContentForm" class="stack">
+              <input id="heroTitleInput" placeholder="Hero title">
+              <input id="heroSubtitleInput" placeholder="Hero subtitle">
+              <input id="heroAnnouncementInput" placeholder="Announcement">
+              <button type="submit">Save Content</button>
+            </form>
+          </section>
+        </div>
+
+        <section class="panel stack">
+          <h3>Manual Status Items</h3>
+          <form id="manualForm" class="grid-2" style="grid-template-columns:1fr 1fr;">
+            <input id="manualBrand" placeholder="Brand" required>
+            <input id="manualGame" placeholder="Game" required>
+            <input id="manualStatus" placeholder="Status" required>
+            <input id="manualUpdated" placeholder="Updated text">
             <button type="submit">Add Item</button>
           </form>
-          <div id="itemsTable"></div>
+          <div class="stack" id="itemsHost"></div>
         </section>
       </div>
+      <p class="state" id="globalState"></p>
+    </main>
+  </div>
 
-      <aside class="admin-side-col">
-        <section class="panel">
-          <div class="panel-header">
-            <h2>Backend Observability</h2>
-            <button id="refreshInspectBtn" type="button">Refresh</button>
-          </div>
-          <p class="status-line">Inspect recent activity, logs, and live backend store snapshots.</p>
-          <div id="adminLogs"></div>
-          <pre id="storeInspect" class="raw-block" style="margin-top:0.8rem; max-height:260px;">Loading backend snapshot...</pre>
-        </section>
-      </aside>
-    </div>
-  </main>
+  <nav class="mobile-nav">
+    <a href="index.html">Status</a>
+    <a href="presentation.html">Guide</a>
+    <a href="commands.html">Commands</a>
+    <a href="profile.html" data-auth-only>Profile</a>
+    <a class="active" href="admin.html">Admin</a>
+    <button id="logoutBtnMobile" data-auth-only>Logout</button>
+  </nav>
 
-  <script src="guard.js?v=20260406c" defer></script>
-  <script src="ui-effects.js?v=20260406c" defer></script>
-  <script src="auth-local.js?v=20260406c"></script>
-  <script>
-  (function () {
-  const adminState = document.getElementById("adminState");
-  let currentAdmin = null;
-  let rolesCache = [];
-
-  function esc(value) {
-    return String(value || "").replace(/[&<>"']/g, function (char) {
-      return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char];
-    });
-  }
-
-  function formatDate(value) {
-    if (!value) return "-";
-    const d = new Date(value);
-    return Number.isNaN(d.getTime()) ? value : d.toLocaleString();
-  }
-
-  function roleBadge(roleStyle, roleLabel, roleName) {
-    const cls = (roleName === "owner" || roleName === "coder") ? `role-${roleName}` : "";
-    const color = roleStyle && roleStyle.color ? roleStyle.color : "#9bb5da";
-    const accent = roleStyle && roleStyle.accent ? roleStyle.accent : "#4666b3";
-    const glowClass = roleStyle && roleStyle.glow ? "role-glow" : "";
-    return `<span class="role-badge ${cls} ${glowClass}" style="--role-color:${esc(color)};--role-accent:${esc(accent)}">${esc(roleLabel || roleName)}</span>`;
-  }
-
-  function renderStats(stats) {
-    document.getElementById("statsGrid").innerHTML = [
-      ["Approved users", stats.approved || 0],
-      ["Pending approval", stats.pending || 0],
-      ["Banned users", stats.banned || 0],
-      ["Online now", stats.online || 0],
-      ["Roles", stats.roles || 0],
-      ["Manual items", stats.manualItems || 0]
-    ].map(function (row) {
-      return `<article class="stat-card"><p>${row[0]}</p><h3>${row[1]}</h3></article>`;
-    }).join("");
-  }
-
-  async function loadUsers() {
-    const users = await GrizzAuth.listUsers();
-    const rows = users.map((u) => {
-      const options = rolesCache.map((r) => {
-        const selected = r.name === u.role ? "selected" : "";
-        return `<option value="${esc(r.name)}" ${selected}>${esc(r.label)}</option>`;
-      }).join("");
-      return `<tr>
-        <td>
-          <strong>${esc(u.displayName)}</strong>
-          <div class="mini-muted">@${esc(u.username || "-")}</div>
-        </td>
-        <td>${roleBadge(u.roleStyle, u.roleLabel, u.role)}</td>
-        <td>${u.banned ? "Banned" : (u.approved ? "Approved" : "Pending")}</td>
-        <td>${formatDate(u.lastSeen)}</td>
-        <td>
-          <select class="role-select" data-role-select="${u.id}">${options}</select>
-          <button data-role-save="${u.id}">Save Role</button>
-          <button data-approve="${u.id}" data-val="true">Approve</button>
-          <button data-approve="${u.id}" data-val="false">Unapprove</button>
-          <button data-ban="${u.id}" data-val="true">Ban</button>
-          <button data-ban="${u.id}" data-val="false">Unban</button>
-          <button data-delete="${u.id}">Remove</button>
-        </td>
-      </tr>`;
-    }).join("");
-    document.getElementById("usersTable").innerHTML = `<table class="admin-table"><thead><tr><th>User</th><th>Role</th><th>Status</th><th>Last Seen</th><th>Actions</th></tr></thead><tbody>${rows}</tbody></table>`;
-  }
-
-  async function loadRoles() {
-    rolesCache = await GrizzAuth.listRoles();
-    const rows = rolesCache.map((r) => {
-      return `<tr>
-        <td>${roleBadge(r, r.label, r.name)}</td>
-        <td>${r.adminAccess ? "Admin" : "Standard"}</td>
-        <td>${r.system ? "System" : `<button data-remove-role="${esc(r.name)}">Remove</button>`}</td>
-      </tr>`;
-    }).join("");
-    document.getElementById("rolesTable").innerHTML = `<table class="admin-table"><thead><tr><th>Role</th><th>Access</th><th>Action</th></tr></thead><tbody>${rows}</tbody></table>`;
-  }
-
-  async function loadContentAndItems() {
-    const content = await GrizzAuth.getSiteContent();
-    const items = await GrizzAuth.getManualItems();
-    document.getElementById("heroTitle").value = content.heroTitle || "";
-    document.getElementById("heroSubtitle").value = content.subtitle || "";
-    document.getElementById("announcement").value = content.announcement || "";
-
-    const rows = items.map((i) => `<tr><td>${esc(i.brand)}</td><td>${esc(i.game)}</td><td>${esc(i.status)}</td><td>${esc(i.updated || "")}</td><td><button data-remove-item="${i.id}">Remove</button></td></tr>`).join("");
-    document.getElementById("itemsTable").innerHTML = `<table class="admin-table"><thead><tr><th>Brand</th><th>Game</th><th>Status</th><th>Updated</th><th>Action</th></tr></thead><tbody>${rows}</tbody></table>`;
-  }
-
-  async function loadObservability() {
-    const overview = await GrizzAuth.getAdminOverview();
-    const store = await GrizzAuth.getAdminStore();
-    renderStats(overview.stats || {});
-    const logRows = (overview.recentLogs || []).map((l) => {
-      return `<tr><td>${formatDate(l.at)}</td><td>${esc(l.actor)}</td><td>${esc(l.action)}</td><td>${esc(l.target)}</td><td>${esc(l.details || "")}</td></tr>`;
-    }).join("");
-    document.getElementById("adminLogs").innerHTML = `<table class="admin-table"><thead><tr><th>Time</th><th>Actor</th><th>Action</th><th>Target</th><th>Details</th></tr></thead><tbody>${logRows}</tbody></table>`;
-    document.getElementById("storeInspect").textContent = JSON.stringify(store, null, 2);
-  }
-
-  async function refreshAll() {
-    await loadRoles();
-    await loadUsers();
-    await loadContentAndItems();
-    await loadObservability();
-  }
-
-  document.getElementById("usersTable").addEventListener("click", async (e) => {
-    const target = e.target;
-    try {
-      if (target.dataset.roleSave) {
-        const userId = target.dataset.roleSave;
-        const select = document.querySelector(`[data-role-select="${userId}"]`);
-        await GrizzAuth.setUserRole(userId, select.value);
-      }
-      if (target.dataset.approve) {
-        await GrizzAuth.updateUser(target.dataset.approve, { approved: target.dataset.val === "true" });
-      }
-      if (target.dataset.ban) {
-        await GrizzAuth.updateUser(target.dataset.ban, { banned: target.dataset.val === "true" });
-      }
-      if (target.dataset.delete) {
-        await GrizzAuth.removeUser(target.dataset.delete);
-      }
-      await refreshAll();
-      adminState.textContent = "User update saved.";
-    } catch (err) {
-      adminState.textContent = err.message;
-    }
-  });
-
-  document.getElementById("roleForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    try {
-      await GrizzAuth.createRole({
-        name: document.getElementById("roleName").value,
-        label: document.getElementById("roleLabel").value,
-        color: document.getElementById("roleColor").value,
-        accent: document.getElementById("roleAccent").value,
-        adminAccess: document.getElementById("roleAdmin").checked,
-        glow: document.getElementById("roleGlow").checked
-      });
-      e.target.reset();
-      document.getElementById("roleColor").value = "#7db2ff";
-      document.getElementById("roleAccent").value = "#2f6dff";
-      await refreshAll();
-      adminState.textContent = "Role created.";
-    } catch (err) {
-      adminState.textContent = err.message;
-    }
-  });
-
-  document.getElementById("rolesTable").addEventListener("click", async (e) => {
-    const roleName = e.target.dataset.removeRole;
-    if (!roleName) return;
-    try {
-      await GrizzAuth.removeRole(roleName);
-      await refreshAll();
-      adminState.textContent = "Role removed. Affected users moved to Support.";
-    } catch (err) {
-      adminState.textContent = err.message;
-    }
-  });
-
-  document.getElementById("contentForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    try {
-      await GrizzAuth.setSiteContent({
-        heroTitle: document.getElementById("heroTitle").value,
-        subtitle: document.getElementById("heroSubtitle").value,
-        announcement: document.getElementById("announcement").value
-      });
-      await loadObservability();
-      adminState.textContent = "Website content saved.";
-    } catch (err) {
-      adminState.textContent = err.message;
-    }
-  });
-
-  document.getElementById("itemForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    try {
-      await GrizzAuth.addManualItem({
-        brand: document.getElementById("itemBrand").value,
-        game: document.getElementById("itemGame").value,
-        status: document.getElementById("itemStatus").value,
-        updated: document.getElementById("itemUpdated").value
-      });
-      e.target.reset();
-      await loadContentAndItems();
-      await loadObservability();
-      adminState.textContent = "Manual item added.";
-    } catch (err) {
-      adminState.textContent = err.message;
-    }
-  });
-
-  document.getElementById("itemsTable").addEventListener("click", async (e) => {
-    const id = e.target.dataset.removeItem;
-    if (!id) return;
-    try {
-      await GrizzAuth.removeManualItem(id);
-      await loadContentAndItems();
-      await loadObservability();
-      adminState.textContent = "Manual item removed.";
-    } catch (err) {
-      adminState.textContent = err.message;
-    }
-  });
-
-  document.getElementById("refreshInspectBtn").addEventListener("click", async function () {
-    try {
-      await loadObservability();
-      adminState.textContent = "Backend snapshot refreshed.";
-    } catch (err) {
-      adminState.textContent = err.message;
-    }
-  });
-
-  (async function boot() {
-    try {
-      await GrizzAuth.init();
-      currentAdmin = GrizzAuth.requireAdminSession("auth.html");
-      if (!currentAdmin) return;
-      await GrizzAuth.touch();
-      await refreshAll();
-      setInterval(function () {
-        GrizzAuth.touch();
-        refreshAll();
-      }, 12000);
-    } catch (err) {
-      adminState.textContent = err.message;
-    }
-  })();
-  })();
-  </script>
+  <script src="app.js?v=20260406k" defer></script>
 </body>
 </html>

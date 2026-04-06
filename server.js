@@ -27,11 +27,9 @@ const PUBLIC_FILE_ALLOWLIST = new Set([
   "/profile.html",
   "/presentation.html",
   "/commands.html",
-  "/styles.css",
-  "/modern-v2.css",
-  "/auth-local.js",
-  "/guard.js",
-  "/ui-effects.js",
+  "/app.css",
+  "/app.js",
+  "/slides_full.txt",
   "/data/status.json"
 ]);
 const STATUS_JSON_PATH = path.join(__dirname, "data", "status.json");
@@ -375,6 +373,13 @@ function adminRequired(req, res, next) {
   next();
 }
 
+function bossRequired(req, res, next) {
+  if (normalizeRoleName(req.user && req.user.role) !== "owner") {
+    return res.status(403).json({ error: "Boss access required" });
+  }
+  next();
+}
+
 app.post("/api/auth/register", checkAuthRateLimit, (req, res) => {
   const username = String(req.body.username || "").trim();
   const password = String(req.body.password || "");
@@ -484,7 +489,7 @@ app.get("/api/commands", authRequired, (req, res) => {
   res.json({ commands });
 });
 
-app.put("/api/site-content", authRequired, adminRequired, (req, res) => {
+app.put("/api/site-content", authRequired, bossRequired, (req, res) => {
   req.db.siteContent.heroTitle = String(req.body.heroTitle || req.db.siteContent.heroTitle || "");
   req.db.siteContent.subtitle = String(req.body.subtitle || req.db.siteContent.subtitle || "");
   req.db.siteContent.announcement = String(req.body.announcement || "");
@@ -497,7 +502,7 @@ app.get("/api/manual-items", authRequired, (req, res) => {
   res.json({ items: req.db.manualItems });
 });
 
-app.post("/api/manual-items", authRequired, adminRequired, (req, res) => {
+app.post("/api/manual-items", authRequired, bossRequired, (req, res) => {
   const out = {
     id: uid("m"),
     brand: String(req.body.brand || "").trim(),
@@ -514,7 +519,7 @@ app.post("/api/manual-items", authRequired, adminRequired, (req, res) => {
   res.json({ item: out });
 });
 
-app.delete("/api/manual-items/:id", authRequired, adminRequired, (req, res) => {
+app.delete("/api/manual-items/:id", authRequired, bossRequired, (req, res) => {
   const idx = req.db.manualItems.findIndex((m) => m.id === req.params.id);
   if (idx === -1) return res.status(404).json({ error: "Item not found" });
   const removed = req.db.manualItems[idx];
@@ -524,7 +529,7 @@ app.delete("/api/manual-items/:id", authRequired, adminRequired, (req, res) => {
   res.json({ ok: true });
 });
 
-app.post("/api/admin/commands/bootstrap", authRequired, adminRequired, (req, res) => {
+app.post("/api/admin/commands/bootstrap", authRequired, bossRequired, (req, res) => {
   const items = Array.isArray(req.body && req.body.commands) ? req.body.commands : [];
   if (!items.length) return res.status(400).json({ error: "commands array is required" });
   if (req.db.commands.length > 0) return res.json({ ok: true, skipped: true });
@@ -547,7 +552,7 @@ app.post("/api/admin/commands/bootstrap", authRequired, adminRequired, (req, res
   return res.json({ ok: true, created: mapped.length });
 });
 
-app.post("/api/admin/commands", authRequired, adminRequired, (req, res) => {
+app.post("/api/admin/commands", authRequired, bossRequired, (req, res) => {
   const command = String(req.body.command || "").trim();
   const response = String(req.body.response || "").trim();
   if (!/^\*[a-z0-9_-]{2,40}$/i.test(command)) {
@@ -572,7 +577,7 @@ app.post("/api/admin/commands", authRequired, adminRequired, (req, res) => {
   res.json({ command: item });
 });
 
-app.delete("/api/admin/commands/:id", authRequired, adminRequired, (req, res) => {
+app.delete("/api/admin/commands/:id", authRequired, bossRequired, (req, res) => {
   const idx = req.db.commands.findIndex((c) => c.id === req.params.id);
   if (idx === -1) return res.status(404).json({ error: "Command not found" });
   const removed = req.db.commands[idx];
@@ -629,7 +634,7 @@ app.post("/api/profile/password", authRequired, (req, res) => {
   res.json({ ok: true });
 });
 
-app.get("/api/admin/overview", authRequired, adminRequired, (req, res) => {
+app.get("/api/admin/overview", authRequired, bossRequired, (req, res) => {
   const users = req.db.users;
   const now = Date.now();
   const approved = users.filter((u) => u.approved && !u.banned).length;
@@ -652,12 +657,12 @@ app.get("/api/admin/overview", authRequired, adminRequired, (req, res) => {
   });
 });
 
-app.get("/api/admin/logs", authRequired, adminRequired, (req, res) => {
+app.get("/api/admin/logs", authRequired, bossRequired, (req, res) => {
   const limit = Math.max(1, Math.min(500, Number(req.query.limit || 120)));
   res.json({ logs: req.db.auditLogs.slice(0, limit) });
 });
 
-app.get("/api/admin/store", authRequired, adminRequired, (req, res) => {
+app.get("/api/admin/store", authRequired, bossRequired, (req, res) => {
   const users = req.db.users.map((u) => ({
     ...u,
     passwordHash: "[hidden]"
@@ -672,11 +677,47 @@ app.get("/api/admin/store", authRequired, adminRequired, (req, res) => {
   });
 });
 
-app.get("/api/admin/users", authRequired, adminRequired, (req, res) => {
+app.get("/api/admin/users", authRequired, bossRequired, (req, res) => {
   res.json({ users: req.db.users.map((u) => sanitizeUser(req.db, u, { includeUsername: true })) });
 });
 
-app.patch("/api/admin/users/:id", authRequired, adminRequired, (req, res) => {
+app.post("/api/admin/users", authRequired, bossRequired, (req, res) => {
+  const username = String(req.body.username || "").trim();
+  const password = String(req.body.password || "");
+  const roleName = normalizeRoleName(req.body.role || "support") || "support";
+
+  if (!/^[a-zA-Z0-9_.-]{3,32}$/.test(username)) {
+    return res.status(400).json({ error: "Username must be 3-32 chars: letters, numbers, _, ., -" });
+  }
+  if (password.length < 4) {
+    return res.status(400).json({ error: "Password must be at least 4 characters" });
+  }
+  const role = findRole(req.db, roleName);
+  if (!role) return res.status(400).json({ error: "Role does not exist" });
+
+  const exists = req.db.users.some((u) => normalizeUsername(u.username) === normalizeUsername(username));
+  if (exists) return res.status(400).json({ error: "Username already exists" });
+
+  const user = {
+    id: uid("u"),
+    username,
+    passwordHash: bcrypt.hashSync(password, 10),
+    role: role.name,
+    approved: true,
+    banned: false,
+    createdAt: nowIso(),
+    lastSeen: null,
+    nickname: "",
+    nicknameUpdatedAt: null
+  };
+
+  req.db.users.push(user);
+  audit(req.db, req.user.username, "user:create", username, `created with role ${role.name}`);
+  saveDb(req.db);
+  res.json({ user: sanitizeUser(req.db, user, { includeUsername: true }) });
+});
+
+app.patch("/api/admin/users/:id", authRequired, bossRequired, (req, res) => {
   const target = req.db.users.find((u) => u.id === req.params.id);
   if (!target) return res.status(404).json({ error: "User not found" });
 
@@ -693,7 +734,7 @@ app.patch("/api/admin/users/:id", authRequired, adminRequired, (req, res) => {
   res.json({ user: sanitizeUser(req.db, target, { includeUsername: true }) });
 });
 
-app.delete("/api/admin/users/:id", authRequired, adminRequired, (req, res) => {
+app.delete("/api/admin/users/:id", authRequired, bossRequired, (req, res) => {
   if (req.user.id === req.params.id) return res.status(400).json({ error: "You cannot remove your own account" });
   const idx = req.db.users.findIndex((u) => u.id === req.params.id);
   if (idx === -1) return res.status(404).json({ error: "User not found" });
@@ -707,12 +748,12 @@ app.delete("/api/admin/users/:id", authRequired, adminRequired, (req, res) => {
   res.json({ ok: true });
 });
 
-app.get("/api/admin/roles", authRequired, adminRequired, (req, res) => {
+app.get("/api/admin/roles", authRequired, bossRequired, (req, res) => {
   const roles = req.db.roles.slice().sort((a, b) => a.label.localeCompare(b.label));
   res.json({ roles });
 });
 
-app.post("/api/admin/roles", authRequired, adminRequired, (req, res) => {
+app.post("/api/admin/roles", authRequired, bossRequired, (req, res) => {
   const name = normalizeRoleName(req.body.name);
   const label = String(req.body.label || name).trim();
   const color = String(req.body.color || "#aac6ff").trim();
@@ -738,7 +779,7 @@ app.post("/api/admin/roles", authRequired, adminRequired, (req, res) => {
   res.json({ role });
 });
 
-app.delete("/api/admin/roles/:name", authRequired, adminRequired, (req, res) => {
+app.delete("/api/admin/roles/:name", authRequired, bossRequired, (req, res) => {
   const roleName = normalizeRoleName(req.params.name);
   const role = findRole(req.db, roleName);
   if (!role) return res.status(404).json({ error: "Role not found" });
