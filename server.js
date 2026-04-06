@@ -28,6 +28,7 @@ const PUBLIC_FILE_ALLOWLIST = new Set([
   "/presentation.html",
   "/commands.html",
   "/styles.css",
+  "/modern-v2.css",
   "/auth-local.js",
   "/guard.js",
   "/ui-effects.js",
