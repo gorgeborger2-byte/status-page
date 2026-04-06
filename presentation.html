@@ -810,43 +810,11 @@
         });
     }
 
-    function renderSelect() {
-      selectEl.innerHTML = filtered.map(function (p, i) {
-        return "<option value=\"" + i + "\">" + p.name + "</option>";
-      }).join("");
-      selectEl.value = String(current);
-
-       productListEl.innerHTML = filtered.map(function (p, i) {
-        var active = i === current ? " active" : "";
-        return "<button type=\"button\" class=\"guide-nav-item" + active + "\" data-index=\"" + i + "\">" + esc(p.name) + "</button>";
-      }).join("");
-    }
-
-    function renderCard() {
-      if (!filtered.length) {
-        cardEl.innerHTML = "<h3>No match</h3><p>Try another search keyword.</p>";
-        lineEl.textContent = "0 / 0";
-        return;
-      }
-
-      var item = filtered[current];
-      var specRows = item.specs.map(function (row) {
-        return "<p><span>" + esc(row[0]) + "</span><strong>" + esc(row[1]) + "</strong></p>";
-      }).join("");
-      var noteRows = item.notes.map(function (n) {
-        return "<li>" + esc(n) + "</li>";
-      }).join("");
-
-      var requirementsText = item.specs.map(function (row) {
-        return row[0] + ": " + row[1];
-      }).join("\n");
+    function buildCardBundle(item) {
+      var requirementsText = item.specs.map(function (row) { return row[0] + ": " + row[1]; }).join("\n");
       var fixesText = item.notes.join("\n");
-      var linksText = (item.links || []).map(function (link) {
-        return link[0] + ": " + link[1];
-      }).join("\n");
-
-      var commandSource = requirementsText + "\n" + fixesText;
-      var commands = unique((commandSource.match(/\*[a-z0-9_]+/gi) || []));
+      var linksText = (item.links || []).map(function (link) { return link[0] + ": " + link[1]; }).join("\n");
+      var commands = unique((requirementsText + "\n" + fixesText).match(/\*[a-z0-9_]+/gi) || []);
       var fullCardText = [
         item.name,
         "",
@@ -862,70 +830,73 @@
         "Links",
         linksText || "(none)"
       ].join("\n");
-      var commandButtons = commands.length
-        ? commands.map(function (cmd) {
-            return "<button type=\"button\" class=\"cmd-chip\" data-cmd=\"" + escAttr(cmd) + "\">" + esc(cmd) + "</button>";
-          }).join("")
-        : "<span class=\"cmd-empty\">No commands in this section</span>";
+      return {
+        requirementsText: requirementsText,
+        fixesText: fixesText,
+        linksText: linksText,
+        commands: commands,
+        fullCardText: fullCardText
+      };
+    }
 
-      var linkRows = "";
-      if (item.links && item.links.length) {
-        linkRows = "<section class=\"guide-section\"><h4>Links</h4><ul>" + item.links.map(function (link) {
-          var href = safeUrl(link[1]);
-          return "<li><a class=\"footer-link\" href=\"" + escAttr(href) + "\" target=\"_blank\" rel=\"noreferrer\">" + esc(link[0]) + "</a></li>";
-        }).join("") + "</ul></section>";
-      }
-
-      cardEl.innerHTML = "<h3>" + esc(item.name) + "</h3>"
-        + "<div class=\"copy-row\">"
-        + "<button type=\"button\" class=\"copy-btn\" id=\"copyReq\">Copy Requirements</button>"
-        + "<button type=\"button\" class=\"copy-btn\" id=\"copyFix\">Copy Fixes</button>"
-        + "<button type=\"button\" class=\"copy-btn\" id=\"copyCmd\">Copy Commands</button>"
-        + "<button type=\"button\" class=\"copy-btn\" id=\"copyLinks\">Copy Links</button>"
-        + "<button type=\"button\" class=\"copy-btn\" id=\"copyAll\">Copy Full Card</button>"
-        + "</div>"
-        + "<section class=\"guide-section\"><h4>Requirements</h4><div class=\"spec-table\">" + specRows + "</div></section>"
-        + "<section class=\"guide-section\"><h4>Important Fixes / Notes</h4><ul>" + noteRows + "</ul></section>"
-        + "<section class=\"guide-section\"><h4>Commands</h4><div class=\"cmd-row\">" + commandButtons + "</div></section>"
-        + linkRows;
-
-      var copyReqBtn = document.getElementById("copyReq");
-      var copyFixBtn = document.getElementById("copyFix");
-      var copyCmdBtn = document.getElementById("copyCmd");
-      var copyLinksBtn = document.getElementById("copyLinks");
-      var copyAllBtn = document.getElementById("copyAll");
-
-      copyReqBtn.addEventListener("click", function () {
-        copyText(requirementsText, "Requirements");
-      });
-      copyFixBtn.addEventListener("click", function () {
-        copyText(fixesText, "Fixes");
-      });
-      copyCmdBtn.addEventListener("click", function () {
-        copyText(commands.join("\n"), "Commands");
-      });
-      copyLinksBtn.addEventListener("click", function () {
-        copyText(linksText || "(none)", "Links");
-      });
-      copyAllBtn.addEventListener("click", function () {
-        copyText(fullCardText, "Full card");
-      });
-
-      Array.prototype.slice.call(cardEl.querySelectorAll(".cmd-chip")).forEach(function (btn) {
-        btn.addEventListener("click", function () {
-          copyText(btn.getAttribute("data-cmd"), "Command");
-        });
-      });
-
-      lineEl.textContent = (current + 1) + " / " + filtered.length;
+    function renderNavList() {
+      selectEl.innerHTML = filtered.map(function (p, i) {
+        return "<option value=\"" + i + "\">" + p.name + "</option>";
+      }).join("");
       selectEl.value = String(current);
-      var activeBtn = productListEl.querySelector(".guide-nav-item.active");
-      if (activeBtn) activeBtn.classList.remove("active");
-      var nextBtn = productListEl.querySelector("[data-index='" + current + "']");
-      if (nextBtn) {
-        nextBtn.classList.add("active");
-        nextBtn.scrollIntoView({ block: "nearest" });
+
+      productListEl.innerHTML = filtered.map(function (p, i) {
+        var active = i === current ? " active" : "";
+        return "<button type=\"button\" class=\"guide-nav-item" + active + "\" data-index=\"" + i + "\">" + esc(p.name) + "</button>";
+      }).join("");
+    }
+
+    function renderCards() {
+      if (!filtered.length) {
+        cardEl.innerHTML = "<h3>No match</h3><p>Try another search keyword.</p>";
+        lineEl.textContent = "0 products";
+        return;
       }
+
+      cardEl.innerHTML = filtered.map(function (item, idx) {
+        var bundle = buildCardBundle(item);
+        var specRows = item.specs.map(function (row) {
+          return "<p><span>" + esc(row[0]) + "</span><strong>" + esc(row[1]) + "</strong></p>";
+        }).join("");
+        var noteRows = item.notes.map(function (n) {
+          return "<li>" + esc(n) + "</li>";
+        }).join("");
+        var commandButtons = bundle.commands.length
+          ? bundle.commands.map(function (cmd) {
+              return "<button type=\"button\" class=\"cmd-chip\" data-cmd=\"" + escAttr(cmd) + "\">" + esc(cmd) + "</button>";
+            }).join("")
+          : "<span class=\"cmd-empty\">No commands in this section</span>";
+        var linkRows = "";
+        if (item.links && item.links.length) {
+          linkRows = "<section class=\"guide-section\"><h4>Links</h4><ul>" + item.links.map(function (link) {
+            var href = safeUrl(link[1]);
+            return "<li><a class=\"footer-link\" href=\"" + escAttr(href) + "\" target=\"_blank\" rel=\"noreferrer\">" + esc(link[0]) + "</a></li>";
+          }).join("") + "</ul></section>";
+        }
+
+        return "<article class=\"guide-card guide-scroll-card\" id=\"guide-product-" + idx + "\">"
+          + "<h3>" + esc(item.name) + "</h3>"
+          + "<div class=\"copy-row\">"
+          + "<button type=\"button\" class=\"copy-btn\" data-action=\"req\" data-index=\"" + idx + "\">Copy Requirements</button>"
+          + "<button type=\"button\" class=\"copy-btn\" data-action=\"fix\" data-index=\"" + idx + "\">Copy Fixes</button>"
+          + "<button type=\"button\" class=\"copy-btn\" data-action=\"cmd\" data-index=\"" + idx + "\">Copy Commands</button>"
+          + "<button type=\"button\" class=\"copy-btn\" data-action=\"links\" data-index=\"" + idx + "\">Copy Links</button>"
+          + "<button type=\"button\" class=\"copy-btn\" data-action=\"all\" data-index=\"" + idx + "\">Copy Full Card</button>"
+          + "</div>"
+          + "<section class=\"guide-section\"><h4>Requirements</h4><div class=\"spec-table\">" + specRows + "</div></section>"
+          + "<section class=\"guide-section\"><h4>Important Fixes / Notes</h4><ul>" + noteRows + "</ul></section>"
+          + "<section class=\"guide-section\"><h4>Commands</h4><div class=\"cmd-row\">" + commandButtons + "</div></section>"
+          + linkRows
+          + "</article>";
+      }).join("");
+
+      lineEl.textContent = filtered.length + " products shown";
+      renderNavList();
     }
 
     function applySearch() {
@@ -938,34 +909,61 @@
         return !q || text.indexOf(q) !== -1 || (normalizedQuery && normalizedText.indexOf(normalizedQuery) !== -1);
       });
       current = 0;
-      renderSelect();
-      renderCard();
+      renderCards();
       updateFullTextSearch(q, normalizedQuery);
     }
 
     searchEl.addEventListener("input", applySearch);
-    selectEl.addEventListener("change", function () {
-      current = Number(selectEl.value) || 0;
-      renderCard();
-    });
 
     productListEl.addEventListener("click", function (event) {
       var target = event.target;
       if (!target || !target.dataset.index) return;
       current = Number(target.dataset.index) || 0;
-      renderCard();
+      var active = productListEl.querySelector(".guide-nav-item.active");
+      if (active) active.classList.remove("active");
+      target.classList.add("active");
+      var section = document.getElementById("guide-product-" + current);
+      if (section) section.scrollIntoView({ behavior: "smooth", block: "start" });
     });
 
     prevBtn.addEventListener("click", function () {
       if (!filtered.length) return;
       current = (current - 1 + filtered.length) % filtered.length;
-      renderCard();
+      var section = document.getElementById("guide-product-" + current);
+      if (section) section.scrollIntoView({ behavior: "smooth", block: "start" });
+      var active = productListEl.querySelector(".guide-nav-item.active");
+      if (active) active.classList.remove("active");
+      var btn = productListEl.querySelector("[data-index='" + current + "']");
+      if (btn) btn.classList.add("active");
     });
 
     nextBtn.addEventListener("click", function () {
       if (!filtered.length) return;
       current = (current + 1) % filtered.length;
-      renderCard();
+      var section = document.getElementById("guide-product-" + current);
+      if (section) section.scrollIntoView({ behavior: "smooth", block: "start" });
+      var active = productListEl.querySelector(".guide-nav-item.active");
+      if (active) active.classList.remove("active");
+      var btn = productListEl.querySelector("[data-index='" + current + "']");
+      if (btn) btn.classList.add("active");
+    });
+
+    cardEl.addEventListener("click", function (event) {
+      var t = event.target;
+      if (!t) return;
+      if (t.classList.contains("cmd-chip")) {
+        copyText(t.getAttribute("data-cmd"), "Command");
+        return;
+      }
+      var action = t.getAttribute("data-action");
+      var idx = Number(t.getAttribute("data-index"));
+      if (!action || Number.isNaN(idx) || !filtered[idx]) return;
+      var bundle = buildCardBundle(filtered[idx]);
+      if (action === "req") copyText(bundle.requirementsText, "Requirements");
+      if (action === "fix") copyText(bundle.fixesText, "Fixes");
+      if (action === "cmd") copyText(bundle.commands.join("\n"), "Commands");
+      if (action === "links") copyText(bundle.linksText || "(none)", "Links");
+      if (action === "all") copyText(bundle.fullCardText, "Full card");
     });
 
     copyAllDataBtn.addEventListener("click", function () {
@@ -976,8 +974,7 @@
       copyText(fullSlidesText || "", "Full slide text");
     });
 
-    renderSelect();
-    renderCard();
+    renderCards();
     loadFullSlidesText();
   })();
   </script>

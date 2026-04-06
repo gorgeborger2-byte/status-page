@@ -1175,11 +1175,19 @@ body.compact-page .footer {
 
 .single-guide-card {
   margin-top: 0.2rem;
-  flex: 1;
-  min-height: 0;
-  overflow: auto;
+  flex: none;
+  min-height: auto;
+  overflow: visible;
   background: linear-gradient(160deg, #2a253b, #1f1b2d);
   border: 1px solid rgba(156, 137, 192, 0.26);
+}
+
+.guide-scroll-card {
+  margin-bottom: 0.9rem;
+}
+
+.guide-scroll-card:last-child {
+  margin-bottom: 0;
 }
 
 .full-slides {
