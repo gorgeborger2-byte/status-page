@@ -1,126 +1,132 @@
 {
   "source": "https://support.cosmotickets.com/status/status.php",
-  "fetchedAt": "2026-04-08T20:27:16.115Z",
-  "lastUpdated": "Last Updated: April 8, 2026 - 10:21 PM",
+  "fetchedAt": "2026-04-08T21:08:16.442Z",
+  "lastUpdated": "Last Updated: April 8, 2026 - 11:06 PM",
   "counts": {
-    "total": 40,
+    "total": 41,
     "updating": 38,
-    "testing": 2
+    "testing": 3
   },
   "items": [
     {
       "brand": "AstroZoom",
       "game": "ARC Raiders",
       "status": "Updating",
-      "updated": "Apr 8, 2026 10:16 PM"
+      "updated": "Apr 8, 2026 11:06 PM"
     },
     {
       "brand": "AstroZoom",
       "game": "Call of Duty",
       "status": "Updating",
-      "updated": "Apr 8, 2026 10:16 PM"
+      "updated": "Apr 8, 2026 11:06 PM"
     },
     {
       "brand": "AstroZoom",
       "game": "Delta Force",
       "status": "Updating",
-      "updated": "Apr 8, 2026 10:16 PM"
+      "updated": "Apr 8, 2026 11:06 PM"
     },
     {
       "brand": "AstroZoom",
       "game": "Rust",
       "status": "Updating",
-      "updated": "Apr 8, 2026 10:16 PM"
+      "updated": "Apr 8, 2026 11:06 PM"
     },
     {
       "brand": "Athena",
       "game": "PUBG",
       "status": "Updating",
-      "updated": "Apr 8, 2026 10:16 PM"
+      "updated": "Apr 8, 2026 11:06 PM"
     },
     {
       "brand": "Atlas",
       "game": "ARC Raiders",
       "status": "Updating",
-      "updated": "Apr 8, 2026 10:16 PM"
+      "updated": "Apr 8, 2026 11:06 PM"
     },
     {
       "brand": "Forge",
       "game": "Apex-Full",
       "status": "Updating",
-      "updated": "Apr 8, 2026 10:16 PM"
+      "updated": "Apr 8, 2026 11:06 PM"
     },
     {
       "brand": "Forge",
       "game": "Apex-Lite",
       "status": "Updating",
-      "updated": "Apr 8, 2026 10:16 PM"
+      "updated": "Apr 8, 2026 11:06 PM"
     },
     {
       "brand": "Forge",
       "game": "BF6",
       "status": "Updating",
-      "updated": "Apr 8, 2026 10:16 PM"
+      "updated": "Apr 8, 2026 11:06 PM"
+    },
+    {
+      "brand": "Forge",
+      "game": "DayZ",
+      "status": "Updating",
+      "updated": "Apr 8, 2026 11:06 PM"
     },
     {
       "brand": "Forge",
       "game": "EFT-Full",
       "status": "Updating",
-      "updated": "Apr 8, 2026 10:16 PM"
+      "updated": "Apr 8, 2026 11:06 PM"
     },
     {
       "brand": "Forge",
       "game": "EFT-Lite",
       "status": "Updating",
-      "updated": "Apr 8, 2026 10:16 PM"
+      "updated": "Apr 8, 2026 11:06 PM"
     },
     {
       "brand": "Forge",
       "game": "Fortnite",
       "status": "Updating",
-      "updated": "Apr 8, 2026 10:16 PM"
+      "updated": "Apr 8, 2026 11:06 PM"
     },
     {
       "brand": "Forge",
       "game": "Rust",
       "status": "Updating",
-      "updated": "Apr 8, 2026 10:16 PM"
+      "updated": "Apr 8, 2026 11:06 PM"
     },
     {
       "brand": "Hero",
       "game": "Apex Legends",
       "status": "Updating",
-      "updated": "Apr 8, 2026 10:21 PM"
+      "updated": "Apr 8, 2026 10:54 PM"
     },
     {
       "brand": "Hero",
       "game": "ARC Raiders",
       "status": "Updating",
-      "updated": "Apr 8, 2026 10:21 PM"
+      "updated": "Apr 8, 2026 10:54 PM"
     },
     {
       "brand": "Hero",
       "game": "Delta Force",
       "status": "Updating",
-      "updated": "Apr 8, 2026 10:21 PM"
+      "updated": "Apr 8, 2026 10:54 PM"
     },
     {
       "brand": "Hero",
       "game": "EFT Full",
       "status": "Updating",
-      "updated": "Apr 8, 2026 10:16 PM"
+      "updated": "Apr 8, 2026 11:06 PM"
     },
     {
       "brand": "Hero",
       "game": "Rainbow Six Siege: Full",
       "status": "Updating",
-      "updated": "Apr 8, 2026 10:21 PM"
+      "updated": "Apr 8, 2026 10:54 PM"
     },
     {
       "brand": "Hero",
       "game": "Rainbow Six Siege: Lite",
       "status": "Updating",
-      "updated": "Apr 8, 2026 10:21 PM"
+      "updated": "Apr 8, 2026 10:54 PM"
     },
     {
       "brand": "Kane",
@@ -197,38 +203,38 @@
     {
       "brand": "Liquid",
       "game": "PUBG",
-      "status": "Updating",
-      "updated": "Apr 8, 2026 11:35 AM"
+      "status": "Testing",
+      "updated": "Apr 8, 2026 10:43 PM"
     },
     {
       "brand": "Pulse",
       "game": "ARC Raiders",
       "status": "Updating",
-      "updated": "Apr 8, 2026 10:16 PM"
+      "updated": "Apr 8, 2026 11:06 PM"
     },
     {
       "brand": "Vex",
       "game": "EAC Spoofer",
       "status": "Updating",
-      "updated": "Apr 8, 2026 10:16 PM"
+      "updated": "Apr 8, 2026 11:06 PM"
     },
     {
       "brand": "Viper",
       "game": "Arena Breakout Infinite",
       "status": "Updating",
-      "updated": "Apr 8, 2026 10:16 PM"
+      "updated": "Apr 8, 2026 11:06 PM"
     },
     {
       "brand": "Viper",
       "game": "Battlefield™ 6",
       "status": "Updating",
-      "updated": "Apr 8, 2026 10:16 PM"
+      "updated": "Apr 8, 2026 11:06 PM"
     },
     {
       "brand": "Viper",
       "game": "Beasts of Bermuda",
       "status": "Updating",
-      "updated": "Apr 8, 2026 10:16 PM"
+      "updated": "Apr 8, 2026 11:06 PM"
     },
     {
       "brand": "Viper",
@@ -240,13 +246,13 @@
       "brand": "Viper",
       "game": "Escape From Tarkov",
       "status": "Updating",
-      "updated": "Apr 8, 2026 10:16 PM"
+      "updated": "Apr 8, 2026 11:06 PM"
     },
     {
       "brand": "Viper",
       "game": "Marathon",
       "status": "Updating",
-      "updated": "Apr 8, 2026 10:16 PM"
+      "updated": "Apr 8, 2026 11:06 PM"
     }
   ]
 }
